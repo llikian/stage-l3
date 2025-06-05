@@ -17,11 +17,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(SOURCES
         src/main.cpp
 
-        # Classes
-
-
-        # Other Sources
-
+        src/Window.cpp
 
         # Libraries
         lib/glad/src/glad.c
