@@ -24,14 +24,19 @@ public:
     Window(const std::string& window_name, void* user_pointer);
 
     /**
+     * @brief Destroys the GLFW window and terminates GLFW.
+     */
+    ~Window();
+
+    /**
      * @brief Conversion operator to allow to use the Window as if it were the underlying GLFWwindow.
      */
-    operator GLFWwindow*() const;
+    inline operator GLFWwindow*() const;
 
     /**
      * @return The GLFW window pointer.
      */
-    GLFWwindow* get_GLFW_window() const;
+    inline GLFWwindow* get_GLFW_window() const;
 
     /**
      * @return The width of the window.

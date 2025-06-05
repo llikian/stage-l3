@@ -140,6 +140,11 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, magenta);
 }
 
+Window::~Window() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
 Window::operator GLFWwindow*() const {
     return window;
 }
