@@ -24,18 +24,24 @@ set(SOURCES
 
 
         # Libraries
-
+        lib/glad/src/glad.c
 )
 
 set(INCLUDES
         include
 
         # Libraries
-
+        lib/glad/include
 )
 
 set(LIBRARIES
-
+        glfw
+        dl
+        pthread
+        X11
+        Xxf86vm
+        Xrandr
+        Xi
 )
 
 # Executable
