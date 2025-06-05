@@ -31,7 +31,7 @@ public:
     /**
      * @brief Conversion operator to allow to use the Window as if it were the underlying GLFWwindow.
      */
-    inline operator GLFWwindow*() const;
+    operator GLFWwindow*() const;
 
     /**
      * @return The GLFW window pointer.
