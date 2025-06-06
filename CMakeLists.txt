@@ -18,6 +18,7 @@ set(SOURCES
         src/main.cpp
 
         src/Application.cpp
+        src/callbacks.cpp
         src/EventHandler.cpp
         src/Window.cpp
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "callbacks.hpp"
 #include "EventHandler.hpp"
 #include "Window.hpp"
 
@@ -24,18 +25,7 @@ public:
      */
     void run();
 
-    /**
-     * @brief
-    *  @param window The window that received the event.
-    *  @param key The keyboard key that was pressed or released.
-    *  @param scancode The system-specific scancode of the key.
-    *  @param action `GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`.
-    *  @param mods Bit field describing which [modifier keys](@ref mods) were held down.
-    */
-    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
     EventHandler event_handler; ///< Event handler. Handles key events.
 private:
     Window window; ///< Contains GLFW window.
-
 };
