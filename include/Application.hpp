@@ -8,6 +8,7 @@
 #include "EventHandler.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
+#include "maths/mat4.hpp"
 
 /**
  * @class Application
@@ -30,4 +31,6 @@ private:
     Window window; ///< Contains GLFW window.
 
     Shader shader;
+
+    mat4 projection;
 };
