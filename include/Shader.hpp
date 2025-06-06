@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <string>
 #include <unordered_map>
 
@@ -18,11 +19,10 @@ public:
     /**
      * @brief Creates a shader program and compiles then attaches the shaders at the specified paths
      * to it.
-     * @param paths The paths to each of the different shaders.
-     * @param shaders_count The amount of shaders to attach.
+     * @param paths_list The paths to each of the different shaders.
      * @param shader_program_name The name of the shader program.
      */
-    Shader(const std::string paths[], unsigned int shaders_count, const std::string& shader_program_name);
+    Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name);
 
     /**
      * @brief Deletes the shader program.

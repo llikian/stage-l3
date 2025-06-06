@@ -9,12 +9,12 @@
 #include <sstream>
 #include <glad/glad.h>
 
-Shader::Shader(const std::string paths[], unsigned int shaders_count, const std::string& shader_program_name = "")
+Shader::Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name = "")
     : id(glCreateProgram()),
       name(shader_program_name.empty() ? "shader" + std::to_string(id) : shader_program_name) {
     /* ---- Shaders ---- */
-    for(unsigned int i = 0 ; i < shaders_count ; ++i) {
-        unsigned int shader_id = compileShader(paths[i]);
+    for(const std::string& path : paths_list) {
+        unsigned int shader_id = compileShader(path);
         glAttachShader(id, shader_id);
         glDeleteShader(shader_id);
     }
