@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.26)
 project(stage-l3)
 
 # Find packages
-
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
