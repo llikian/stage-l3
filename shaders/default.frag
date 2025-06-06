@@ -16,5 +16,5 @@ void main() {
     float ambient = 0.2f;
     float diffuse = max(dot(normalize(normal), normalize(LIGHT_POS)), 0.0f);
 
-    fragColor = vec4((ambient + diffuse) * LIGHT_COLOR , 1.0f);
+    fragColor = vec4((ambient + diffuse) * LIGHT_COLOR, 1.0f);
 }
