@@ -5,6 +5,8 @@
 
 #include "Window.hpp"
 
+#include <glad/glad.h>
+
 static void glfw_error_callback(int code, const char* message) {
     std::cerr << "GLFW Error '" << code << "' : " << message << '\n';
 }
@@ -134,7 +136,7 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glDebugMessageCallback(opengl_error_callback, user_pointer);
 
     // Sets the default texture to a plain magenta color
-    constexpr unsigned char magenta[3]{ 255, 255, 255 };
+    constexpr unsigned char magenta[3]{ 255, 0, 255 };
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, magenta);
@@ -163,4 +165,9 @@ int Window::get_height() const {
 
 float Window::get_size_ratio() const {
     return static_cast<float>(width) / static_cast<float>(height);
+}
+
+void Window::update_size(int width, int height) {
+    this->width = width;
+    this->height = height;
 }

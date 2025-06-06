@@ -5,9 +5,10 @@
 
 #pragma once
 
+#define GLFW_INCLUDE_NONE
+
 #include <iostream>
 #include <string>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 /**
@@ -53,6 +54,13 @@ public:
      * @return The window's width divided by its height.
      */
     inline float get_size_ratio() const;
+
+    /**
+     * @brief Updates the size of the window.
+     * @param width The window's current width.
+     * @param height The window's current height.
+     */
+    void update_size(int width, int height);
 
 private:
     GLFWwindow* window; ///< The GLFW window pointer.
