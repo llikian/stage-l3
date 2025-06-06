@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "callbacks.hpp"
 #include "EventHandler.hpp"
 #include "Window.hpp"
 
