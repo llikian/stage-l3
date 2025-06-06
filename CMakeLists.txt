@@ -23,6 +23,16 @@ set(SOURCES
         src/Shader.cpp
         src/Window.cpp
 
+        # Maths Module
+        src/maths/geometry.cpp
+        src/maths/mat3.cpp
+        src/maths/mat4.cpp
+        src/maths/transforms.cpp
+        src/maths/trigonometry.cpp
+        src/maths/vec2.cpp
+        src/maths/vec3.cpp
+        src/maths/vec4.cpp
+
         # Libraries
         lib/glad/src/glad.c
 )
