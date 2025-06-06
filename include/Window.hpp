@@ -37,23 +37,23 @@ public:
     /**
      * @return The GLFW window pointer.
      */
-    inline GLFWwindow* get_GLFW_window() const;
+    GLFWwindow* get_GLFW_window() const;
 
     /**
      * @return The width of the window.
      */
-    inline int get_width() const;
+    int get_width() const;
 
     /**
      * @return The height of the window.
      */
-    inline int get_height() const;
+    int get_height() const;
 
     /**
      * @brief Returns the window's size ratio.
      * @return The window's width divided by its height.
      */
-    inline float get_size_ratio() const;
+    float get_size_ratio() const;
 
     /**
      * @brief Updates the size of the window.
