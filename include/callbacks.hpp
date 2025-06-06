@@ -15,7 +15,7 @@ class Application;
  * @param width
  * @param height
  */
-static void window_size_callback(GLFWwindow* window, int width, int height);
+void window_size_callback(GLFWwindow* window, int width, int height);
 
 /**
  * @brief
@@ -23,7 +23,7 @@ static void window_size_callback(GLFWwindow* window, int width, int height);
  * @param width
  * @param height
  */
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 /**
  * @brief Handles what happens when a key is pressed, released or held down.
@@ -33,7 +33,7 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
  * @param action `GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`.
  * @param mods Bit field describing which [modifier keys](@ref mods) were held down.
  */
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 /**
  * @brief
@@ -41,4 +41,4 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
  * @param xPos
  * @param yPos
  */
-static void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
