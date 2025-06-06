@@ -184,3 +184,23 @@ void Shader::set_uniform(int location, float x, float y, float z) {
 void Shader::set_uniform(int location, float x, float y, float z, float w) {
     glUniform4f(location, x, y, z, w);
 }
+
+void Shader::set_uniform(int location, const vec2& vec) {
+    glUniform2fv(location, 1, &vec.x);
+}
+
+void Shader::set_uniform(int location, const vec3& vec) {
+    glUniform3fv(location, 1, &vec.x);
+}
+
+void Shader::set_uniform(int location, const vec4& vec) {
+    glUniform4fv(location, 1, &vec.x);
+}
+
+void Shader::set_uniform(int location, const mat3& matrix) {
+    glUniformMatrix3fv(location, 1, false, &(matrix(0, 0)));
+}
+
+void Shader::set_uniform(int location, const mat4& matrix) {
+    glUniformMatrix4fv(location, 1, false, &(matrix(0, 0)));
+}

@@ -6,8 +6,14 @@
 #pragma once
 
 #include <initializer_list>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include "maths/mat3.hpp"
+#include "maths/mat4.hpp"
+#include "maths/vec2.hpp"
+#include "maths/vec3.hpp"
+#include "maths/vec4.hpp"
 
 /**
  * @class Shader
@@ -59,7 +65,11 @@ public:
      * @param value The new value of the uniform.
      */
     template <typename... Value>
-    void setUniform(const std::string& uniform, Value... value);
+    void set_uniform(const std::string& uniform, Value... value) {
+        try {
+            set_uniform(uniform_locations.at(uniform), value...);
+        } catch(const std::out_of_range&) { }
+    }
 
 private:
     /**
@@ -149,15 +159,43 @@ private:
      */
     static void set_uniform(int location, float x, float y, float z, float w);
 
+    /**
+     * @brief Sets the value of a uniform of type vec2.
+     * @param location The uniform's location.
+     * @param vec The new value of the uniform.
+     */
+    static void set_uniform(int location, const vec2& vec);
+
+    /**
+     * @brief Sets the value of a uniform of type vec3.
+     * @param location The uniform's location.
+     * @param vec The new value of the uniform.
+     */
+    static void set_uniform(int location, const vec3& vec);
+
+    /**
+     * @brief Sets the value of a uniform of type vec4.
+     * @param location The uniform's location.
+     * @param vec The new value of the uniform.
+     */
+    static void set_uniform(int location, const vec4& vec);
+
+    /**
+     * @brief Sets the value of a uniform of type mat3.
+     * @param location The uniform's location.
+     * @param matrix The new value of the uniform.
+     */
+    static void set_uniform(int location, const mat3& matrix);
+
+    /**
+     * @brief Sets the value of a uniform of type mat4.
+     * @param location The uniform's location.
+     * @param matrix The new value of the uniform.
+     */
+    static void set_uniform(int location, const mat4& matrix);
+
     unsigned int id;  ///< The shader program's id.
     std::string name; ///< The shader's name.
 
     std::unordered_map<std::string, int> uniform_locations; ///< Stores location of uniforms.
 };
-
-template <typename... Value>
-void Shader::setUniform(const std::string& uniform, Value... value) {
-    if(uniform.contains(uniform)) {
-        setUniform(uniform_locations.at(uniform), value...);
-    }
-}
