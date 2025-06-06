@@ -38,7 +38,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 /**
  * @brief
  * @param window
- * @param xPos
- * @param yPos
+ * @param position_x
+ * @param position_y
  */
-void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
+void cursor_position_callback(GLFWwindow* window, double position_x, double position_y);

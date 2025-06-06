@@ -27,7 +27,7 @@ void key_callback(GLFWwindow* window, int key, int /* scancode */, int action, i
     }
 }
 
-void cursor_position_callback(GLFWwindow* window, double xPos, double yPos) {
+void cursor_position_callback(GLFWwindow* window, double position_x, double position_y) {
     auto application = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    application->event_handler.handle_cursor_position_event(xPos, yPos);
+    application->event_handler.handle_cursor_position_event(position_x, position_y);
 }
