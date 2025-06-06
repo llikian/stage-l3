@@ -6,6 +6,7 @@
 #pragma once
 
 #include "EventHandler.hpp"
+#include "Shader.hpp"
 #include "Window.hpp"
 
 /**
@@ -27,4 +28,6 @@ public:
     EventHandler event_handler; ///< Event handler. Handles key events.
 private:
     Window window; ///< Contains GLFW window.
+
+    Shader shader;
 };

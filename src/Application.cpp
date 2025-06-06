@@ -9,7 +9,9 @@
 #include "callbacks.hpp"
 
 Application::Application()
-    : event_handler(&window), window("Projet Stage L3", this) {
+    : event_handler(&window),
+      window("Projet Stage L3", this),
+      shader({ "shaders/default.vert", "shaders/default.frag" }, "default") {
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
