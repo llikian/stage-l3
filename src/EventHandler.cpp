@@ -16,7 +16,7 @@ void EventHandler::poll_and_handle_events() {
     glfwPollEvents();
 
     float temp_time = glfwGetTime();
-    delta = time - temp_time;
+    delta = temp_time - time;
     time = temp_time;
 
     // Non Repeatable Keys
@@ -66,7 +66,7 @@ void EventHandler::handle_key_release_event(int key) {
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
     if(active_camera != nullptr) {
-        active_camera->look_around(mouse_position.x - position_x, mouse_position.y - position_y, delta);
+        active_camera->look_around(mouse_position.y - position_y, mouse_position.x - position_x, delta);
     }
 
     mouse_position.x = position_x;
