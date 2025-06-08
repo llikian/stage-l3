@@ -34,6 +34,12 @@ set(SOURCES
         src/maths/vec3.cpp
         src/maths/vec4.cpp
 
+        # Mesh Module
+        src/mesh/LineMesh.cpp
+        src/mesh/Mesh.cpp
+        src/mesh/PointMesh.cpp
+        src/mesh/TriangleMesh.cpp
+
         # Libraries
         lib/glad/src/glad.c
 )
