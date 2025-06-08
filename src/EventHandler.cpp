@@ -10,7 +10,34 @@
 
 EventHandler::EventHandler(Window* window)
     : time(glfwGetTime()), delta(0.0f),
-      window(window), active_camera(nullptr) { }
+      window(window), active_camera(nullptr),
+      is_cursor_visible(false) {
+    associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(*this->window, true); });
+    associate_action_to_key(GLFW_KEY_TAB, false, [this] {
+        glfwSetInputMode(*this->window, GLFW_CURSOR, is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        is_cursor_visible = !is_cursor_visible;
+    });
+
+    /* ---- Camera ---- */
+    associate_action_to_key(GLFW_KEY_W, true, [this] {
+        active_camera->move_around(MovementDirection::FORWARD, delta);
+    });
+    associate_action_to_key(GLFW_KEY_A, true, [this] {
+        active_camera->move_around(MovementDirection::LEFT, delta);
+    });
+    associate_action_to_key(GLFW_KEY_S, true, [this] {
+        active_camera->move_around(MovementDirection::BACKWARD, delta);
+    });
+    associate_action_to_key(GLFW_KEY_D, true, [this] {
+        active_camera->move_around(MovementDirection::RIGHT, delta);
+    });
+    associate_action_to_key(GLFW_KEY_SPACE, true, [this] {
+        active_camera->move_around(MovementDirection::UPWARD, delta);
+    });
+    associate_action_to_key(GLFW_KEY_LEFT_SHIFT, true, [this] {
+        active_camera->move_around(MovementDirection::DOWNWARD, delta);
+    });
+}
 
 void EventHandler::poll_and_handle_events() {
     glfwPollEvents();
@@ -69,7 +96,7 @@ void EventHandler::handle_key_release_event(int key) {
 }
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
-    if(active_camera != nullptr) {
+    if(!is_cursor_visible && active_camera != nullptr) {
         active_camera->look_around(position_y - mouse_position.y, position_x - mouse_position.x);
     }
 

@@ -48,4 +48,6 @@ private:
 
     Window* window;
     Camera* active_camera;
+
+    bool is_cursor_visible;
 };

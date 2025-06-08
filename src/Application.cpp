@@ -26,27 +26,6 @@ Application::Application()
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
 
-    event_handler.associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(window, true); });
-
-    event_handler.associate_action_to_key(GLFW_KEY_W, true, [this] {
-        camera.move_around(MovementDirection::FORWARD, event_handler.get_delta());
-    });
-    event_handler.associate_action_to_key(GLFW_KEY_A, true, [this] {
-        camera.move_around(MovementDirection::LEFT, event_handler.get_delta());
-    });
-    event_handler.associate_action_to_key(GLFW_KEY_S, true, [this] {
-        camera.move_around(MovementDirection::BACKWARD, event_handler.get_delta());
-    });
-    event_handler.associate_action_to_key(GLFW_KEY_D, true, [this] {
-        camera.move_around(MovementDirection::RIGHT, event_handler.get_delta());
-    });
-    event_handler.associate_action_to_key(GLFW_KEY_SPACE, true, [this] {
-        camera.move_around(MovementDirection::UPWARD, event_handler.get_delta());
-    });
-    event_handler.associate_action_to_key(GLFW_KEY_LEFT_SHIFT, true, [this] {
-        camera.move_around(MovementDirection::DOWNWARD, event_handler.get_delta());
-    });
-
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
 }
