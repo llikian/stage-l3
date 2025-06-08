@@ -92,8 +92,7 @@ void Application::run() {
 
         shader.use();
 
-        update_mvp(translate_z(-5.0f) * rotate_y(45));
-
+        update_mvp(translate_z(-5.0f));
         cube.draw();
 
         glfwSwapBuffers(window);
@@ -101,7 +100,6 @@ void Application::run() {
 }
 
 void Application::update_mvp(const mat4& model) const {
-    mat4 mvp = projection * camera.get_view_matrix() * model;
-    shader.set_uniform("mvp", mvp);
-    shader.set_uniform("normalModel", transpose_inverse(mvp));
+    shader.set_uniform("mvp", projection * camera.get_view_matrix() * model);
+    shader.set_uniform("normalModel", transpose_inverse(model));
 }
