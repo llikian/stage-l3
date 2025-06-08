@@ -21,8 +21,12 @@ void EventHandler::poll_and_handle_events() {
 
     // Non Repeatable Keys
     while(!pressed_keys.empty()) {
-        key_actions[pressed_keys.front()]();
+        int key = pressed_keys.front();
         pressed_keys.pop();
+
+        if(key_actions.contains(key)) {
+            key_actions[key]();
+        }
     }
 
     // Repeatable Keys
@@ -66,7 +70,7 @@ void EventHandler::handle_key_release_event(int key) {
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
     if(active_camera != nullptr) {
-        active_camera->look_around(mouse_position.y - position_y, mouse_position.x - position_x, delta);
+        active_camera->look_around(position_y - mouse_position.y, position_x - mouse_position.x);
     }
 
     mouse_position.x = position_x;
