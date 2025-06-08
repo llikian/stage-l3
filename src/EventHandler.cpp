@@ -12,6 +12,10 @@ EventHandler::EventHandler(Window* window, Camera* camera)
     : time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
       is_cursor_visible(false) {
+    if(camera == nullptr) {
+        throw std::runtime_error("Cannot set active_camera to nullptr");
+    }
+
     associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(*this->window, true); });
     associate_action_to_key(GLFW_KEY_TAB, false, [this] {
         glfwSetInputMode(*this->window, GLFW_CURSOR, is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
@@ -70,7 +74,11 @@ void EventHandler::associate_action_to_key(int key, bool repeatable, Action acti
 }
 
 void EventHandler::set_active_camera(Camera* camera) {
-    active_camera = camera;
+    if(camera == nullptr) {
+        std::cerr << "WARNING : Cannot change active_camera to nullptr.\n";
+    } else {
+        active_camera = camera;
+    }
 }
 
 void EventHandler::handle_window_size_event(int width, int height) {

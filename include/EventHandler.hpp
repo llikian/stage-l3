@@ -20,7 +20,7 @@ using Action = std::function<void()>;
  */
 class EventHandler {
 public:
-    explicit EventHandler(Window* window, Camera* camera);
+    EventHandler(Window* window, Camera* camera);
 
     void poll_and_handle_events();
 
