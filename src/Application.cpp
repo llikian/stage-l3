@@ -13,7 +13,7 @@
 #include "mesh/TriangleMesh.hpp"
 
 Application::Application()
-    : event_handler(&window),
+    : event_handler(&window, &camera),
       window("Projet Stage L3", this),
       shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
       projection(perspective(M_PI_4f, window.get_size_ratio(), 0.1f, 100.0f)),

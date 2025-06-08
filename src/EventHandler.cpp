@@ -8,9 +8,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-EventHandler::EventHandler(Window* window)
+EventHandler::EventHandler(Window* window, Camera* camera)
     : time(glfwGetTime()), delta(0.0f),
-      window(window), active_camera(nullptr),
+      window(window), active_camera(camera),
       is_cursor_visible(false) {
     associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(*this->window, true); });
     associate_action_to_key(GLFW_KEY_TAB, false, [this] {
@@ -96,7 +96,7 @@ void EventHandler::handle_key_release_event(int key) {
 }
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
-    if(!is_cursor_visible && active_camera != nullptr) {
+    if(!is_cursor_visible) {
         active_camera->look_around(position_y - mouse_position.y, position_x - mouse_position.x);
     }
 
