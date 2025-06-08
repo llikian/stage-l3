@@ -9,6 +9,7 @@
 #include <queue>
 #include <unordered_map>
 #include "Window.hpp"
+#include "maths/vec2.hpp"
 
 using Action = std::function<void()>;
 
@@ -35,8 +36,7 @@ private:
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
     std::unordered_map<int, bool> repeatable_keys; ///< Stores repeatable keys and whether they are active.
 
-    float mouse_position_x;
-    float mouse_position_y;
+    vec2 mouse_position;
 
     Window* window;
 };

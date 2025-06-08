@@ -55,6 +55,6 @@ void EventHandler::handle_key_release_event(int key) {
 }
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
-    mouse_position_x = position_x;
-    mouse_position_y = position_y;
+    mouse_position.x = position_x;
+    mouse_position.y = position_y;
 }
