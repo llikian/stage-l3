@@ -16,7 +16,8 @@ Application::Application()
     : event_handler(&window),
       window("Projet Stage L3", this),
       shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
-      projection(perspective(M_PI_4f, window.get_size_ratio(), 0.1f, 100.0f)) {
+      projection(perspective(M_PI_4f, window.get_size_ratio(), 0.1f, 100.0f)),
+      camera(vec3(0.0f, 0.0f, 0.0f)) {
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
@@ -24,7 +25,25 @@ Application::Application()
 
     /* ---- Event Actions ---- */
     event_handler.associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(window, true); });
-    // event_handler.set_window_size_action([this](int width, int height) { window.update_size(width, height); });
+
+    event_handler.associate_action_to_key(GLFW_KEY_W, true, [this] {
+        camera.move_around(MovementDirection::FORWARD, event_handler.get_delta());
+    });
+    event_handler.associate_action_to_key(GLFW_KEY_A, true, [this] {
+        camera.move_around(MovementDirection::LEFT, event_handler.get_delta());
+    });
+    event_handler.associate_action_to_key(GLFW_KEY_S, true, [this] {
+        camera.move_around(MovementDirection::BACKWARD, event_handler.get_delta());
+    });
+    event_handler.associate_action_to_key(GLFW_KEY_D, true, [this] {
+        camera.move_around(MovementDirection::RIGHT, event_handler.get_delta());
+    });
+    event_handler.associate_action_to_key(GLFW_KEY_SPACE, true, [this] {
+        camera.move_around(MovementDirection::UPWARD, event_handler.get_delta());
+    });
+    event_handler.associate_action_to_key(GLFW_KEY_LEFT_SHIFT, true, [this] {
+        camera.move_around(MovementDirection::DOWNWARD, event_handler.get_delta());
+    });
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
@@ -71,12 +90,16 @@ void Application::run() {
 
         shader.use();
 
-        mat4 mvp = projection * translate_z(-5.0f) * rotate_y(45);
-        shader.set_uniform("mvp", mvp);
-        shader.set_uniform("normalModel", transpose_inverse(mvp));
+        update_mvp(translate_z(-5.0f) * rotate_y(45));
 
         cube.draw();
 
         glfwSwapBuffers(window);
     }
+}
+
+void Application::update_mvp(const mat4& model) const {
+    mat4 mvp = projection * camera.get_view_matrix() * model;
+    shader.set_uniform("mvp", mvp);
+    shader.set_uniform("normalModel", transpose_inverse(mvp));
 }

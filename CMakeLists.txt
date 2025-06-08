@@ -20,6 +20,7 @@ set(SOURCES
 
         src/Application.cpp
         src/callbacks.cpp
+        src/Camera.cpp
         src/EventHandler.cpp
         src/Shader.cpp
         src/Window.cpp

@@ -8,6 +8,7 @@
 #include <functional>
 #include <queue>
 #include <unordered_map>
+#include "Camera.hpp"
 #include "Window.hpp"
 #include "maths/vec2.hpp"
 
@@ -31,6 +32,9 @@ public:
     void handle_key_release_event(int key);
     void handle_cursor_position_event(int position_x, int position_y);
 
+    float get_time() const;
+    float get_delta() const;
+
 private:
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
@@ -38,5 +42,9 @@ private:
 
     vec2 mouse_position;
 
+    float time;
+    float delta;
+
     Window* window;
+    Camera* active_camera;
 };

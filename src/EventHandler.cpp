@@ -8,10 +8,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-EventHandler::EventHandler(Window* window): window(window) { }
+EventHandler::EventHandler(Window* window)
+    : time(glfwGetTime()), delta(0.0f),
+      window(window), active_camera(nullptr) { }
 
 void EventHandler::poll_and_handle_events() {
     glfwPollEvents();
+
+    float temp_time = glfwGetTime();
+    delta = time - temp_time;
+    time = temp_time;
 
     // Non Repeatable Keys
     while(!pressed_keys.empty()) {
@@ -55,6 +61,18 @@ void EventHandler::handle_key_release_event(int key) {
 }
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
+    if(active_camera != nullptr) {
+        active_camera->look_around(mouse_position.x - position_x, mouse_position.y - position_y, delta);
+    }
+
     mouse_position.x = position_x;
     mouse_position.y = position_y;
+}
+
+float EventHandler::get_time() const {
+    return time;
+}
+
+float EventHandler::get_delta() const {
+    return delta;
 }
