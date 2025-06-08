@@ -9,7 +9,8 @@
 #include <GLFW/glfw3.h>
 
 EventHandler::EventHandler(Window* window, Camera* camera)
-    : time(glfwGetTime()), delta(0.0f),
+    : mouse_position(window->get_width() / 2.0f, window->get_height() / 2.0f),
+      time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
       is_cursor_visible(false) {
     if(camera == nullptr) {

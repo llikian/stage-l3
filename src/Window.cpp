@@ -121,6 +121,7 @@ Window::Window(const std::string& window_name, void* user_pointer)
 
     glfwMaximizeWindow(window);
     glfwGetWindowSize(window, &width, &height);
+    glfwSetCursorPos(window, width / 2.0f, height / 2.0f);
 
     /* ---- GLAD ---- */
     if(!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
