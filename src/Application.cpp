@@ -10,6 +10,7 @@
 #include "callbacks.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
+#include "mesh/TriangleMesh.hpp"
 
 Application::Application()
     : event_handler(&window),
@@ -41,23 +42,20 @@ void Application::run() {
         vec3(-1.0f, -1.0f, -1.0f)
     };
 
-    std::vector<vec3> mesh_data;
+    TriangleMesh cube;
 
-    auto add_face = [&cube_positions, &mesh_data](unsigned int A, unsigned int B, unsigned int C, unsigned int D,
-                                                  const vec3& normal) {
-        mesh_data.push_back(cube_positions[A]);
-        mesh_data.push_back(normal);
-        mesh_data.push_back(cube_positions[B]);
-        mesh_data.push_back(normal);
-        mesh_data.push_back(cube_positions[D]);
-        mesh_data.push_back(normal);
+    auto add_face = [&cube_positions, &cube](unsigned int A, // TOP LEFT
+                                             unsigned int B, // BOTTOM LEFT
+                                             unsigned int C, // BOTTOM RIGHT
+                                             unsigned int D, // TOP RIGHT
+                                             const vec3& normal) {
+        cube.addVertex(cube_positions[A], normal, vec2(0.0f, 1.0f));
+        cube.addVertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
+        cube.addVertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
 
-        mesh_data.push_back(cube_positions[B]);
-        mesh_data.push_back(normal);
-        mesh_data.push_back(cube_positions[C]);
-        mesh_data.push_back(normal);
-        mesh_data.push_back(cube_positions[D]);
-        mesh_data.push_back(normal);
+        cube.addVertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
+        cube.addVertex(cube_positions[C], normal, vec2(1.0f, 0.0f));
+        cube.addVertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
     };
 
     add_face(0, 2, 3, 1, vec3(1.0f, 0.0f, 0.0f));
@@ -66,23 +64,6 @@ void Application::run() {
     add_face(3, 2, 6, 7, vec3(0.0f, -1.0f, 0.0f));
     add_face(4, 6, 2, 0, vec3(0.0f, 0.0f, 1.0f));
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
-
-    unsigned int VAO = 0;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    unsigned int VBO = 0;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, mesh_data.size() * 2 * sizeof(vec3), mesh_data.data(), GL_STATIC_DRAW);
-
-    /* Positions */
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 2 * sizeof(vec3), reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-
-    /* Normals */
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 2 * sizeof(vec3), reinterpret_cast<void*>(sizeof(vec3)));
-    glEnableVertexAttribArray(1);
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
@@ -94,12 +75,8 @@ void Application::run() {
         shader.set_uniform("mvp", mvp);
         shader.set_uniform("normalModel", transpose_inverse(mvp));
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, mesh_data.size());
+        cube.draw();
 
         glfwSwapBuffers(window);
     }
-
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 }
