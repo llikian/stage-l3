@@ -13,8 +13,8 @@
 #include "mesh/TriangleMesh.hpp"
 
 Application::Application()
-    : event_handler(&window, &camera),
-      window("Projet Stage L3", this),
+    : window("Projet Stage L3", this),
+      event_handler(&window, &camera),
       shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
       projection(perspective(M_PI_4f, window.get_size_ratio(), 0.1f, 100.0f)),
       camera(vec3(0.0f, 0.0f, 0.0f)) {
