@@ -14,7 +14,7 @@ Shader::Shader(std::initializer_list<std::string> paths_list, const std::string&
       name(shader_program_name.empty() ? "shader" + std::to_string(id) : shader_program_name) {
     /* ---- Shaders ---- */
     for(const std::string& path : paths_list) {
-        unsigned int shader_id = compileShader(path);
+        unsigned int shader_id = compile_shader(path);
         glAttachShader(id, shader_id);
         glDeleteShader(shader_id);
     }
@@ -40,7 +40,7 @@ Shader::~Shader() {
     glDeleteProgram(id);
 }
 
-unsigned int Shader::compileShader(const std::string& path) {
+unsigned int Shader::compile_shader(const std::string& path) {
     std::string extension = path.substr(path.find_last_of('.') + 1);
 
     std::string shader_type_name;
@@ -107,19 +107,19 @@ void Shader::use() const {
 void Shader::get_uniforms() {
     use();
 
-    int MAX_CHAR;
-    glGetProgramiv(id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &MAX_CHAR);
+    int max_name_length;
+    glGetProgramiv(id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
 
     int length;
     int size;
     unsigned int type;
-    char* uniform_name = new char[MAX_CHAR];
+    char* uniform_name = new char[max_name_length];
 
     int count;
     glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
 
     for(int i = 0 ; i < count ; ++i) {
-        glGetActiveUniform(id, i, MAX_CHAR, &length, &size, &type, uniform_name);
+        glGetActiveUniform(id, i, max_name_length, &length, &size, &type, uniform_name);
 
         if(size == 1) { // Single value
             uniform_locations.emplace(uniform_name, glGetUniformLocation(id, uniform_name));
@@ -137,11 +137,11 @@ void Shader::get_uniforms() {
     delete[] uniform_name;
 }
 
-uint Shader::getID() const {
+uint Shader::get_id() const {
     return id;
 }
 
-std::string Shader::getName() const {
+std::string Shader::get_name() const {
     return name;
 }
 

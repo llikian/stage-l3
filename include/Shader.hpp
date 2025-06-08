@@ -40,7 +40,7 @@ public:
      * @param path The path to the shader file.
      * @return The shader's corresponding id.
      */
-    static unsigned int compileShader(const std::string& path);
+    static unsigned int compile_shader(const std::string& path);
 
     /**
      * @brief Uses the shader program.
@@ -51,13 +51,13 @@ public:
      * @brief Getter for the id of the shader.
      * @return The id of the shader.
      */
-    uint getID() const;
+    uint get_id() const;
 
     /**
      * @brief Getter for the name of the shader.
      * @return The name of the shader.
      */
-    std::string getName() const;
+    std::string get_name() const;
 
     /**
      * @brief Sets the value of a uniform of any of the available types.
