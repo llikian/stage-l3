@@ -14,7 +14,7 @@
 
 Camera::Camera(const vec3& position)
     : position(position),
-      pitch(0.0f), yaw(PIf),
+      pitch(0.0f), yaw(-PIf / 2.0f),
       view_matrix(1.0f) {
     update_vectors_and_view_matrix();
 }
