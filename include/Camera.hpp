@@ -30,12 +30,14 @@ public:
      */
     explicit Camera(const vec3& position);
 
-    void look_around(float pitch_offset, float yaw_offset, float delta);
+    void look_around(float pitch_offset, float yaw_offset);
     void move_around(MovementDirection movement_direction, float delta);
 
     const mat4& get_view_matrix() const;
 
 private:
+    void update_vectors_and_view_matrix();
+
     vec3 position;
     float pitch;
     float yaw;
@@ -45,6 +47,9 @@ private:
     vec3 up;
 
     mat4 view_matrix;
+
+    const float CAMERA_SENSITIVITY{ 0.1f };
+    const float MOVEMENT_SPEED{ 10.0f };
 
     const vec3 WORLD_UP{ 0.0f, 1.0f, 0.0f };
 };
