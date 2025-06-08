@@ -25,6 +25,7 @@ public:
     void poll_and_handle_events();
 
     void associate_action_to_key(int key, bool repeatable, Action action);
+    void set_active_camera(Camera* camera);
 
     void handle_window_size_event(int width, int height);
     void handle_framebuffer_size_event(int width, int height);

@@ -23,7 +23,9 @@ Application::Application()
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
 
-    /* ---- Event Actions ---- */
+    /* ---- Event Handler ---- */
+    event_handler.set_active_camera(&camera);
+
     event_handler.associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(window, true); });
 
     event_handler.associate_action_to_key(GLFW_KEY_W, true, [this] {

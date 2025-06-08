@@ -38,6 +38,10 @@ void EventHandler::associate_action_to_key(int key, bool repeatable, Action acti
     if(repeatable) { repeatable_keys.emplace(key, false); }
 }
 
+void EventHandler::set_active_camera(Camera* camera) {
+    active_camera = camera;
+}
+
 void EventHandler::handle_window_size_event(int width, int height) {
     window->update_size(width, height);
 }
