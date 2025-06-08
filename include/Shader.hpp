@@ -65,7 +65,7 @@ public:
      * @param value The new value of the uniform.
      */
     template <typename... Value>
-    void set_uniform(const std::string& uniform, Value... value) {
+    void set_uniform(const std::string& uniform, Value... value) const {
         try {
             set_uniform(uniform_locations.at(uniform), value...);
         } catch(const std::out_of_range&) { }
