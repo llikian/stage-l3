@@ -16,8 +16,6 @@
  * @brief Core of the project. Assembles everything together and handles the main loop.
  */
 class Application {
-    Window window; ///< Contains GLFW window. Needs to be initialized first.
-
 public:
     /**
      * @brief Constructor.
@@ -29,14 +27,23 @@ public:
      */
     void run();
 
-    EventHandler event_handler; ///< Event handler. Handles key events.
+    /**
+     * @return A reference to the Application's event handler.
+     */
+    EventHandler& get_event_handler();
 
 private:
+    /**
+     * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader.
+     * @param model The model matrix used in the next draw call.
+     */
     void update_mvp(const mat4& model) const;
 
+    Window window; ///< Contains the GLFW window. Needs to be initialized first.
+
     Shader shader;
-
     mat4 projection;
-
     Camera camera;
+
+    EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 };

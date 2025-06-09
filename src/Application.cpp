@@ -78,7 +78,11 @@ void Application::run() {
     }
 }
 
+EventHandler& Application::get_event_handler() {
+    return event_handler;
+}
+
 void Application::update_mvp(const mat4& model) const {
     shader.set_uniform("mvp", projection * camera.get_view_matrix() * model);
-    shader.set_uniform("normalModel", transpose_inverse(model));
+    shader.set_uniform("normals_model_matrix", transpose_inverse(model));
 }
