@@ -53,4 +53,6 @@ private:
     Camera* active_camera;
 
     bool is_cursor_visible;
+    bool is_face_culling_enabled;
+    bool is_wireframe_enabled;
 };

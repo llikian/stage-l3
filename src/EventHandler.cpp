@@ -12,15 +12,25 @@ EventHandler::EventHandler(Window* window, Camera* camera)
     : mouse_position(window->get_width() / 2.0f, window->get_height() / 2.0f),
       time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
-      is_cursor_visible(false) {
+      is_cursor_visible(false), is_face_culling_enabled(true), is_wireframe_enabled(false) {
     if(camera == nullptr) {
         throw std::runtime_error("Cannot set active_camera to nullptr");
     }
 
     associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(*this->window, true); });
+
+    /* ---- Toggles ---- */
     associate_action_to_key(GLFW_KEY_TAB, false, [this] {
         glfwSetInputMode(*this->window, GLFW_CURSOR, is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
         is_cursor_visible = !is_cursor_visible;
+    });
+    associate_action_to_key(GLFW_KEY_C, false, [this] {
+        (is_face_culling_enabled ? glDisable : glEnable)(GL_CULL_FACE);
+        is_face_culling_enabled = !is_face_culling_enabled;
+    });
+    associate_action_to_key(GLFW_KEY_Z, false, [this] {
+        glPolygonMode(GL_FRONT_AND_BACK, is_wireframe_enabled ? GL_FILL : GL_LINE);
+        is_wireframe_enabled = !is_wireframe_enabled;
     });
 
     /* ---- Camera ---- */
