@@ -42,8 +42,11 @@ private:
     Window window; ///< Contains the GLFW window. Needs to be initialized first.
 
     Shader shader;
-    mat4 projection;
     Camera camera;
+
+    float fov;
+    mat4 projection;
+    mat4 view_projection;
 
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 };

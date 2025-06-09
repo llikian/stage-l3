@@ -26,6 +26,7 @@ public:
 
     void associate_action_to_key(int key, bool repeatable, Action action);
     void set_active_camera(Camera* camera);
+    void set_window_size_event_action(const Action& action);
 
     void handle_window_size_event(int width, int height);
     void handle_framebuffer_size_event(int width, int height);
@@ -40,6 +41,8 @@ private:
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
     std::unordered_map<int, bool> repeatable_keys; ///< Stores repeatable keys and whether they are active.
+
+    Action window_size_event_action;
 
     vec2 mouse_position;
 

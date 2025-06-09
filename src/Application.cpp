@@ -14,10 +14,10 @@
 
 Application::Application()
     : window("Projet Stage L3", this),
-      event_handler(&window, &camera),
       shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
-      projection(perspective(M_PI_4f, window.get_size_ratio(), 0.1f, 100.0f)),
-      camera(vec3(0.0f, 0.0f, 0.0f)) {
+      camera(vec3(0.0f, 0.0f, 0.0f)),
+      fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 100.0f)),
+      event_handler(&window, &camera) {
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
@@ -25,6 +25,9 @@ Application::Application()
 
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
+    event_handler.set_window_size_event_action([this] {
+        projection(0, 0) = 1.0f / (window.get_size_ratio() * tanf(0.5f * fov));
+    });
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
@@ -69,10 +72,16 @@ void Application::run() {
         event_handler.poll_and_handle_events();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        view_projection = projection * camera.get_view_matrix();
+
         shader.use();
 
-        update_mvp(translate_z(-5.0f));
-        cube.draw();
+        for(int i = -5 ; i <= 5 ; ++i) {
+            for(int j = -5 ; j <= 5 ; ++j) {
+                update_mvp(translate(i * 3, std::sqrt(i * i + j * j), j * 3));
+                cube.draw();
+            }
+        }
 
         glfwSwapBuffers(window);
     }
@@ -83,6 +92,6 @@ EventHandler& Application::get_event_handler() {
 }
 
 void Application::update_mvp(const mat4& model) const {
-    shader.set_uniform("mvp", projection * camera.get_view_matrix() * model);
+    shader.set_uniform("mvp", view_projection * model);
     shader.set_uniform("normals_model_matrix", transpose_inverse(model));
 }
