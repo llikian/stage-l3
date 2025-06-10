@@ -86,6 +86,13 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
         }
     }
 
+    if(verbose) {
+        std::cout << "Successfully loaded mesh '" << name << "' containing:\n";
+        std::cout << '\t' << positions.size() << " vertex positions.\n";
+        if(!normals.empty()) { std::cout << '\t' << normals.size() - 1 << " normals.\n"; }
+        if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() - 1 << " texture coordinates.\n"; }
+    }
+
     if(vertex_indices.empty()) {
         // TODO : Find out if this is actually possible in obj files. If not it's not an unhandled case but an error.
         throw std::runtime_error("Unhandled case in read_obj_file, no faces.");
@@ -109,11 +116,6 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     }
 
     if(verbose) {
-        std::cout << "Successfully loaded mesh '" << name << "' containing:\n";
-        std::cout << '\t' << positions.size() << " vertex positions.\n";
-        if(!normals.empty()) { std::cout << '\t' << normals.size() - 1 << " normals.\n"; }
-        if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() - 1 << " texture coordinates.\n"; }
-
         size_t indices_amount = mesh.get_indices_amount();
         std::cout << '\t' << "For a total of "
             << (indices_amount == 0 ? mesh.get_vertices_amount() : indices_amount) / 3
