@@ -69,10 +69,17 @@ void Application::run() {
     add_face(4, 6, 2, 0, vec3(0.0f, 0.0f, 1.0f));
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
 
-    TriangleMesh suzanne;
-    read_obj_file("data/suzanne.obj", suzanne, true);
-    TriangleMesh dragon;
-    read_obj_file("data/dragon80k.obj", dragon, true);
+    std::pair<TriangleMesh, mat4> suzanne;
+    read_obj_file("data/suzanne.obj", suzanne.first, true);
+    suzanne.second = translate_z(-5.0f);
+
+    std::pair<TriangleMesh, mat4> dragon;
+    read_obj_file("data/dragon80k.obj", dragon.first, true);
+    dragon.second = scale(10.0f);
+
+    std::pair<TriangleMesh, mat4> sponza;
+    read_obj_file("data/sponza.obj", sponza.first, true);
+    sponza.second = translate_y(-5.0f).scale(0.05f);
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
@@ -89,11 +96,14 @@ void Application::run() {
         //     }
         // }
 
-        // update_mvp(translate_z(-5.0f));
-        // suzanne.draw();
+        update_mvp(suzanne.second);
+        suzanne.first.draw();
 
-        update_mvp(translate_z(-5.0f).scale(10.0f));
-        dragon.draw();
+        update_mvp(dragon.second);
+        dragon.first.draw();
+
+        update_mvp(sponza.second);
+        sponza.first.draw();
 
         glfwSwapBuffers(window);
     }
