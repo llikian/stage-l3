@@ -27,6 +27,7 @@ set(SOURCES
 
         # Maths Module
         src/maths/geometry.cpp
+        src/maths/ivec3.cpp
         src/maths/mat3.cpp
         src/maths/mat4.cpp
         src/maths/transforms.cpp
