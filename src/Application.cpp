@@ -11,6 +11,7 @@
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/TriangleMesh.hpp"
+#include "utility/file_readers.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -68,6 +69,9 @@ void Application::run() {
     add_face(4, 6, 2, 0, vec3(0.0f, 0.0f, 1.0f));
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
 
+    TriangleMesh suzanne;
+    read_obj_file("data/suzanne.obj", suzanne);
+
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,12 +80,15 @@ void Application::run() {
 
         shader.use();
 
-        for(int i = -5 ; i <= 5 ; ++i) {
-            for(int j = -5 ; j <= 5 ; ++j) {
-                update_mvp(translate(i * 3, std::sqrt(i * i + j * j), j * 3));
-                cube.draw();
-            }
-        }
+        // for(int i = -5 ; i <= 5 ; ++i) {
+        //     for(int j = -5 ; j <= 5 ; ++j) {
+        //         update_mvp(translate(i * 3, std::sqrt(i * i + j * j), j * 3));
+        //         cube.draw();
+        //     }
+        // }
+
+        update_mvp(translate_z(-5.0f));
+        suzanne.draw();
 
         glfwSwapBuffers(window);
     }

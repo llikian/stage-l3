@@ -41,6 +41,9 @@ set(SOURCES
         src/mesh/PointMesh.cpp
         src/mesh/TriangleMesh.cpp
 
+        # Utility Module
+        src/utility/file_readers.cpp
+
         # Libraries
         lib/glad/src/glad.c
 )
