@@ -81,9 +81,9 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
                 throw std::runtime_error("Unhandled case in read_obj_file, more than 4 vertices in face.");
             }
         } else if(line[0] == 'o') { // Object Name
-            name = line.substr(2);
+            stream >> name;
         } else if(line[0] == 's') { // Smooth Shading
-            smooth_shading = line[2] == 1;
+            stream >> smooth_shading;
         }
     }
 
