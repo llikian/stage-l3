@@ -40,10 +40,9 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
                 stream >> x >> y >> z;
                 positions.emplace_back(x, y, z);
             } else if(line[1] == 'n') {
-                stream >> x >> y >> z;
-                normals.emplace_back(x, y, z);
+                normals.push_back(normalize(vec3(x, y, z)));
             } else if(line[1] == 't') {
-                stream >> x >> y >> z;
+                stream >> x >> y;
                 tex_coords.emplace_back(x, y);
             }
         } else if(line[0] == 'f') { // Face
@@ -92,6 +91,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
     }
 
     if(vertex_indices.empty()) {
+        // TODO : Find out if this is actually possible in obj files.
         throw std::runtime_error("Unhandled case in read_obj_file, no faces.");
     } else {
         for(int i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
