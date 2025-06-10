@@ -6,7 +6,7 @@
 #include "utility/hash.hpp"
 
 int hash_pair(int x, int y) {
-    return (x + y) * (x + y + 1) / 2;
+    return (x + y) * (x + y + 1) / 2 + y;
 }
 
 int hash_triplet(int x, int y, int z) {
