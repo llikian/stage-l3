@@ -18,12 +18,11 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
 
-    positions.emplace_back(0.0f, 0.0f, 0.0f); // Should not be used. Means there is a problem.
-    normals.emplace_back(0.0f, 0.0f, 0.0f);   // Should not be used. Calculated with cross product.
-    tex_coords.emplace_back(0.0f, 0.0f);
+    normals.emplace_back(0.0f, 0.0f, 0.0f); // When no normal is provided, calculates it with a cross product.
+    tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
     struct VertexIndices {
-        int v, vt, vn;
+        int v, vn, vt;
     };
     std::vector<VertexIndices> vertex_indices;
 
@@ -33,7 +32,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     while(std::getline(file, line)) {
         std::stringstream stream(line);
         std::string buf;
-        stream >> buf; // Get rid of the line's data type specifier (v, vt, vn, f, etc...)
+        stream >> buf; // Get rid of the line's data type specifier (v, vn, vt, f, etc...)
 
         if(line[0] == 'v') {
             stream >> x >> y >> z;
@@ -47,8 +46,8 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
             }
         } else if(line[0] == 'f') { // Face
             int v[4]{ 0, 0, 0, 0 };
-            int vt[4]{ 0, 0, 0, 0 };
             int vn[4]{ 0, 0, 0, 0 };
+            int vt[4]{ 0, 0, 0, 0 };
 
             unsigned int vertices = 0;
 
@@ -59,25 +58,23 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
                     std::sscanf(buf.c_str(), "%d//%d", &v[vertices], &vn[vertices]);
                 } else if(count == 0) {
                     throw std::runtime_error("Format error in .obj file, no vertex attribute.");
-                } else if(count > 3) {
-                    throw std::runtime_error("Format error in .obj file, more than 3 vertex attributes.");
                 }
 
                 ++vertices;
             }
 
             if(vertices == 3) {
-                vertex_indices.emplace_back(v[0], vt[0], vn[0]);
-                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
-                vertex_indices.emplace_back(v[2], vt[2], vn[2]);
+                vertex_indices.emplace_back(v[0] - 1, vn[0], vt[0]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
+                vertex_indices.emplace_back(v[2] - 1, vn[2], vt[2]);
             } else if(vertices == 4) {
-                vertex_indices.emplace_back(v[0], vt[0], vn[0]);
-                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
-                vertex_indices.emplace_back(v[3], vt[3], vn[3]);
+                vertex_indices.emplace_back(v[0] - 1, vn[0], vt[0]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
+                vertex_indices.emplace_back(v[3] - 1, vn[3], vt[3]);
 
-                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
-                vertex_indices.emplace_back(v[2], vt[2], vn[2]);
-                vertex_indices.emplace_back(v[3], vt[3], vn[3]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
+                vertex_indices.emplace_back(v[2] - 1, vn[2], vt[2]);
+                vertex_indices.emplace_back(v[3] - 1, vn[3], vt[3]);
             } else if(vertices < 3) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             } else {
@@ -114,7 +111,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
 
     if(verbose) {
         std::cout << "Successfully loaded mesh '" << name << "' containing:\n";
-        std::cout << '\t' << positions.size() - 1 << " vertex positions.\n";
+        std::cout << '\t' << positions.size() << " vertex positions.\n";
         if(!normals.empty()) { std::cout << '\t' << normals.size() - 1 << " normals.\n"; }
         if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() - 1 << " texture coordinates.\n"; }
         std::cout << '\t' << "For a total of " << vertex_indices.size() / 3 << " triangles.\n";
