@@ -44,7 +44,6 @@ set(SOURCES
 
         # Utility Module
         src/utility/file_readers.cpp
-        src/utility/hash.cpp
 
         # Libraries
         lib/glad/src/glad.c
