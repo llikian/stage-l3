@@ -70,7 +70,7 @@ void Application::run() {
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
 
     TriangleMesh suzanne;
-    read_obj_file("data/suzanne.obj", suzanne);
+    read_obj_file("data/suzanne.obj", suzanne, true);
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
