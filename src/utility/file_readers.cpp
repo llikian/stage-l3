@@ -110,6 +110,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
 
         std::string ids[3];
         for(int j = 0 ; j < 3 ; ++j) {
+            // TODO : Find a better solution to this.
             ids[j] = std::to_string(vertex_indices[i + j].x) + '/'
             + std::to_string(vertex_indices[i + j].y)+ '/'
             + std::to_string(vertex_indices[i + j].z);
