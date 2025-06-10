@@ -20,7 +20,6 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
 
-    normals.emplace_back(0.0f, 0.0f, 0.0f); // When no normal is provided, calculates it with a cross product.
     tex_coords.emplace_back(0.0f, 0.0f);    // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
     std::vector<ivec3> vertex_indices; // x is the index for the position, y for the normal and z for the tex coords
@@ -44,6 +43,8 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
                 tex_coords.emplace_back(x, y);
             }
         } else if(line[0] == 'f') { // Face
+            // We don't set the default value to -1 for positions and normals because we subtract 1 from every index,
+            // so the 0 here later becomes -1 if sscanf doesn't replace the value.
             int v[4]{ 0, 0, 0, 0 };
             int vn[4]{ 0, 0, 0, 0 };
             int vt[4]{ 0, 0, 0, 0 };
@@ -63,17 +64,17 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
             }
 
             if(vertices == 3) {
-                vertex_indices.emplace_back(v[0] - 1, vn[0], vt[0]);
-                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
-                vertex_indices.emplace_back(v[2] - 1, vn[2], vt[2]);
+                vertex_indices.emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices.emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
             } else if(vertices == 4) {
-                vertex_indices.emplace_back(v[0] - 1, vn[0], vt[0]);
-                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
-                vertex_indices.emplace_back(v[3] - 1, vn[3], vt[3]);
+                vertex_indices.emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices.emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
 
-                vertex_indices.emplace_back(v[1] - 1, vn[1], vt[1]);
-                vertex_indices.emplace_back(v[2] - 1, vn[2], vt[2]);
-                vertex_indices.emplace_back(v[3] - 1, vn[3], vt[3]);
+                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices.emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
+                vertex_indices.emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
             } else if(vertices < 3) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             } else {
@@ -89,7 +90,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     if(verbose) {
         std::cout << "Successfully loaded mesh '" << name << "' containing:\n";
         std::cout << '\t' << positions.size() << " vertex positions.\n";
-        if(!normals.empty()) { std::cout << '\t' << normals.size() - 1 << " normals.\n"; }
+        if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals.\n"; }
         if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() - 1 << " texture coordinates.\n"; }
     }
 
@@ -98,9 +99,11 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
         throw std::runtime_error("Unhandled case in read_obj_file, no faces.");
     } else {
         for(int i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
-            if(vertex_indices[i].y == 0) {
-                normals[0] = normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
-                                             positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x]));
+            if(vertex_indices[i].y == -1) {
+                normals.push_back(
+                    normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
+                                    positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
+                vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size() - 1;
             }
 
             mesh.addVertex(positions[vertex_indices[i].x],
