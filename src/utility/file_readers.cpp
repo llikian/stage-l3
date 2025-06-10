@@ -11,7 +11,6 @@
 
 #include "maths/geometry.hpp"
 #include "maths/ivec3.hpp"
-#include "utility/hash.hpp"
 
 void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::ifstream file(path);
