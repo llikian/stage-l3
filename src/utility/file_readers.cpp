@@ -7,8 +7,11 @@
 
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
+
 #include "maths/geometry.hpp"
 #include "maths/ivec3.hpp"
+#include "utility/hash.hpp"
 
 void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::ifstream file(path);
@@ -23,6 +26,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
     std::vector<ivec3> vertex_indices; // x is the index for the position, y for the normal and z for the tex coords
+    std::unordered_map<int, int> unique_attribute_triplets;
 
     std::string line;
     float x, y, z;
@@ -104,6 +108,21 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
                                               positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
         }
 
+        int ids[3];
+        for(int j = 0 ; j < 3 ; ++j) {
+            ids[j] = hash_triplet(vertex_indices[i + j].x, vertex_indices[i + j].y, vertex_indices[i + j].z);
+            if(!unique_attribute_triplets.contains(ids[j])) {
+                mesh.addVertex(positions[vertex_indices[i + j].x],
+                               normals[vertex_indices[i + j].y],
+                               tex_coords[vertex_indices[i + j].z]);
+                unique_attribute_triplets.emplace(ids[j], mesh.get_vertices_amount() - 1);
+            }
+        }
+
+        mesh.addTriangle(unique_attribute_triplets[ids[0]],
+                         unique_attribute_triplets[ids[1]],
+                         unique_attribute_triplets[ids[2]]);
+
         mesh.addVertex(positions[vertex_indices[i].x],
                        normals[vertex_indices[i].y],
                        tex_coords[vertex_indices[i].z]);
@@ -118,7 +137,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     if(verbose) {
         size_t indices_amount = mesh.get_indices_amount();
         std::cout << '\t' << "For a total of "
-            << (indices_amount == 0 ? mesh.get_vertices_amount() : indices_amount) / 3
-            << " triangles.\n";
+            << mesh.get_vertices_amount() << " vertices and "
+            << (indices_amount == 0 ? mesh.get_vertices_amount() : indices_amount) / 3 << " triangles.\n";
     }
 }
