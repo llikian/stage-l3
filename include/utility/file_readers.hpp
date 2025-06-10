@@ -9,4 +9,4 @@
 
 #include <fstream>
 
-void read_obj_file(const std::string& path, TriangleMesh& mesh);
+void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose = false);

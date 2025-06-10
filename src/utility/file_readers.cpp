@@ -8,7 +8,7 @@
 #include <sstream>
 #include "maths/geometry.hpp"
 
-void read_obj_file(const std::string& path, TriangleMesh& mesh) {
+void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file"); }
 
@@ -36,13 +36,13 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
         stream >> buf; // Get rid of the line's data type specifier (v, vt, vn, f, etc...)
 
         if(line[0] == 'v') {
+            stream >> x >> y >> z;
+
             if(line[1] == ' ') {
-                stream >> x >> y >> z;
                 positions.emplace_back(x, y, z);
             } else if(line[1] == 'n') {
                 normals.push_back(normalize(vec3(x, y, z)));
             } else if(line[1] == 't') {
-                stream >> x >> y;
                 tex_coords.emplace_back(x, y);
             }
         } else if(line[0] == 'f') { // Face
@@ -91,7 +91,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
     }
 
     if(vertex_indices.empty()) {
-        // TODO : Find out if this is actually possible in obj files.
+        // TODO : Find out if this is actually possible in obj files. If not it's not an unhandled case but an error.
         throw std::runtime_error("Unhandled case in read_obj_file, no faces.");
     } else {
         for(int i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
@@ -110,5 +110,13 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
                            normals[vertex_indices[i + 2].vn],
                            tex_coords[vertex_indices[i + 2].vt]);
         }
+    }
+
+    if(verbose) {
+        std::cout << "Successfully loaded mesh '" << name << "' containing:\n";
+        std::cout << '\t' << positions.size() - 1 << " vertex positions.\n";
+        if(!normals.empty()) { std::cout << '\t' << normals.size() - 1 << " normals.\n"; }
+        if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() - 1 << " texture coordinates.\n"; }
+        std::cout << '\t' << "For a total of " << vertex_indices.size() / 3 << " triangles.\n";
     }
 }
