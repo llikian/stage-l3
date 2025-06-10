@@ -6,11 +6,13 @@
 #include "utility/file_readers.hpp"
 
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <unordered_map>
 
 #include "maths/geometry.hpp"
 #include "maths/ivec3.hpp"
+#include "utility/hash.hpp"
 
 void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::ifstream file(path);
@@ -25,7 +27,7 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
     std::vector<ivec3> vertex_indices; // x is the index for the position, y for the normal and z for the tex coords
-    std::unordered_map<std::string, int> unique_attribute_triplets;
+    std::unordered_map<uint64_t, unsigned int> unique_attribute_triplets;
 
     std::string line;
     float x, y, z;
@@ -107,12 +109,11 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
             vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size() - 1;
         }
 
-        std::string ids[3];
+        uint64_t ids[3];
         for(int j = 0 ; j < 3 ; ++j) {
-            // TODO : Find a better solution to this.
-            ids[j] = std::to_string(vertex_indices[i + j].x) + '/'
-            + std::to_string(vertex_indices[i + j].y)+ '/'
-            + std::to_string(vertex_indices[i + j].z);
+            ids[j] = hash_triplet(vertex_indices[i + j].x,
+                                  vertex_indices[i + j].y,
+                                  vertex_indices[i + j].z);
 
             if(!unique_attribute_triplets.contains(ids[j])) {
                 mesh.addVertex(positions[vertex_indices[i + j].x],
