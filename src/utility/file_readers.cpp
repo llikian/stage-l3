@@ -68,20 +68,20 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
             }
 
             if(vertices == 3) {
-                vertex_indices.emplace_back(v[0] , vt[0] , vn[0] );
-                vertex_indices.emplace_back(v[1] , vt[1] , vn[1] );
-                vertex_indices.emplace_back(v[2] , vt[2] , vn[2] );
+                vertex_indices.emplace_back(v[0], vt[0], vn[0]);
+                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
+                vertex_indices.emplace_back(v[2], vt[2], vn[2]);
             } else if(vertices == 4) {
-                vertex_indices.emplace_back(v[0] , vt[0] , vn[0] );
-                vertex_indices.emplace_back(v[1] , vt[1] , vn[1] );
-                vertex_indices.emplace_back(v[3] , vt[3] , vn[3] );
+                vertex_indices.emplace_back(v[0], vt[0], vn[0]);
+                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
+                vertex_indices.emplace_back(v[3], vt[3], vn[3]);
 
-                vertex_indices.emplace_back(v[1] , vt[1] , vn[1] );
-                vertex_indices.emplace_back(v[2] , vt[2] , vn[2] );
-                vertex_indices.emplace_back(v[3] , vt[3] , vn[3] );
+                vertex_indices.emplace_back(v[1], vt[1], vn[1]);
+                vertex_indices.emplace_back(v[2], vt[2], vn[2]);
+                vertex_indices.emplace_back(v[3], vt[3], vn[3]);
             } else if(vertices < 3) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
-            } else if(vertices > 4) {
+            } else {
                 throw std::runtime_error("Unhandled case in read_obj_file, more than 4 vertices in face.");
             }
         } else if(line[0] == 'o') { // Object Name
@@ -98,10 +98,6 @@ void read_obj_file(const std::string& path, TriangleMesh& mesh) {
             if(vertex_indices[i].vn == 0) {
                 normals[0] = normalize(cross(positions[vertex_indices[i + 1].v] - positions[vertex_indices[i].v],
                                              positions[vertex_indices[i + 2].v] - positions[vertex_indices[i].v]));
-            }
-
-            if(vertex_indices[i].v == 0) {
-                std::cout << "OH OH...\n";
             }
 
             mesh.addVertex(positions[vertex_indices[i].v],
