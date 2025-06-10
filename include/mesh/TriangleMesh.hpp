@@ -38,6 +38,9 @@ public:
     void addTriangle(uint top, uint left, uint right);
     void addFace(uint topL, uint bottomL, uint bottomR, uint topR);
 
+    size_t get_vertices_amount() const;
+    size_t get_indices_amount() const;
+
 private:
     void bindBuffers() override;
 

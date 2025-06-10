@@ -67,6 +67,14 @@ void TriangleMesh::addFace(uint topL, uint bottomL, uint bottomR, uint topR) {
     indices.push_back(topR);
 }
 
+size_t TriangleMesh::get_vertices_amount() const {
+    return vertices.size();
+}
+
+size_t TriangleMesh::get_indices_amount() const {
+    return indices.size();
+}
+
 void TriangleMesh::bindBuffers() {
     /* VAO */
     glGenVertexArrays(1, &VAO);
