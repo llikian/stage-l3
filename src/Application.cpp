@@ -71,6 +71,8 @@ void Application::run() {
 
     TriangleMesh suzanne;
     read_obj_file("data/suzanne.obj", suzanne, true);
+    TriangleMesh dragon;
+    read_obj_file("data/dragon80k.obj", dragon, true);
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
@@ -87,8 +89,11 @@ void Application::run() {
         //     }
         // }
 
-        update_mvp(translate_z(-5.0f));
-        suzanne.draw();
+        // update_mvp(translate_z(-5.0f));
+        // suzanne.draw();
+
+        update_mvp(translate_z(-5.0f).scale(10.0f));
+        dragon.draw();
 
         glfwSwapBuffers(window);
     }
