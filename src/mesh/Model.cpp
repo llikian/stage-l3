@@ -132,6 +132,10 @@ void Model::parse_mtl_file(const std::filesystem::path& path, bool verbose) {
             stream >> material->ambient;
         } else if(buffer == "Kd") {
             stream >> material->diffuse;
+        } else if(buffer == "Ks") {
+            stream >> material->specular;
+        } else if(buffer == "Ns") {
+            stream >> material->specular_exponent;
         } else if(buffer == "map_Ka") {
             stream >> buffer;
             for(char& c : buffer) { if(c == '\\') { c = '/'; } }
