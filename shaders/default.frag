@@ -6,15 +6,23 @@
 #version 460 core
 
 in vec3 normal;
+in vec2 tex_coords;
 
 out vec4 frag_color;
 
-const vec3 LIGHT_POS = vec3(10.0f);
+const vec3 LIGHT_POS = vec3(0.0f, 10.0f, 0.0f);
 const vec3 LIGHT_COLOR = vec3(1.0f);
 
-void main() {
-    float ambient = 0.2f;
-    float diffuse = max(dot(normalize(normal), normalize(LIGHT_POS)), 0.0f);
+uniform vec3 u_ambient;
+uniform vec3 u_diffuse;
+uniform sampler2D u_ambient_map;
+uniform sampler2D u_diffuse_map;
 
-    frag_color = vec4((ambient + diffuse) * LIGHT_COLOR, 1.0f);
+void main() {
+    vec3 ambient = u_ambient * texture(u_ambient_map, tex_coords).xyz;
+    vec3 diffuse = u_diffuse * texture(u_diffuse_map, tex_coords).xyz;
+    diffuse *= max(dot(normalize(normal), normalize(LIGHT_POS)), 0.0f);
+
+    frag_color.xyz = (ambient + diffuse) * LIGHT_COLOR;
+    frag_color.w = 1.0f;
 }
