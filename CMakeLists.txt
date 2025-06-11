@@ -43,8 +43,8 @@ set(SOURCES
         src/mesh/TriangleMesh.cpp
 
         # Utility Module
-        src/utility/file_readers.cpp
         src/utility/hash.cpp
+        src/utility/parsers.cpp
 
         # Libraries
         lib/glad/src/glad.c

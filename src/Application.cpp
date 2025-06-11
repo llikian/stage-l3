@@ -11,7 +11,7 @@
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/TriangleMesh.hpp"
-#include "utility/file_readers.hpp"
+#include "utility/parsers.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -70,15 +70,15 @@ void Application::run() {
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
 
     std::pair<TriangleMesh, mat4> suzanne;
-    read_obj_file("data/suzanne.obj", suzanne.first, true);
+    parse_obj_file("data/suzanne.obj", suzanne.first, true);
     suzanne.second = translate_z(-5.0f);
 
     std::pair<TriangleMesh, mat4> dragon;
-    read_obj_file("data/dragon80k.obj", dragon.first, true);
+    parse_obj_file("data/dragon80k.obj", dragon.first, true);
     dragon.second = scale(10.0f);
 
     std::pair<TriangleMesh, mat4> sponza;
-    read_obj_file("data/sponza.obj", sponza.first, true);
+    parse_obj_file("data/sponza.obj", sponza.first, true);
     sponza.second = translate_y(-5.0f).scale(0.05f);
 
     while(!glfwWindowShouldClose(window)) {

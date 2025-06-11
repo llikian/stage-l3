@@ -1,9 +1,9 @@
 /***************************************************************************************************
- * @file  file_readers.cpp
- * @brief Implementation of function aimed at reading specific file formats.
+ * @file  parsers.cpp
+ * @brief Implementation of function aimed at parsing specific file formats.
  **************************************************************************************************/
 
-#include "utility/file_readers.hpp"
+#include "utility/parsers.hpp"
 
 #include <fstream>
 #include <limits>
@@ -14,7 +14,7 @@
 #include "maths/ivec3.hpp"
 #include "utility/hash.hpp"
 
-void read_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
+void parse_obj_file(const std::string& path, TriangleMesh& mesh, bool verbose) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file"); }
 
