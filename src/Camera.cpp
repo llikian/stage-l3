@@ -61,6 +61,10 @@ const mat4& Camera::get_view_matrix() const {
     return view_matrix;
 }
 
+vec3 Camera::get_position() const {
+    return position;
+}
+
 void Camera::update_vectors_and_view_matrix() {
     direction.x = std::cos(pitch) * std::cos(yaw);
     direction.y = std::sin(pitch);

@@ -35,6 +35,8 @@ public:
 
     const mat4& get_view_matrix() const;
 
+    vec3 get_position() const;
+
 private:
     void update_vectors_and_view_matrix();
 
