@@ -39,6 +39,8 @@ public:
     void addTriangle(unsigned int top, unsigned int left, unsigned int right);
     void addFace(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR);
 
+    void set_material(const Material* material);
+
     size_t get_vertices_amount() const;
     size_t get_indices_amount() const;
 
@@ -49,5 +51,6 @@ private:
 
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Material> materials;
+
+    const Material* material;
 };

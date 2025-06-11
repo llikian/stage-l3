@@ -7,7 +7,7 @@
 
 #include <glad/glad.h>
 
-TriangleMesh::TriangleMesh() : EBO(0) { }
+TriangleMesh::TriangleMesh() : EBO(0), material(nullptr) { }
 
 TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
     : EBO(0), vertices(vertices), indices(indices) {
@@ -25,6 +25,11 @@ TriangleMesh::~TriangleMesh() {
 
 void TriangleMesh::draw(Shader& shader) {
     if(!bound) { bindBuffers(); }
+
+    shader.use();
+    if(material != nullptr) {
+        material->update_shader_uniforms(shader);
+    }
 
     glBindVertexArray(VAO);
 
@@ -65,6 +70,10 @@ void TriangleMesh::addFace(unsigned int topL, unsigned int bottomL, unsigned int
     indices.push_back(topL);
     indices.push_back(bottomR);
     indices.push_back(topR);
+}
+
+void TriangleMesh::set_material(const Material* material) {
+    this->material = material;
 }
 
 size_t TriangleMesh::get_vertices_amount() const {
