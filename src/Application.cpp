@@ -17,7 +17,7 @@ Application::Application()
     : window("Projet Stage L3", this),
       shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
       camera(vec3(0.0f, 0.0f, 0.0f)),
-      fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 100.0f)),
+      fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       event_handler(&window, &camera) {
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -79,6 +79,8 @@ void Application::run() {
 
         shader.use();
 
+        shader.set_uniform("u_camera_position", camera.get_position());
+
         // for(int i = -5 ; i <= 5 ; ++i) {
         //     for(int j = -5 ; j <= 5 ; ++j) {
         //         update_mvp(translate(i * 3, std::sqrt(i * i + j * j), j * 3));
@@ -99,5 +101,6 @@ EventHandler& Application::get_event_handler() {
 
 void Application::update_mvp(const mat4& model) const {
     shader.set_uniform("u_mvp", view_projection * model);
+    shader.set_uniform("u_model", model);
     shader.set_uniform("u_normals_model_matrix", transpose_inverse(model));
 }

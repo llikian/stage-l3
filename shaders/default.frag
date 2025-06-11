@@ -32,7 +32,9 @@ void main() {
     float diffuse_strength = max(dot(normalized_normal, light_direction), 0.0f);
     vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, tex_coords).xyz;
 
-    vec3 specular = u_specular;
+    vec3 view_direction = normalize(u_camera_position - position);
+    vec3 reflected_direction = reflect(-light_direction, normalized_normal);
+    vec3 specular = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent) * u_specular;
 
     frag_color.xyz = (ambient + diffuse + specular) * LIGHT_COLOR;
     frag_color.w = 1.0f;
