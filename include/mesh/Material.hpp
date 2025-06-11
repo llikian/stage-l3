@@ -8,6 +8,8 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 
+// TODO: Write and use different shaders depending on which material attributes are active
+
 /**
  * @class Material
  * @brief
