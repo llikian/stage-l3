@@ -38,7 +38,9 @@ set(SOURCES
 
         # Mesh Module
         src/mesh/LineMesh.cpp
+        src/mesh/Material.cpp
         src/mesh/Mesh.cpp
+        src/mesh/Model.cpp
         src/mesh/PointMesh.cpp
         src/mesh/TriangleMesh.cpp
 
