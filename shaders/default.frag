@@ -27,14 +27,15 @@ void main() {
     vec3 normalized_normal = normalize(normal);
     vec3 light_direction = normalize(LIGHT_POS - position);
 
-    vec3 ambient = u_ambient * texture(u_ambient_map, tex_coords).xyz;
+    vec3 ambient = u_ambient * texture(u_ambient_map, tex_coords).rgb;
 
     float diffuse_strength = max(dot(normalized_normal, light_direction), 0.0f);
-    vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, tex_coords).xyz;
+    vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, tex_coords).rgb;
 
     vec3 view_direction = normalize(u_camera_position - position);
     vec3 reflected_direction = reflect(-light_direction, normalized_normal);
-    vec3 specular = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent) * u_specular;
+    float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
+    vec3 specular = specular_strength * u_specular;
 
     frag_color.xyz = (ambient + diffuse + specular) * LIGHT_COLOR;
     frag_color.w = 1.0f;
