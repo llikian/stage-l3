@@ -6,6 +6,7 @@
 #pragma once
 
 #include <vector>
+#include "Material.hpp"
 #include "maths/vec2.hpp"
 #include "maths/vec3.hpp"
 #include "mesh/Mesh.hpp"
@@ -23,20 +24,20 @@ public:
     };
 
     TriangleMesh();
-    TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<uint>& indices);
+    TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
     explicit TriangleMesh(const std::vector<Vertex>& vertices);
     ~TriangleMesh() override;
 
-    void draw() override;
+    void draw(Shader& shader) override;
 
-    uint getPrimitive() override;
+    unsigned int getPrimitive() override;
 
     void addVertex(const Vertex& vertex);
     void addVertex(const vec3& position, const vec3& normal, const vec2& texCoords);
 
-    void addIndex(uint index);
-    void addTriangle(uint top, uint left, uint right);
-    void addFace(uint topL, uint bottomL, uint bottomR, uint topR);
+    void addIndex(unsigned int index);
+    void addTriangle(unsigned int top, unsigned int left, unsigned int right);
+    void addFace(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR);
 
     size_t get_vertices_amount() const;
     size_t get_indices_amount() const;
@@ -44,8 +45,9 @@ public:
 private:
     void bindBuffers() override;
 
-    uint EBO;
+    unsigned int EBO;
 
     std::vector<Vertex> vertices;
-    std::vector<uint> indices;
+    std::vector<unsigned int> indices;
+    std::vector<Material> materials;
 };

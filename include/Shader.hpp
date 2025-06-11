@@ -51,7 +51,7 @@ public:
      * @brief Getter for the id of the shader.
      * @return The id of the shader.
      */
-    uint get_id() const;
+    unsigned int get_id() const;
 
     /**
      * @brief Getter for the name of the shader.

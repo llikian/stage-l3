@@ -10,7 +10,6 @@
 #include <vector>
 #include "Shader.hpp"
 #include "TriangleMesh.hpp"
-#include "Material.hpp"
 
 /**
  * @class Model
@@ -18,12 +17,13 @@
  */
 class Model {
 public:
-    explicit Model(const std::filesystem::path& obj_file_path, bool verbose = false);
+    explicit Model(const std::filesystem::path& obj_file_path, const mat4& model = mat4(1.0f), bool verbose = false);
 
     void parse_obj_file(std::ifstream& file, bool verbose);
 
     void draw(Shader& shader);
+
+    mat4 model;
 private:
     std::vector<TriangleMesh> meshes;
-    std::vector<Material> materials;
 };

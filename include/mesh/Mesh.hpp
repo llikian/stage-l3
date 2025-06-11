@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <sys/types.h>
+#include "Shader.hpp"
 
 /**
  * @class Mesh
@@ -16,14 +16,14 @@ public:
     Mesh();
     virtual ~Mesh();
 
-    virtual void draw() = 0;
-    virtual uint getPrimitive() = 0;
+    virtual void draw(Shader& shader) = 0;
+    virtual unsigned int getPrimitive() = 0;
 
 protected:
     virtual void bindBuffers() = 0;
 
     bool bound;
 
-    uint VAO;
-    uint VBO;
+    unsigned int VAO;
+    unsigned int VBO;
 };

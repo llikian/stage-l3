@@ -9,7 +9,7 @@
 
 TriangleMesh::TriangleMesh() : EBO(0) { }
 
-TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<uint>& indices)
+TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
     : EBO(0), vertices(vertices), indices(indices) {
     TriangleMesh::bindBuffers();
 }
@@ -23,7 +23,7 @@ TriangleMesh::~TriangleMesh() {
     if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
 }
 
-void TriangleMesh::draw() {
+void TriangleMesh::draw(Shader& shader) {
     if(!bound) { bindBuffers(); }
 
     glBindVertexArray(VAO);
@@ -35,7 +35,7 @@ void TriangleMesh::draw() {
     }
 }
 
-uint TriangleMesh::getPrimitive() {
+unsigned int TriangleMesh::getPrimitive() {
     return GL_TRIANGLES;
 }
 
@@ -47,17 +47,17 @@ void TriangleMesh::addVertex(const vec3& position, const vec3& normal, const vec
     vertices.emplace_back(position, normal, texCoords);
 }
 
-void TriangleMesh::addIndex(uint index) {
+void TriangleMesh::addIndex(unsigned int index) {
     indices.push_back(index);
 }
 
-void TriangleMesh::addTriangle(uint top, uint left, uint right) {
+void TriangleMesh::addTriangle(unsigned int top, unsigned int left, unsigned int right) {
     indices.push_back(top);
     indices.push_back(left);
     indices.push_back(right);
 }
 
-void TriangleMesh::addFace(uint topL, uint bottomL, uint bottomR, uint topR) {
+void TriangleMesh::addFace(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR) {
     indices.push_back(topL);
     indices.push_back(bottomL);
     indices.push_back(bottomR);

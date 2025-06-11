@@ -21,25 +21,25 @@ public:
     };
 
     LineMesh();
-    LineMesh(const std::vector<Vertex>& vertices, const std::vector<uint>& indices);
+    LineMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
     explicit LineMesh(const std::vector<Vertex>& vertices);
     ~LineMesh() override;
 
-    void draw() override;
+    void draw(Shader& shader) override;
 
-    uint getPrimitive() override;
+    unsigned int getPrimitive() override;
 
     void addVertex(const Vertex& vertex);
     void addVertex(const vec3& position, const vec3& color = vec3(1.0f));
 
-    void addIndex(uint index);
-    void addLine(uint start, uint end);
+    void addIndex(unsigned int index);
+    void addLine(unsigned int start, unsigned int end);
 
 private:
     void bindBuffers() override;
 
-    uint EBO;
+    unsigned int EBO;
 
     std::vector<Vertex> vertices;
-    std::vector<uint> indices;
+    std::vector<unsigned int> indices;
 };

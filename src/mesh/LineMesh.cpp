@@ -9,7 +9,7 @@
 
 LineMesh::LineMesh() : EBO(0) { }
 
-LineMesh::LineMesh(const std::vector<Vertex>& vertices, const std::vector<uint>& indices)
+LineMesh::LineMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
     : EBO(0), vertices(vertices), indices(indices) {
     LineMesh::bindBuffers();
 }
@@ -23,7 +23,7 @@ LineMesh::~LineMesh() {
     if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
 }
 
-void LineMesh::draw() {
+void LineMesh::draw(Shader& shader) {
     if(!bound) { bindBuffers(); }
 
     glBindVertexArray(VAO);
@@ -35,7 +35,7 @@ void LineMesh::draw() {
     }
 }
 
-uint LineMesh::getPrimitive() {
+unsigned int LineMesh::getPrimitive() {
     return GL_LINES;
 }
 
@@ -47,7 +47,7 @@ void LineMesh::addVertex(const vec3& position, const vec3& color) {
     vertices.emplace_back(position, color);
 }
 
-void LineMesh::addLine(uint start, uint end) {
+void LineMesh::addLine(unsigned int start, unsigned int end) {
     indices.push_back(start);
     indices.push_back(end);
 }

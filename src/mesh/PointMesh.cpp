@@ -18,13 +18,13 @@ void PointMesh::addVertex(const vec3& position, const vec3& color, float size) {
     vertices.emplace_back(position, color, size);
 }
 
-void PointMesh::draw() {
+void PointMesh::draw(Shader& shader) {
     if(!bound) { bindBuffers(); }
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, vertices.size());
 }
 
-uint PointMesh::getPrimitive() {
+unsigned int PointMesh::getPrimitive() {
     return GL_POINTS;
 }
 

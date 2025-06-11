@@ -137,7 +137,7 @@ void Shader::get_uniforms() {
     delete[] uniform_name;
 }
 
-uint Shader::get_id() const {
+unsigned int Shader::get_id() const {
     return id;
 }
 

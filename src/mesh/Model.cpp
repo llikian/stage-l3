@@ -5,7 +5,7 @@
 
 #include "mesh/Model.hpp"
 
-Model::Model(const std::filesystem::path& obj_file_path, bool verbose) {
+Model::Model(const std::filesystem::path& obj_file_path, const mat4& model, bool verbose) : model(model) {
     std::string extension = obj_file_path.extension().string();
 
     if(extension != ".obj") {

@@ -24,9 +24,9 @@ public:
     PointMesh();
     explicit PointMesh(const std::vector<Vertex>& vertices);
 
-    void draw() override;
+    void draw(Shader& shader) override;
 
-    uint getPrimitive() override;
+    unsigned int getPrimitive() override;
 
     void addVertex(const Vertex& vertex);
     void addVertex(const vec3& position, const vec3& color = vec3(1.0f), float size = 1.0f);
