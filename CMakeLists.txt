@@ -49,6 +49,7 @@ set(SOURCES
 
         # Libraries
         lib/glad/src/glad.c
+        lib/stb/stb_image.cpp
 )
 
 set(INCLUDES
@@ -56,6 +57,7 @@ set(INCLUDES
 
         # Libraries
         lib/glad/include
+        lib/stb
 )
 
 set(LIBRARIES
