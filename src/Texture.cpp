@@ -7,22 +7,22 @@
 
 #include <glad/glad.h>
 
-Texture::Texture(const std::string& path) {
-    Image image(path);
+Texture::Texture() : id(0) { }
 
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, image.getData());
-    glGenerateMipmap(GL_TEXTURE_2D);
+Texture::Texture(const std::string& path) {
+    create(path);
 }
 
 Texture::Texture(const Image& image) {
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, image.getData());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    create(image);
+}
+
+Texture::Texture(const vec3& color) {
+    create(color);
+}
+
+Texture::Texture(unsigned char r, unsigned char g, unsigned char b) {
+    create(r, g, b);
 }
 
 Texture::~Texture() {
@@ -34,7 +34,31 @@ void Texture::bind(unsigned int texUnit) const {
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
-Texture::Texture(const vec3& color) {
+void Texture::create(const std::string& path) {
+    if(id != 0) { glDeleteTextures(1, &id); }
+
+    Image image(path);
+
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 image.getData());
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void Texture::create(const Image& image) {
+    if(id != 0) { glDeleteTextures(1, &id); }
+
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, image.getData());
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void Texture::create(const vec3& color) {
+    if(id != 0) { glDeleteTextures(1, &id); }
+
     unsigned char c[3]{
         static_cast<unsigned char>(color.x * 255.0f),
         static_cast<unsigned char>(color.y * 255.0f),
@@ -46,8 +70,10 @@ Texture::Texture(const vec3& color) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
 }
 
-Texture::Texture(unsigned char r, unsigned char g, unsigned char b) {
-    unsigned char c[3]{r, g, b};
+void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
+    if(id != 0) { glDeleteTextures(1, &id); }
+
+    unsigned char c[3]{ r, g, b };
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);

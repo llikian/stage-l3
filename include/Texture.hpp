@@ -14,6 +14,8 @@
  */
 class Texture {
 public:
+    Texture();
+
     /**
      * @brief Constructs a texture by loading an image and assigning its data to a new texture.
      * @param path The image's path.
@@ -39,6 +41,32 @@ public:
      * @param b The b component of the texture's color.
      */
     Texture(unsigned char r, unsigned char g, unsigned char b);
+
+    /**
+     * @brief Creates a texture by loading an image and assigning its data to a new texture.
+     * @param path The image's path.
+     */
+    void create(const std::string& path);
+
+    /**
+     * @brief Creates a texture by assigning an image's data to a new texture.
+     * @param image The image.
+     */
+    void create(const Image& image);
+
+    /**
+     * @brief Creates a 1*1px texture with a specific color.
+     * @param color The color of the texture.
+     */
+    void create(const vec3& color);
+
+    /**
+     * @brief Creates a 1*1px texture with a specific color.
+     * @param r The r component of the texture's color.
+     * @param g The g component of the texture's color.
+     * @param b The b component of the texture's color.
+     */
+    void create(unsigned char r, unsigned char g, unsigned char b);
 
     /**
      * @brief Deletes the texture.
