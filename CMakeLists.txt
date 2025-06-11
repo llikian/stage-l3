@@ -22,7 +22,9 @@ set(SOURCES
         src/callbacks.cpp
         src/Camera.cpp
         src/EventHandler.cpp
+        src/Image.cpp
         src/Shader.cpp
+        src/Texture.cpp
         src/Window.cpp
 
         # Maths Module
