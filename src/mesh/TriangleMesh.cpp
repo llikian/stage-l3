@@ -27,10 +27,7 @@ void TriangleMesh::draw(Shader& shader) {
     if(!bound) { bindBuffers(); }
 
     shader.use();
-    if(material != nullptr) {
-        material->update_shader_uniforms(shader);
-    }
-
+    if(material != nullptr) { material->update_shader_uniforms(shader); }
     glBindVertexArray(VAO);
 
     if(indices.empty()) {
