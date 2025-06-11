@@ -33,7 +33,6 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
 
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
-
     std::string line;
 
     while(std::getline(file, line)) {
@@ -45,7 +44,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             float x, y, z;
             stream >> x >> y >> z;
 
-            if(buffer[1] == ' ') {
+            if(buffer.size() == 1) {
                 positions.emplace_back(x, y, z);
             } else if(buffer[1] == 'n') {
                 normals.push_back(normalize(vec3(x, y, z)));
@@ -90,19 +89,23 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             } else {
                 throw std::runtime_error("Unhandled case in read_obj_file, more than 4 vertices in face.");
             }
-
-            if(file.peek() == 'g' || file.peek() == file.eof()) {
+        } else if(buffer[0] == 'g') {
+            if(!vertex_indices.empty()) {
                 handle_object(positions, normals, tex_coords, vertex_indices);
                 meshes.back().set_material(material);
+                vertex_indices.resize(0);
             }
         } else if(buffer == "usemtl") {
             stream >> buffer;
             material = &materials[buffer];
         } else if(buffer == "mtllib") {
             stream >> buffer;
-            parse_mtl_file(path.parent_path().string() + buffer, verbose);
+            parse_mtl_file(path.parent_path().string() + '/' + buffer, verbose);
         }
     }
+
+    handle_object(positions, normals, tex_coords, vertex_indices);
+    meshes.back().set_material(material);
 }
 
 void Model::parse_mtl_file(const std::filesystem::path& path, bool verbose) {
@@ -119,9 +122,6 @@ void Model::handle_object(std::vector<vec3>& positions,
     TriangleMesh& mesh = meshes.emplace_back();
 
     std::unordered_map<uint64_t, unsigned int> unique_attribute_triplets;
-
-    // TODO : Find out if this is actually possible in obj files. If not it's not an unhandled case but an error.
-    if(vertex_indices.empty()) { throw std::runtime_error("Unhandled case in read_obj_file, no faces."); }
 
     for(int i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
         if(vertex_indices[i].y == -1) {

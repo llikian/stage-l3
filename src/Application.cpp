@@ -12,7 +12,6 @@
 #include "maths/transforms.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
-#include "utility/parsers.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -70,7 +69,7 @@ void Application::run() {
     add_face(4, 6, 2, 0, vec3(0.0f, 0.0f, 1.0f));
     add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
 
-    Model sponza("data/sponza.obj", translate_y(-5.0f).scale(0.05f), true);
+    Model sponza("data/sponza/sponza.obj", scale(0.05f), true);
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
