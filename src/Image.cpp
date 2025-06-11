@@ -5,6 +5,8 @@
 
 #include "Image.hpp"
 
+#include <iostream>
+
 #include "stb_image.h"
 
 Image::Image(const std::string& path) {
@@ -12,6 +14,7 @@ Image::Image(const std::string& path) {
 
     int W, H, nbC;
     data = stbi_load(path.c_str(), &W, &H, &nbC, 3); // TODO : Maybe change 3 to 4 for transparency
+    if(data == nullptr) { throw std::runtime_error("Couldn't load image '" + path + '\''); }
 
     width = W;
     height = H;
