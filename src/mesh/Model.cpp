@@ -25,6 +25,8 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
+    std::string parent_path = path.parent_path().string() + '/';
+
     std::vector<vec3> positions;
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
@@ -38,7 +40,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     while(std::getline(file, line)) {
         std::istringstream stream(line);
         std::string buffer;
-        stream >> buffer; // Get rid of the line's data type specifier (v, vn, vt, f, etc...)
+        stream >> buffer; // Get the line's data type specifier (v, vn, vt, f, etc...)
 
         if(buffer[0] == 'v') {
             float x, y, z;
@@ -100,7 +102,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             material = &materials[buffer];
         } else if(buffer == "mtllib") {
             stream >> buffer;
-            parse_mtl_file(path.parent_path().string() + '/' + buffer, verbose);
+            parse_mtl_file(parent_path + buffer, verbose);
         }
     }
 
@@ -112,7 +114,34 @@ void Model::parse_mtl_file(const std::filesystem::path& path, bool verbose) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
+    std::string parent_path = path.parent_path().string() + '/';
 
+    std::string line;
+    Material* material = nullptr;
+
+    while(std::getline(file, line)) {
+        std::istringstream stream(line);
+        std::string buffer;
+        stream >> buffer; // Get the line's data type specifier (v, vn, vt, f, etc...)
+
+        if(buffer == "newmtl") {
+            stream >> buffer;
+            materials.emplace(buffer, Material());
+            material = &materials[buffer];
+        } else if(buffer == "Ka") {
+            stream >> material->ambient;
+        } else if(buffer == "Kd") {
+            stream >> material->diffuse;
+        } else if(buffer == "map_Ka") {
+            stream >> buffer;
+            for(char& c : buffer) { if(c == '\\') { c = '/'; } }
+            material->ambient_map.create(parent_path + buffer);
+        } else if(buffer == "map_Kd") {
+            stream >> buffer;
+            for(char& c : buffer) { if(c == '\\') { c = '/'; } }
+            material->diffuse_map.create(parent_path + buffer);
+        }
+    }
 }
 
 void Model::handle_object(std::vector<vec3>& positions,

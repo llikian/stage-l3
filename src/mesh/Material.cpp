@@ -6,7 +6,10 @@
 #include "mesh/Material.hpp"
 
 void Material::update_shader_uniforms(const Shader& shader) const {
-    shader.set_uniform("ambient", ambiant);
-    shader.set_uniform("diffuse", diffuse);
-    shader.set_uniform("specular", specular);
+    shader.set_uniform("u_ambient", ambient);
+    shader.set_uniform("u_diffuse", diffuse);
+    shader.set_uniform("u_specular", specular);
+
+    ambient_map.bind(0);
+    diffuse_map.bind(1);
 }
