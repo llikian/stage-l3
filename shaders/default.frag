@@ -37,6 +37,6 @@ void main() {
     float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
     vec3 specular = specular_strength * u_specular;
 
-    frag_color.xyz = (ambient + diffuse + specular) * LIGHT_COLOR;
+    frag_color.xyz = (ambient + diffuse) * LIGHT_COLOR;
     frag_color.w = 1.0f;
 }

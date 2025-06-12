@@ -27,7 +27,8 @@ public:
     void handle_object(std::vector<vec3>& positions,
                        std::vector<vec3>& normals,
                        std::vector<vec2>& tex_coords,
-                       std::vector<ivec3>& vertex_indices);
+                       std::vector<ivec3>& vertex_indices,
+                       size_t original_normals_amount);
 
     void draw(Shader& shader);
 

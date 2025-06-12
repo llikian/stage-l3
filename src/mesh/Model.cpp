@@ -56,8 +56,6 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
                 tex_coords.emplace_back(x, y);
             }
         } else if(buffer[0] == 'f') { // Face
-            // We don't set the default value to -1 for positions and normals because we subtract 1 from every index,
-            // so the 0 here later becomes -1 if sscanf doesn't replace the value.
             int v[4]{ 0, 0, 0, 0 };
             int vn[4]{ 0, 0, 0, 0 };
             int vt[4]{ 0, 0, 0, 0 };
@@ -82,17 +80,17 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             }
 
             if(vertices == 3) {
-                vertex_indices[current_material].emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
-                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices[current_material].emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
+                vertex_indices[current_material].emplace_back(v[0], vn[0], vt[0]);
+                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
+                vertex_indices[current_material].emplace_back(v[2], vn[2], vt[2]);
             } else if(vertices == 4) {
-                vertex_indices[current_material].emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
-                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices[current_material].emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
+                vertex_indices[current_material].emplace_back(v[0], vn[0], vt[0]);
+                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
+                vertex_indices[current_material].emplace_back(v[3], vn[3], vt[3]);
 
-                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices[current_material].emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
-                vertex_indices[current_material].emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
+                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
+                vertex_indices[current_material].emplace_back(v[2], vn[2], vt[2]);
+                vertex_indices[current_material].emplace_back(v[3], vn[3], vt[3]);
             } else if(vertices < 3) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             } else {
@@ -108,8 +106,9 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     }
 
     uint64_t total_indices = 0;
+    size_t original_normals_amount = normals.size();
     for(auto& [_, material] : materials) {
-        handle_object(positions, normals, tex_coords, vertex_indices[&material]);
+        handle_object(positions, normals, tex_coords, vertex_indices[&material], original_normals_amount);
         meshes.back().set_material(&material);
         total_indices += vertex_indices.size();
     }
@@ -166,20 +165,37 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
 void Model::handle_object(std::vector<vec3>& positions,
                           std::vector<vec3>& normals,
                           std::vector<vec2>& tex_coords,
-                          std::vector<ivec3>& vertex_indices) {
+                          std::vector<ivec3>& vertex_indices,
+                          size_t original_normals_amount) {
     TriangleMesh& mesh = meshes.emplace_back();
 
     std::unordered_map<uint64_t, unsigned int> unique_attribute_triplets;
 
     for(size_t i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
-        if(vertex_indices[i].y == -1) {
+        if(vertex_indices[i].y == 0) {
             normals.push_back(normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
                                               positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
-            vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size() - 1;
+            vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size();
         }
 
         uint64_t ids[3];
         for(int j = 0 ; j < 3 ; ++j) {
+            if(vertex_indices[i + j].x < 0) {
+                vertex_indices[i + j].x = positions.size() + vertex_indices[i + j].x;
+            } else {
+                vertex_indices[i + j].x -= 1;
+            }
+
+            if(vertex_indices[i + j].y < 0) {
+                vertex_indices[i + j].y = original_normals_amount + vertex_indices[i + j].y;
+            } else {
+                vertex_indices[i + j].y -= 1;
+            }
+
+            if(vertex_indices[i + j].z < 0) {
+                vertex_indices[i + j].z = tex_coords.size() + vertex_indices[i + j].z;
+            }
+
             ids[j] = hash_triplet(vertex_indices[i + j].x,
                                   vertex_indices[i + j].y,
                                   vertex_indices[i + j].z);
