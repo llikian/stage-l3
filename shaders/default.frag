@@ -22,7 +22,6 @@ uniform vec3 u_specular;
 uniform float u_specular_exponent;
 uniform sampler2D u_ambient_map;
 uniform sampler2D u_diffuse_map;
-uniform sampler2D u_bump_map;
 
 void main() {
     vec3 normal = normalize(v_normal);
