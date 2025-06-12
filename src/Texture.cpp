@@ -9,19 +9,19 @@
 
 Texture::Texture() : id(0) { }
 
-Texture::Texture(const std::string& path) {
+Texture::Texture(const std::string& path) : id(0) {
     create(path);
 }
 
-Texture::Texture(const Image& image) {
+Texture::Texture(const Image& image) : id(0) {
     create(image);
 }
 
-Texture::Texture(const vec3& color) {
+Texture::Texture(const vec3& color) : id(0) {
     create(color);
 }
 
-Texture::Texture(unsigned char r, unsigned char g, unsigned char b) {
+Texture::Texture(unsigned char r, unsigned char g, unsigned char b) : id(0) {
     create(r, g, b);
 }
 
