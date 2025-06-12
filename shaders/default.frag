@@ -5,9 +5,9 @@
 
 #version 460 core
 
-in vec3 position;
-in vec3 normal;
-in vec2 tex_coords;
+in vec3 v_position;
+in vec3 v_normal;
+in vec2 v_tex_coords;
 
 out vec4 frag_color;
 
@@ -18,22 +18,23 @@ uniform vec3 u_camera_position;
 
 uniform vec3 u_ambient;
 uniform vec3 u_diffuse;
-uniform sampler2D u_ambient_map;
-uniform sampler2D u_diffuse_map;
 uniform vec3 u_specular;
 uniform float u_specular_exponent;
+uniform sampler2D u_ambient_map;
+uniform sampler2D u_diffuse_map;
+uniform sampler2D u_bump_map;
 
 void main() {
-    vec3 normalized_normal = normalize(normal);
-    vec3 light_direction = normalize(LIGHT_POS - position);
+    vec3 normal = normalize(v_normal);
+    vec3 light_direction = normalize(LIGHT_POS - v_position);
 
-    vec3 ambient = u_ambient * texture(u_ambient_map, tex_coords).rgb;
+    vec3 ambient = 0.5f * u_ambient * texture(u_ambient_map, v_tex_coords).rgb;
 
-    float diffuse_strength = max(dot(normalized_normal, light_direction), 0.0f);
-    vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, tex_coords).rgb;
+    float diffuse_strength = max(dot(normal, light_direction), 0.0f);
+    vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, v_tex_coords).rgb;
 
-    vec3 view_direction = normalize(u_camera_position - position);
-    vec3 reflected_direction = reflect(-light_direction, normalized_normal);
+    vec3 view_direction = normalize(u_camera_position - v_position);
+    vec3 reflected_direction = reflect(-light_direction, normal);
     float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
     vec3 specular = specular_strength * u_specular;
 

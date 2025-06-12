@@ -9,9 +9,9 @@ layout (location = 0) in vec3 a_position;
 layout (location = 1) in vec3 a_normal;
 layout (location = 2) in vec2 a_tex_coords;
 
-out vec3 position;
-out vec3 normal;
-out vec2 tex_coords;
+out vec3 v_position;
+out vec3 v_normal;
+out vec2 v_tex_coords;
 
 uniform mat4 u_mvp;
 uniform mat4 u_model;
@@ -22,7 +22,7 @@ void main() {
 
     gl_Position = u_mvp * pos;
 
-    position = (u_model * pos).xyz;
-    normal = normalize(u_normals_model_matrix * a_normal);
-    tex_coords = a_tex_coords;
+    v_position = (u_model * pos).xyz;
+    v_normal = normalize(u_normals_model_matrix * a_normal);
+    v_tex_coords = a_tex_coords;
 }
