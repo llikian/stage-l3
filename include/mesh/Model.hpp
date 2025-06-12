@@ -22,7 +22,7 @@ public:
     explicit Model(const std::filesystem::path& path, const mat4& model = mat4(1.0f), bool verbose = false);
 
     void parse_obj_file(const std::filesystem::path& path, bool verbose);
-    void parse_mtl_file(const std::filesystem::path& path, bool verbose);
+    void parse_mtl_file(const std::filesystem::path& path);
 
     void handle_object(std::vector<vec3>& positions,
                        std::vector<vec3>& normals,

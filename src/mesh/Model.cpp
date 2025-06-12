@@ -37,6 +37,8 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
 
     std::string line;
 
+    uint64_t total_indices = 0;
+
     while(std::getline(file, line)) {
         std::istringstream stream(line);
         std::string buffer;
@@ -95,6 +97,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             if(!vertex_indices.empty()) {
                 handle_object(positions, normals, tex_coords, vertex_indices);
                 meshes.back().set_material(material);
+                total_indices += vertex_indices.size();
                 vertex_indices.resize(0);
             }
         } else if(buffer == "usemtl") {
@@ -102,15 +105,25 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             material = &materials[buffer];
         } else if(buffer == "mtllib") {
             stream >> buffer;
-            parse_mtl_file(parent_path + buffer, verbose);
+            parse_mtl_file(parent_path + buffer);
         }
     }
 
+    total_indices += vertex_indices.size();
     handle_object(positions, normals, tex_coords, vertex_indices);
     meshes.back().set_material(material);
+
+    if(verbose) {
+        std::cout << '\t' << positions.size() << " vertex positions\n";
+        if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals\n"; }
+        if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() << " texture coordinates\n"; }
+        std::cout << '\t' << meshes.size() << " meshes\n";
+        std::cout << '\t' << materials.size() << " materials\n";
+        std::cout << '\t' << "For a total of " << total_indices / 3 << " triangles.\n";
+    }
 }
 
-void Model::parse_mtl_file(const std::filesystem::path& path, bool verbose) {
+void Model::parse_mtl_file(const std::filesystem::path& path) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
@@ -156,7 +169,7 @@ void Model::handle_object(std::vector<vec3>& positions,
 
     std::unordered_map<uint64_t, unsigned int> unique_attribute_triplets;
 
-    for(int i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
+    for(size_t i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
         if(vertex_indices[i].y == -1) {
             normals.push_back(normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
                                               positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
