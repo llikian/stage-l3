@@ -30,14 +30,14 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     std::vector<vec3> positions;
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
-    std::vector<ivec3> vertex_indices; // x is the index for the position, y for the normal and z for the tex coords
-    Material* material = nullptr;
+
+    // x is the index for the position, y for the normal and z for the tex coords
+    Material* current_material = nullptr;
+    std::unordered_map<Material*, std::vector<ivec3>> vertex_indices;
 
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
     std::string line;
-
-    uint64_t total_indices = 0;
 
     while(std::getline(file, line)) {
         std::istringstream stream(line);
@@ -76,42 +76,43 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
                 ++vertices;
             }
 
-            if(vertices == 3) {
-                vertex_indices.emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
-                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices.emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
-            } else if(vertices == 4) {
-                vertex_indices.emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
-                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices.emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
+            if(current_material == nullptr) {
+                materials.emplace("default_material", Material());
+                current_material = &materials["default_material"];
+            }
 
-                vertex_indices.emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
-                vertex_indices.emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
-                vertex_indices.emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
+            if(vertices == 3) {
+                vertex_indices[current_material].emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
+                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices[current_material].emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
+            } else if(vertices == 4) {
+                vertex_indices[current_material].emplace_back(v[0] - 1, vn[0] - 1, vt[0]);
+                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices[current_material].emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
+
+                vertex_indices[current_material].emplace_back(v[1] - 1, vn[1] - 1, vt[1]);
+                vertex_indices[current_material].emplace_back(v[2] - 1, vn[2] - 1, vt[2]);
+                vertex_indices[current_material].emplace_back(v[3] - 1, vn[3] - 1, vt[3]);
             } else if(vertices < 3) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             } else {
                 throw std::runtime_error("Unhandled case in read_obj_file, more than 4 vertices in face.");
             }
-        } else if(buffer[0] == 'g') {
-            if(!vertex_indices.empty()) {
-                handle_object(positions, normals, tex_coords, vertex_indices);
-                meshes.back().set_material(material);
-                total_indices += vertex_indices.size();
-                vertex_indices.resize(0);
-            }
         } else if(buffer == "usemtl") {
             stream >> buffer;
-            material = &materials[buffer];
+            current_material = &materials[buffer];
         } else if(buffer == "mtllib") {
             stream >> buffer;
             parse_mtl_file(parent_path + buffer);
         }
     }
 
-    total_indices += vertex_indices.size();
-    handle_object(positions, normals, tex_coords, vertex_indices);
-    meshes.back().set_material(material);
+    uint64_t total_indices = 0;
+    for(auto& [_, material] : materials) {
+        handle_object(positions, normals, tex_coords, vertex_indices[&material]);
+        meshes.back().set_material(&material);
+        total_indices += vertex_indices.size();
+    }
 
     if(verbose) {
         std::cout << '\t' << positions.size() << " vertex positions\n";
@@ -129,8 +130,9 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
 
     std::string parent_path = path.parent_path().string() + '/';
 
-    std::string line;
     Material* material = nullptr;
+
+    std::string line;
 
     while(std::getline(file, line)) {
         std::istringstream stream(line);
