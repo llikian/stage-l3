@@ -117,7 +117,7 @@ Window::Window(const std::string& window_name, void* user_pointer)
 
     glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, user_pointer);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwMaximizeWindow(window);
     glfwGetWindowSize(window, &width, &height);
