@@ -35,40 +35,6 @@ Application::Application()
 }
 
 void Application::run() {
-    const vec3 cube_positions[8]{
-        vec3(1.0f, 1.0f, 1.0f),
-        vec3(1.0f, 1.0f, -1.0f),
-        vec3(1.0f, -1.0f, 1.0f),
-        vec3(1.0f, -1.0f, -1.0f),
-        vec3(-1.0f, 1.0f, 1.0f),
-        vec3(-1.0f, 1.0f, -1.0f),
-        vec3(-1.0f, -1.0f, 1.0f),
-        vec3(-1.0f, -1.0f, -1.0f)
-    };
-
-    TriangleMesh cube;
-
-    auto add_face = [&cube_positions, &cube](unsigned int A, // TOP LEFT
-                                             unsigned int B, // BOTTOM LEFT
-                                             unsigned int C, // BOTTOM RIGHT
-                                             unsigned int D, // TOP RIGHT
-                                             const vec3& normal) {
-        cube.add_vertex(cube_positions[A], normal, vec2(0.0f, 1.0f));
-        cube.add_vertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
-        cube.add_vertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
-
-        cube.add_vertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
-        cube.add_vertex(cube_positions[C], normal, vec2(1.0f, 0.0f));
-        cube.add_vertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
-    };
-
-    add_face(0, 2, 3, 1, vec3(1.0f, 0.0f, 0.0f));
-    add_face(5, 7, 6, 4, vec3(-1.0f, 0.0f, 0.0f));
-    add_face(0, 1, 5, 4, vec3(0.0f, 1.0f, 0.0f));
-    add_face(3, 2, 6, 7, vec3(0.0f, -1.0f, 0.0f));
-    add_face(4, 6, 2, 0, vec3(0.0f, 0.0f, 1.0f));
-    add_face(1, 3, 7, 5, vec3(0.0f, 0.0f, -1.0f));
-
     Model sponza("data/sponza/sponza.obj", scale(0.05f), true);
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f), true);
 
@@ -81,13 +47,6 @@ void Application::run() {
         shader.use();
 
         shader.set_uniform("u_camera_position", camera.get_position());
-
-        // for(int i = -5 ; i <= 5 ; ++i) {
-        //     for(int j = -5 ; j <= 5 ; ++j) {
-        //         update_mvp(translate(i * 3, std::sqrt(i * i + j * j), j * 3));
-        //         cube.draw();
-        //     }
-        // }
 
         update_mvp(sponza.model_matrix);
         sponza.draw(shader);
