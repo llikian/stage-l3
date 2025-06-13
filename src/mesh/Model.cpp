@@ -56,22 +56,21 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
                 tex_coords.emplace_back(x, y);
             }
         } else if(buffer[0] == 'f') { // Face
-            int v[4]{ 0, 0, 0, 0 };
-            int vn[4]{ 0, 0, 0, 0 };
-            int vt[4]{ 0, 0, 0, 0 };
-
-            unsigned int vertices = 0;
+            std::vector<ivec3> face;
 
             while(stream >> buffer) {
-                int count = std::sscanf(buffer.c_str(), "%d/%d/%d", &v[vertices], &vt[vertices], &vn[vertices]);
+                face.emplace_back();
+                int count = std::sscanf(buffer.c_str(), "%d/%d/%d", &face.back().x, &face.back().z, &face.back().y);
 
                 if(count == 1) {
-                    std::sscanf(buffer.c_str(), "%d//%d", &v[vertices], &vn[vertices]);
+                    std::sscanf(buffer.c_str(), "%d//%d", &face.back().x, &face.back().y);
                 } else if(count == 0) {
                     throw std::runtime_error("Format error in .obj file, no vertex attribute.");
                 }
+            }
 
-                ++vertices;
+            if(face.size() < 3) {
+                throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             }
 
             if(current_material == nullptr) {
@@ -79,22 +78,10 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
                 current_material = &materials["default_material"];
             }
 
-            if(vertices == 3) {
-                vertex_indices[current_material].emplace_back(v[0], vn[0], vt[0]);
-                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
-                vertex_indices[current_material].emplace_back(v[2], vn[2], vt[2]);
-            } else if(vertices == 4) {
-                vertex_indices[current_material].emplace_back(v[0], vn[0], vt[0]);
-                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
-                vertex_indices[current_material].emplace_back(v[3], vn[3], vt[3]);
-
-                vertex_indices[current_material].emplace_back(v[1], vn[1], vt[1]);
-                vertex_indices[current_material].emplace_back(v[2], vn[2], vt[2]);
-                vertex_indices[current_material].emplace_back(v[3], vn[3], vt[3]);
-            } else if(vertices < 3) {
-                throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
-            } else {
-                throw std::runtime_error("Unhandled case in read_obj_file, more than 4 vertices in face.");
+            for(unsigned int i = 1 ; i + 1 < face.size() ; ++i) {
+                vertex_indices[current_material].push_back(face[0]);
+                vertex_indices[current_material].push_back(face[i]);
+                vertex_indices[current_material].push_back(face[i + 1]);
             }
         } else if(buffer == "usemtl") {
             stream >> buffer;
