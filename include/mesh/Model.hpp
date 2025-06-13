@@ -11,7 +11,7 @@
 #include "Material.hpp"
 #include "Shader.hpp"
 #include "TriangleMesh.hpp"
-#include "maths/ivec3.hpp"
+#include "maths/vec3.hpp"
 
 /**
  * @class Model

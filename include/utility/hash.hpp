@@ -6,7 +6,7 @@
 #pragma once
 
 #include <iostream>
-#include "maths/ivec3.hpp"
+#include "maths/vec3.hpp"
 
 struct ivec3_hash {
     std::size_t operator()(const ivec3& vec) const;
