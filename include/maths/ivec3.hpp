@@ -14,6 +14,8 @@ struct ivec3 {
     explicit ivec3(int value);
     ivec3(int x, int y, int z);
 
+    bool operator==(const ivec3& other) const;
+
     int x;
     int y;
     int z;
