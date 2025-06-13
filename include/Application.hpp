@@ -41,11 +41,13 @@ private:
 
     Window window; ///< Contains the GLFW window. Needs to be initialized first.
 
-    Shader shader;
-    Camera camera;
+    Shader shader; ///< The default shader used for draw calls.
+    Camera camera; ///< The active camera.
 
-    float fov;
-    mat4 projection;
+    float fov; ///< The field of view angle.
+    mat4 projection; ///< The projection matrix. Used every frame in the mvp matrix calculation.
+
+    /// Holds the projection matrix multiplied by the view matrix in order to only do the calculation once per frame.
     mat4 view_projection;
 
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
