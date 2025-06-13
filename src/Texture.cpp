@@ -34,16 +34,7 @@ Texture::~Texture() {
 }
 
 void Texture::create(const std::string& path) {
-    if(id != 0) { glDeleteTextures(1, &id); }
-
-    Image image(path);
-
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-
-    unsigned int format = image.get_channels_amount() == 4 ? GL_RGBA : GL_RGB;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, image.get_width(), image.get_height(), 0, format, GL_UNSIGNED_BYTE, image.get_data());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    create(Image(path));
 }
 
 void Texture::create(const Image& image) {
@@ -52,23 +43,16 @@ void Texture::create(const Image& image) {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
 
-    unsigned int format = image.get_channels_amount() == 4 ? GL_RGBA : GL_RGB;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, image.get_width(), image.get_height(), 0, format, GL_UNSIGNED_BYTE, image.get_data());
+    unsigned int format = image.get_color_format();
+    glTexImage2D(GL_TEXTURE_2D, 0, format, image.get_width(), image.get_height(), 0, format, GL_UNSIGNED_BYTE,
+                 image.get_data());
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void Texture::create(const vec3& color) {
-    if(id != 0) { glDeleteTextures(1, &id); }
-
-    unsigned char c[3]{
-        static_cast<unsigned char>(color.x * 255.0f),
-        static_cast<unsigned char>(color.y * 255.0f),
-        static_cast<unsigned char>(color.z * 255.0f)
-    };
-
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
+    create(static_cast<unsigned char>(color.x * 255.0f),
+           static_cast<unsigned char>(color.y * 255.0f),
+           static_cast<unsigned char>(color.z * 255.0f));
 }
 
 void Texture::create(unsigned char r, unsigned char g, unsigned char b) {

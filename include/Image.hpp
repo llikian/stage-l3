@@ -44,6 +44,11 @@ public:
      */
     unsigned int get_channels_amount() const;
 
+    /**
+     * @return The OpenGL color format corresponding to the image's amount of channels.
+     */
+    unsigned int get_color_format() const;
+
 private:
     unsigned char* data;          ///< The data of the image.
     unsigned int width;           ///< The width of the image.
