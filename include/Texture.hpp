@@ -20,19 +20,19 @@ public:
      * @brief Constructs a texture by loading an image and assigning its data to a new texture.
      * @param path The image's path.
      */
-    Texture(const std::string& path);
+    explicit Texture(const std::string& path);
 
     /**
      * @brief Constructs a texture by assigning an image's data to a new texture.
      * @param image The image.
      */
-    Texture(const Image& image);
+    explicit Texture(const Image& image);
 
     /**
      * @brief Constructs a 1*1px texture with a specific color.
      * @param color The color of the texture.
      */
-    Texture(const vec3& color);
+    explicit Texture(const vec3& color);
 
     /**
      * @brief Constructs a 1*1px texture with a specific color.
