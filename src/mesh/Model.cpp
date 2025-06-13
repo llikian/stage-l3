@@ -9,7 +9,7 @@
 #include "utility/hash.hpp"
 
 Model::Model(const std::filesystem::path& path, const mat4& model, bool verbose)
-    : model(model) {
+    : model_matrix(model) {
     std::string extension = path.extension().string();
 
     if(extension != ".obj") {
@@ -94,7 +94,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     uint64_t total_indices = 0;
     size_t original_normals_amount = normals.size();
     for(auto& [material_name, material] : materials) {
-        handle_object(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
+        add_mesh(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
         meshes.back().set_material(&material);
         total_indices += meshes.back().get_indices_amount();
     }
@@ -146,7 +146,7 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
     }
 }
 
-void Model::handle_object(const std::vector<vec3>& positions,
+void Model::add_mesh(const std::vector<vec3>& positions,
                           std::vector<vec3>& normals,
                           const std::vector<vec2>& tex_coords,
                           std::vector<ivec3>& vertex_indices,
