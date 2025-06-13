@@ -53,13 +53,13 @@ void Application::run() {
                                              unsigned int C, // BOTTOM RIGHT
                                              unsigned int D, // TOP RIGHT
                                              const vec3& normal) {
-        cube.addVertex(cube_positions[A], normal, vec2(0.0f, 1.0f));
-        cube.addVertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
-        cube.addVertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
+        cube.add_vertex(cube_positions[A], normal, vec2(0.0f, 1.0f));
+        cube.add_vertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
+        cube.add_vertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
 
-        cube.addVertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
-        cube.addVertex(cube_positions[C], normal, vec2(1.0f, 0.0f));
-        cube.addVertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
+        cube.add_vertex(cube_positions[B], normal, vec2(0.0f, 0.0f));
+        cube.add_vertex(cube_positions[C], normal, vec2(1.0f, 0.0f));
+        cube.add_vertex(cube_positions[D], normal, vec2(1.0f, 1.0f));
     };
 
     add_face(0, 2, 3, 1, vec3(1.0f, 0.0f, 0.0f));

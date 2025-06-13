@@ -11,28 +11,32 @@ PointMesh::PointMesh() { }
 
 PointMesh::PointMesh(const std::vector<Vertex>& vertices)
     : vertices(vertices) {
-    PointMesh::bindBuffers();
-}
-
-void PointMesh::addVertex(const vec3& position, const vec3& color, float size) {
-    vertices.emplace_back(position, color, size);
+    PointMesh::bind_buffers();
 }
 
 void PointMesh::draw(Shader& shader) {
-    if(!bound) { bindBuffers(); }
+    if(!bound) { bind_buffers(); }
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, vertices.size());
 }
 
-unsigned int PointMesh::getPrimitive() {
+unsigned int PointMesh::get_primitive() const {
     return GL_POINTS;
 }
 
-void PointMesh::addVertex(const Vertex& vertex) {
+void PointMesh::add_vertex(const Vertex& vertex) {
     vertices.push_back(vertex);
 }
 
-void PointMesh::bindBuffers() {
+void PointMesh::add_vertex(const vec3& position, const vec3& color, float size) {
+    vertices.emplace_back(position, color, size);
+}
+
+size_t PointMesh::get_vertices_amount() const {
+    return vertices.size();
+}
+
+void PointMesh::bind_buffers() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 

@@ -173,11 +173,11 @@ void Model::handle_object(const std::vector<vec3>& positions,
             if(vertex.z < 0) { vertex.z += tex_coords.size(); }
 
             auto [index, was_inserted] = unique_attribute_triplets.try_emplace(vertex, mesh.get_vertices_amount());
-            if(was_inserted) { mesh.addVertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }
+            if(was_inserted) { mesh.add_vertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }
             indices[j] = index->second;
         }
 
-        mesh.addTriangle(indices[0], indices[1], indices[2]);
+        mesh.add_triangle(indices[0], indices[1], indices[2]);
     }
 }
 

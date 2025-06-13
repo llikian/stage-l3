@@ -11,12 +11,12 @@ TriangleMesh::TriangleMesh() : EBO(0), material(nullptr) { }
 
 TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
     : EBO(0), vertices(vertices), indices(indices) {
-    TriangleMesh::bindBuffers();
+    TriangleMesh::bind_buffers();
 }
 
 TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices)
     : EBO(0), vertices(vertices) {
-    TriangleMesh::bindBuffers();
+    TriangleMesh::bind_buffers();
 }
 
 TriangleMesh::~TriangleMesh() {
@@ -24,7 +24,7 @@ TriangleMesh::~TriangleMesh() {
 }
 
 void TriangleMesh::draw(Shader& shader) {
-    if(!bound) { bindBuffers(); }
+    if(!bound) { bind_buffers(); }
 
     shader.use();
     if(material != nullptr) { material->update_shader_uniforms(shader); }
@@ -37,29 +37,25 @@ void TriangleMesh::draw(Shader& shader) {
     }
 }
 
-unsigned int TriangleMesh::getPrimitive() {
+unsigned int TriangleMesh::get_primitive() const {
     return GL_TRIANGLES;
 }
 
-void TriangleMesh::addVertex(const Vertex& vertex) {
+void TriangleMesh::add_vertex(const Vertex& vertex) {
     vertices.push_back(vertex);
 }
 
-void TriangleMesh::addVertex(const vec3& position, const vec3& normal, const vec2& texCoords) {
+void TriangleMesh::add_vertex(const vec3& position, const vec3& normal, const vec2& texCoords) {
     vertices.emplace_back(position, normal, texCoords);
 }
 
-void TriangleMesh::addIndex(unsigned int index) {
-    indices.push_back(index);
-}
-
-void TriangleMesh::addTriangle(unsigned int top, unsigned int left, unsigned int right) {
+void TriangleMesh::add_triangle(unsigned int top, unsigned int left, unsigned int right) {
     indices.push_back(top);
     indices.push_back(left);
     indices.push_back(right);
 }
 
-void TriangleMesh::addFace(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR) {
+void TriangleMesh::add_face(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR) {
     indices.push_back(topL);
     indices.push_back(bottomL);
     indices.push_back(bottomR);
@@ -81,7 +77,7 @@ size_t TriangleMesh::get_indices_amount() const {
     return indices.size();
 }
 
-void TriangleMesh::bindBuffers() {
+void TriangleMesh::bind_buffers() {
     /* VAO */
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);

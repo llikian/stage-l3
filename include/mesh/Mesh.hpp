@@ -13,17 +13,40 @@
  */
 class Mesh {
 public:
+    /**
+     * @brief Creates an empty mesh without initializing buffers.
+     */
     Mesh();
+
+    /**
+     * @brief Frees buffers.
+     */
     virtual ~Mesh();
 
+    /**
+     * @brief Performs a draw call with a certain shader.
+     * @param shader The shader to perform the draw call with.
+     */
     virtual void draw(Shader& shader) = 0;
-    virtual unsigned int getPrimitive() = 0;
+
+    /**
+     * @return The mesh's primitive.
+     */
+    virtual unsigned int get_primitive() const = 0;
+
+    /**
+     * @return Get the amount of vertices in the mesh.
+     */
+    virtual size_t get_vertices_amount() const = 0;
 
 protected:
-    virtual void bindBuffers() = 0;
+    /**
+     * @brief Binds the OpenGL buffers.
+     */
+    virtual void bind_buffers() = 0;
 
-    bool bound;
+    bool bound; ///< Whether the buffers were bound.
 
-    unsigned int VAO;
-    unsigned int VBO;
+    unsigned int VAO; ///< The mesh's Vertex Array Object.
+    unsigned int VBO; ///< The mesh's Vertex Buffer Object.
 };

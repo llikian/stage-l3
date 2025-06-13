@@ -13,33 +13,86 @@
  * @class LineMesh
  * @brief Represents a 3D mesh made out of lines that can be created and rendererd.
  */
-class LineMesh : public Mesh {
+class LineMesh : protected Mesh {
 public:
+    /**
+     * @struct LineMesh::Vertex
+     * @brief A structure holding a vertex's attributes.
+     */
     struct Vertex {
         vec3 position;
         vec3 color;
     };
 
+    /**
+     * @brief Creates an empty mesh without initializing buffers.
+     */
     LineMesh();
+
+    /**
+     * @brief Creates a mesh with the specified vertices and indices and initializes the buffers.
+     */
     LineMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+
+    /**
+     * @brief Creates a mesh with the specified vertices and no indices and initializes the buffers.
+     */
     explicit LineMesh(const std::vector<Vertex>& vertices);
+
+    /**
+     * @brief Frees buffers.
+     */
     ~LineMesh() override;
 
+    /**
+     * @brief Performs a draw call with a certain shader.
+     * @param shader The shader to perform the draw call with.
+     */
     void draw(Shader& shader) override;
 
-    unsigned int getPrimitive() override;
+    /**
+     * @return The mesh's primitive: GL_LINES.
+     */
+    unsigned int get_primitive() const override;
 
-    void addVertex(const Vertex& vertex);
-    void addVertex(const vec3& position, const vec3& color = vec3(1.0f));
+    /**
+     * @brief Add a vertex to the mesh.
+     * @param vertex The vertex.
+     */
+    void add_vertex(const Vertex& vertex);
 
-    void addIndex(unsigned int index);
-    void addLine(unsigned int start, unsigned int end);
+    /**
+     * @brief Create and add a vertex to the mesh.
+     * @param position
+     * @param color
+     */
+    void add_vertex(const vec3& position, const vec3& color = vec3(1.0f));
+
+    /**
+     * @brief Add a line's indices to the mesh.
+     * @param start The index of the start of the line.
+     * @param end The index of the end of the line.
+     */
+    void add_line(unsigned int start, unsigned int end);
+
+    /**
+     * @return The amount of vertices in the mesh.
+     */
+    size_t get_vertices_amount() const override;
+
+    /**
+     * @return The amount of indices in the mesh.
+     */
+    size_t get_indices_amount() const;
 
 private:
-    void bindBuffers() override;
+    /**
+     * @brief Binds the OpenGL buffers.
+     */
+    void bind_buffers() override;
 
-    unsigned int EBO;
+    unsigned int EBO; ///< The mesh's Element Buffer Object. Useful to avoid repeating vertices in memory.
 
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<Vertex> vertices;      ///< The mesh's vertices.
+    std::vector<unsigned int> indices; ///< The mesh's indices.
 };
