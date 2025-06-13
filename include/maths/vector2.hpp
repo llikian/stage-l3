@@ -48,7 +48,7 @@ struct vector2 {
      * @brief Subtracts the current instance's components by another vector2's components.
      * @param vec The vector2 to subtract by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator -=(const vector2& vec) {
         x -= vec.x;
         y -= vec.y;
@@ -60,7 +60,7 @@ struct vector2 {
      * @brief Multiplies the current instance's components by another vector2's components.
      * @param vec The vector2 to multiply by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator *=(const vector2& vec) {
         x *= vec.x;
         y *= vec.y;
@@ -72,7 +72,7 @@ struct vector2 {
      * @brief Divides the current instance's components by another vector2's components.
      * @param vec The vector2 to divide by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator /=(const vector2& vec) {
         x /= vec.x;
         y /= vec.y;
@@ -84,7 +84,7 @@ struct vector2 {
      * @brief Adds a value to all of the current instance's components.
      * @param value The value to add.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator +=(Type value) {
         x += value;
         y += value;
@@ -96,7 +96,7 @@ struct vector2 {
      * @brief Subtracts all of the current instance's components by a value.
      * @param value The value to subtract by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator -=(Type value) {
         x -= value;
         y -= value;
@@ -108,7 +108,7 @@ struct vector2 {
      * @brief Multiplies all of the current instance's components by a value.
      * @param value The value to multiply by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator *=(Type value) {
         x *= value;
         y *= value;
@@ -120,7 +120,7 @@ struct vector2 {
      * @brief Divides all of the current instance's components by a value.
      * @param value The value to divide by.
      * @return A reference to this instance.
-    */
+     */
     vector2& operator /=(Type value) {
         x /= value;
         y /= value;

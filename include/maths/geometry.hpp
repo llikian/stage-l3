@@ -76,9 +76,9 @@ vec3 normalize(const vec3& vec);
 vec4 normalize(const vec4& vec);
 
 /**
- * @brief Calculates the cross product of two Vector.
+ * @brief Calculates the cross product of two vec3.
  * @param left The left operand.
  * @param right The right operand.
- * @return The cross product of the two Vector.
+ * @return The cross product of the two vec3.
  */
 vec3 cross(const vec3& left, const vec3& right);
