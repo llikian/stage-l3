@@ -43,6 +43,11 @@ public:
     Texture(unsigned char r, unsigned char g, unsigned char b);
 
     /**
+     * @brief Deletes the texture.
+     */
+    ~Texture();
+
+    /**
      * @brief Creates a texture by loading an image and assigning its data to a new texture.
      * @param path The image's path.
      */
@@ -69,15 +74,20 @@ public:
     void create(unsigned char r, unsigned char g, unsigned char b);
 
     /**
-     * @brief Deletes the texture.
-     */
-    ~Texture();
-
-    /**
      * @brief Binds the texture to a specifc texture unit.
      * @param texUnit The opengl texture unit ID.
      */
     void bind(unsigned int texUnit = 0) const;
+
+    /**
+     * @return Whether the texture is the default texture (id == 0).
+     */
+    bool is_default_texture() const;
+
+    /**
+     * @return The texture's id.
+     */
+    unsigned int get_id() const;
 
 private:
     unsigned int id; ///< Texture id.

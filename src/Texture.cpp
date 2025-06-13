@@ -29,11 +29,6 @@ Texture::~Texture() {
     glDeleteTextures(1, &id);
 }
 
-void Texture::bind(unsigned int texUnit) const {
-    glActiveTexture(GL_TEXTURE0 + texUnit);
-    glBindTexture(GL_TEXTURE_2D, id);
-}
-
 void Texture::create(const std::string& path) {
     if(id != 0) { glDeleteTextures(1, &id); }
 
@@ -78,4 +73,17 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
+}
+
+void Texture::bind(unsigned int texUnit) const {
+    glActiveTexture(GL_TEXTURE0 + texUnit);
+    glBindTexture(GL_TEXTURE_2D, id);
+}
+
+bool Texture::is_default_texture() const {
+    return id == 0;
+}
+
+unsigned int Texture::get_id() const {
+    return id;
 }
