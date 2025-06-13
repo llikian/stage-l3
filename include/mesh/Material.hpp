@@ -15,6 +15,8 @@
  * @brief
  */
 struct Material {
+    Material();
+
     void update_shader_uniforms(const Shader& shader) const;
 
     vec3 ambient;
