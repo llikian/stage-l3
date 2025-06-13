@@ -89,7 +89,7 @@ void Application::run() {
         //     }
         // }
 
-        update_mvp(sponza.model);
+        update_mvp(sponza.model_matrix);
         sponza.draw(shader);
 
         // update_mvp(vokselia.model);
