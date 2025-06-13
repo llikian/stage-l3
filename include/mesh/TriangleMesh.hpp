@@ -43,6 +43,11 @@ public:
     explicit TriangleMesh(const std::vector<Vertex>& vertices);
 
     /**
+     * @brief Frees buffers.
+     */
+    ~TriangleMesh();
+
+    /**
      * @brief Performs a draw call with a certain shader.
      * @param shader The shader to perform the draw call with.
      */
