@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <cstdint>
+#include <iostream>
+#include "maths/ivec3.hpp"
 
-// https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function
-uint64_t hash_pair(uint64_t x, uint64_t y);
-
-uint64_t hash_triplet(uint64_t x, uint64_t y, uint64_t z);
+struct ivec3_hash {
+    std::size_t operator()(const ivec3& vec) const;
+};

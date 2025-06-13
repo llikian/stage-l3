@@ -25,15 +25,13 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
-    std::string parent_path = path.parent_path().string() + '/';
-
     std::vector<vec3> positions;
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
 
-    // x is the index for the position, y for the normal and z for the tex coords
     std::string current_material_name;
     std::unordered_map<std::string, std::vector<ivec3>> vertex_indices;
+    // x is the index for the position, y for the normal and z for the tex coords
 
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
@@ -89,7 +87,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
             stream >> current_material_name;
         } else if(buffer == "mtllib") {
             stream >> buffer;
-            parse_mtl_file(parent_path + buffer);
+            parse_mtl_file(path.parent_path() / buffer);
         }
     }
 
@@ -115,8 +113,6 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
-    std::string parent_path = path.parent_path().string() + '/';
-
     Material* material = nullptr;
 
     std::string line;
@@ -141,23 +137,23 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
         } else if(buffer == "map_Ka") {
             stream >> buffer;
             for(char& c : buffer) { if(c == '\\') { c = '/'; } }
-            material->ambient_map.create(parent_path + buffer);
+            material->ambient_map.create(path.parent_path() / buffer);
         } else if(buffer == "map_Kd") {
             stream >> buffer;
             for(char& c : buffer) { if(c == '\\') { c = '/'; } }
-            material->diffuse_map.create(parent_path + buffer);
+            material->diffuse_map.create(path.parent_path() / buffer);
         }
     }
 }
 
-void Model::handle_object(std::vector<vec3>& positions,
+void Model::handle_object(const std::vector<vec3>& positions,
                           std::vector<vec3>& normals,
-                          std::vector<vec2>& tex_coords,
+                          const std::vector<vec2>& tex_coords,
                           std::vector<ivec3>& vertex_indices,
                           size_t original_normals_amount) {
     TriangleMesh& mesh = meshes.emplace_back();
 
-    std::unordered_map<uint64_t, unsigned int> unique_attribute_triplets;
+    std::unordered_map<ivec3, unsigned int, ivec3_hash> unique_attribute_triplets;
 
     for(size_t i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
         if(vertex_indices[i].y == 0) {
@@ -166,39 +162,21 @@ void Model::handle_object(std::vector<vec3>& positions,
             vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size();
         }
 
-        uint64_t ids[3];
+        // Handling negative indices & Vertex Deduplication
+        unsigned int indices[3];
         for(int j = 0 ; j < 3 ; ++j) {
-            if(vertex_indices[i + j].x < 0) {
-                vertex_indices[i + j].x = positions.size() + vertex_indices[i + j].x;
-            } else {
-                vertex_indices[i + j].x -= 1;
-            }
+            ivec3& vertex = vertex_indices[i + j];
 
-            if(vertex_indices[i + j].y < 0) {
-                vertex_indices[i + j].y = original_normals_amount + vertex_indices[i + j].y;
-            } else {
-                vertex_indices[i + j].y -= 1;
-            }
+            vertex.x += vertex.x < 0 ? positions.size() : -1;
+            vertex.y += vertex.y < 0 ? original_normals_amount : -1;
+            vertex.z += vertex.z < 0 ? tex_coords.size() : 0;
 
-            if(vertex_indices[i + j].z < 0) {
-                vertex_indices[i + j].z = tex_coords.size() + vertex_indices[i + j].z;
-            }
-
-            ids[j] = hash_triplet(vertex_indices[i + j].x,
-                                  vertex_indices[i + j].y,
-                                  vertex_indices[i + j].z);
-
-            if(!unique_attribute_triplets.contains(ids[j])) {
-                mesh.addVertex(positions[vertex_indices[i + j].x],
-                               normals[vertex_indices[i + j].y],
-                               tex_coords[vertex_indices[i + j].z]);
-                unique_attribute_triplets.emplace(ids[j], mesh.get_vertices_amount() - 1);
-            }
+            auto [index, was_inserted] = unique_attribute_triplets.try_emplace(vertex, mesh.get_vertices_amount());
+            if(was_inserted) { mesh.addVertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }
+            indices[j] = index->second;
         }
 
-        mesh.addTriangle(unique_attribute_triplets[ids[0]],
-                         unique_attribute_triplets[ids[1]],
-                         unique_attribute_triplets[ids[2]]);
+        mesh.addTriangle(indices[0], indices[1], indices[2]);
     }
 }
 

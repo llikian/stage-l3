@@ -24,9 +24,9 @@ public:
     void parse_obj_file(const std::filesystem::path& path, bool verbose);
     void parse_mtl_file(const std::filesystem::path& path);
 
-    void handle_object(std::vector<vec3>& positions,
+    void handle_object(const std::vector<vec3>& positions,
                        std::vector<vec3>& normals,
-                       std::vector<vec2>& tex_coords,
+                       const std::vector<vec2>& tex_coords,
                        std::vector<ivec3>& vertex_indices,
                        size_t original_normals_amount);
 
