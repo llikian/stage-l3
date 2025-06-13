@@ -96,7 +96,7 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     for(auto& [material_name, material] : materials) {
         handle_object(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
         meshes.back().set_material(&material);
-        total_indices += vertex_indices.size();
+        total_indices += meshes.back().get_indices_amount();
     }
 
     if(verbose) {
