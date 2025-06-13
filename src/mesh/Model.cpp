@@ -32,8 +32,8 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
     std::vector<vec2> tex_coords;
 
     // x is the index for the position, y for the normal and z for the tex coords
-    Material* current_material = nullptr;
-    std::unordered_map<Material*, std::vector<ivec3>> vertex_indices;
+    std::string current_material_name;
+    std::unordered_map<std::string, std::vector<ivec3>> vertex_indices;
 
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
@@ -73,19 +73,20 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             }
 
-            if(current_material == nullptr) {
-                materials.emplace("default_material", Material());
-                current_material = &materials["default_material"];
+            if(current_material_name.empty()) {
+                current_material_name = "default_material";
+                materials.emplace(current_material_name, Material());
             }
 
+            std::vector<ivec3>& indices = vertex_indices[current_material_name];
+
             for(unsigned int i = 1 ; i + 1 < face.size() ; ++i) {
-                vertex_indices[current_material].push_back(face[0]);
-                vertex_indices[current_material].push_back(face[i]);
-                vertex_indices[current_material].push_back(face[i + 1]);
+                indices.push_back(face[0]);
+                indices.push_back(face[i]);
+                indices.push_back(face[i + 1]);
             }
         } else if(buffer == "usemtl") {
-            stream >> buffer;
-            current_material = &materials[buffer];
+            stream >> current_material_name;
         } else if(buffer == "mtllib") {
             stream >> buffer;
             parse_mtl_file(parent_path + buffer);
@@ -94,8 +95,8 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
 
     uint64_t total_indices = 0;
     size_t original_normals_amount = normals.size();
-    for(auto& [_, material] : materials) {
-        handle_object(positions, normals, tex_coords, vertex_indices[&material], original_normals_amount);
+    for(auto& [material_name, material] : materials) {
+        handle_object(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
         meshes.back().set_material(&material);
         total_indices += vertex_indices.size();
     }
