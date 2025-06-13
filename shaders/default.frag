@@ -24,19 +24,26 @@ uniform sampler2D u_ambient_map;
 uniform sampler2D u_diffuse_map;
 
 void main() {
+    vec4 ambient_map = texture(u_ambient_map, v_tex_coords);
+    vec4 diffuse_map = texture(u_diffuse_map, v_tex_coords);
+
+    frag_color.a = diffuse_map.a;
+    if (frag_color.a < 0.2f) {
+        discard;
+    }
+
     vec3 normal = normalize(v_normal);
     vec3 light_direction = normalize(LIGHT_POS - v_position);
 
-    vec3 ambient = 0.5f * u_ambient * texture(u_ambient_map, v_tex_coords).rgb;
+    vec3 ambient = 0.5f * u_ambient * ambient_map.rgb;
 
     float diffuse_strength = max(dot(normal, light_direction), 0.0f);
-    vec3 diffuse = diffuse_strength * u_diffuse * texture(u_diffuse_map, v_tex_coords).rgb;
+    vec3 diffuse = diffuse_strength * u_diffuse * diffuse_map.rgb;
 
     vec3 view_direction = normalize(u_camera_position - v_position);
     vec3 reflected_direction = reflect(-light_direction, normal);
     float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
     vec3 specular = specular_strength * u_specular;
 
-    frag_color.xyz = (ambient + diffuse) * LIGHT_COLOR;
-    frag_color.w = 1.0f;
+    frag_color.rgb = (ambient + diffuse + specular) * LIGHT_COLOR;
 }

@@ -13,7 +13,7 @@ Image::Image(const std::string& path) {
     stbi_set_flip_vertically_on_load(true);
 
     int w, h, c;
-    data = stbi_load(path.c_str(), &w, &h, &c, 3); // TODO : Maybe change 3 to 4 for transparency
+    data = stbi_load(path.c_str(), &w, &h, &c, 0);
     if(data == nullptr) { throw std::runtime_error("Couldn't load image '" + path + '\''); }
 
     width = w;
