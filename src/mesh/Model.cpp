@@ -164,12 +164,13 @@ void Model::handle_object(const std::vector<vec3>& positions,
 
         // Handling negative indices & Vertex Deduplication
         unsigned int indices[3];
+
         for(int j = 0 ; j < 3 ; ++j) {
             ivec3& vertex = vertex_indices[i + j];
 
             vertex.x += vertex.x < 0 ? positions.size() : -1;
             vertex.y += vertex.y < 0 ? original_normals_amount : -1;
-            vertex.z += vertex.z < 0 ? tex_coords.size() : 0;
+            if(vertex.z < 0) { vertex.z += tex_coords.size(); }
 
             auto [index, was_inserted] = unique_attribute_triplets.try_emplace(vertex, mesh.get_vertices_amount());
             if(was_inserted) { mesh.addVertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }
