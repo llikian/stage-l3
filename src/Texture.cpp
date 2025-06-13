@@ -36,8 +36,8 @@ void Texture::create(const std::string& path) {
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 image.getData());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.get_width(), image.get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 image.get_data());
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
@@ -46,8 +46,8 @@ void Texture::create(const Image& image) {
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, image.getData());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.get_width(), image.get_height(), 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, image.get_data());
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
