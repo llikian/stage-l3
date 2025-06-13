@@ -12,31 +12,31 @@
 Image::Image(const std::string& path) {
     stbi_set_flip_vertically_on_load(true);
 
-    int W, H, nbC;
-    data = stbi_load(path.c_str(), &W, &H, &nbC, 3); // TODO : Maybe change 3 to 4 for transparency
+    int w, h, c;
+    data = stbi_load(path.c_str(), &w, &h, &c, 3); // TODO : Maybe change 3 to 4 for transparency
     if(data == nullptr) { throw std::runtime_error("Couldn't load image '" + path + '\''); }
 
-    width = W;
-    height = H;
-    nbChannels = nbC;
+    width = w;
+    height = h;
+    channels_amount = c;
 }
 
 Image::~Image() {
     stbi_image_free(data);
 }
 
-const unsigned char* Image::getData() const {
+const unsigned char* Image::get_data() const {
     return data;
 }
 
-unsigned int Image::getWidth() const {
+unsigned int Image::get_width() const {
     return width;
 }
 
-unsigned int Image::getHeight() const {
+unsigned int Image::get_height() const {
     return height;
 }
 
-unsigned int Image::getChannelsNumber() const {
-    return nbChannels;
+unsigned int Image::get_channels_amount() const {
+    return channels_amount;
 }

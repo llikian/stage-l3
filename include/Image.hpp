@@ -17,7 +17,7 @@ public:
      * @brief Loads the image at the specified path.
      * @param path The path to the image.
      */
-    Image(const std::string& path);
+    explicit Image(const std::string& path);
 
     /**
      * @brief Frees all the allocated memory.
@@ -25,32 +25,28 @@ public:
     ~Image();
 
     /**
-     * @brief Getter for the data member.
      * @return The data of the image.
      */
-    const unsigned char* getData() const;
+    const unsigned char* get_data() const;
 
     /**
-     * @brief Getter for the width member.
      * @return The width of the image.
      */
-    unsigned int getWidth() const;
+    unsigned int get_width() const;
 
     /**
-     * @brief Getter for the height member.
      * @return The height of the image.
      */
-    unsigned int getHeight() const;
+    unsigned int get_height() const;
 
     /**
-     * @brief Getter for the nbChannels member.
      * @return The number of channels of the image.
      */
-    unsigned int getChannelsNumber() const;
+    unsigned int get_channels_amount() const;
 
 private:
-    unsigned char* data;     ///< The data of the image.
-    unsigned int width;      ///< The width of the image.
-    unsigned int height;     ///< The height of the image.
-    unsigned int nbChannels; ///< The number of channels of the image.
+    unsigned char* data;          ///< The data of the image.
+    unsigned int width;           ///< The width of the image.
+    unsigned int height;          ///< The height of the image.
+    unsigned int channels_amount; ///< The number of channels of the image.
 };
