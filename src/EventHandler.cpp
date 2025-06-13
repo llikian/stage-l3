@@ -12,7 +12,8 @@ EventHandler::EventHandler(Window* window, Camera* camera)
     : mouse_position(window->get_width() / 2.0f, window->get_height() / 2.0f),
       time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
-      is_cursor_visible(false), is_face_culling_enabled(true), is_wireframe_enabled(false) {
+      is_cursor_visible(glfwGetInputMode(window->get_GLFW_window(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
+      is_face_culling_enabled(true), is_wireframe_enabled(false) {
     if(camera == nullptr) {
         throw std::runtime_error("Cannot set active_camera to nullptr");
     }
