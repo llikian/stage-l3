@@ -11,7 +11,7 @@ in vec2 v_tex_coords;
 
 out vec4 frag_color;
 
-const vec3 LIGHT_POS = vec3(0.0f, 10.0f, 0.0f);
+const vec3 LIGHT_POS = vec3(0.0f, 20.0f, 0.0f);
 const vec3 LIGHT_COLOR = vec3(1.0f);
 
 uniform vec3 u_camera_position;
@@ -28,14 +28,12 @@ void main() {
     vec4 diffuse_map = texture(u_diffuse_map, v_tex_coords);
 
     frag_color.a = diffuse_map.a;
-    if (frag_color.a < 0.2f) {
-        discard;
-    }
+    if (frag_color.a < 0.2f) { discard; }
 
     vec3 normal = normalize(v_normal);
     vec3 light_direction = normalize(LIGHT_POS - v_position);
 
-    vec3 ambient = 0.5f * u_ambient * ambient_map.rgb;
+    vec3 ambient = 0.2f * u_ambient * ambient_map.rgb;
 
     float diffuse_strength = max(dot(normal, light_direction), 0.0f);
     vec3 diffuse = diffuse_strength * u_diffuse * diffuse_map.rgb;
