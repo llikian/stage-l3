@@ -147,10 +147,10 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
 }
 
 void Model::add_mesh(const std::vector<vec3>& positions,
-                          std::vector<vec3>& normals,
-                          const std::vector<vec2>& tex_coords,
-                          std::vector<ivec3>& vertex_indices,
-                          size_t original_normals_amount) {
+                     std::vector<vec3>& normals,
+                     const std::vector<vec2>& tex_coords,
+                     std::vector<ivec3>& vertex_indices,
+                     size_t original_normals_amount) {
     TriangleMesh& mesh = meshes.emplace_back();
 
     std::unordered_map<ivec3, unsigned int, ivec3_hash> unique_attribute_triplets;
