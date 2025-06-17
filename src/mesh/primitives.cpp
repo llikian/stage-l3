@@ -6,10 +6,7 @@
 #include "mesh/primitives.hpp"
 
 #include <cmath>
-
-#define PI_F 3.141592653589793f
-#define PI_HALF_F 1.570796326794897f
-#define TAU_F 6.283185307179586f
+#include "maths/constants.hpp"
 
 void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     const float theta_step = PI_F / horizontal_slices; // theta in [-PI/2 ; PI/2]
