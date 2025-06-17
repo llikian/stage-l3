@@ -59,8 +59,7 @@ void Application::run() {
         view_projection = projection * camera.get_view_matrix();
 
         /* Blinn-Phong */ {
-            // const Shader& shader = shaders["blinn-phong"];
-            const Shader& shader = shaders.find("blinn-phong")->second;
+            const Shader& shader = shaders["blinn-phong"];
             shader.use();
 
             shader.set_uniform("u_camera_position", camera.get_position());
