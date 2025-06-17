@@ -11,9 +11,8 @@ in vec2 v_tex_coords;
 
 out vec4 frag_color;
 
-const vec3 LIGHT_POS = vec3(0.0f, 20.0f, 0.0f);
-const vec3 LIGHT_COLOR = vec3(1.0f);
-
+uniform vec3 u_light_color;
+uniform vec3 u_light_position;
 uniform vec3 u_camera_position;
 
 uniform vec3 u_ambient;
@@ -30,7 +29,7 @@ void main() {
     if (frag_color.a < 0.2f) { discard; }
 
     vec3 normal = normalize(v_normal);
-    vec3 light_direction = normalize(LIGHT_POS - v_position);
+    vec3 light_direction = normalize(u_light_position - v_position);
 
     vec4 ambient_map = texture(u_ambient_map, v_tex_coords);
     float ambient_strength = 0.2f;
@@ -44,5 +43,5 @@ void main() {
     float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
     vec3 specular = specular_strength * u_specular;
 
-    frag_color.rgb = (ambient + diffuse + specular) * LIGHT_COLOR;
+    frag_color.rgb = (ambient + diffuse + specular) * u_light_color;
 }

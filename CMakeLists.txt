@@ -40,6 +40,7 @@ set(SOURCES
         src/mesh/Mesh.cpp
         src/mesh/Model.cpp
         src/mesh/PointMesh.cpp
+        src/mesh/primitives.cpp
         src/mesh/TriangleMesh.cpp
 
         # Utility Module
