@@ -23,7 +23,7 @@ LineMesh::~LineMesh() {
     if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
 }
 
-void LineMesh::draw(Shader& shader) {
+void LineMesh::draw(const Shader& shader) {
     if(!bound) { bind_buffers(); }
 
     glBindVertexArray(VAO);

@@ -181,7 +181,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
     }
 }
 
-void Model::draw(Shader& shader) {
+void Model::draw(const Shader& shader) {
     shader.use();
     for(TriangleMesh& mesh : meshes) { mesh.draw(shader); }
 }

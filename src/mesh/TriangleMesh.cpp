@@ -23,7 +23,7 @@ TriangleMesh::~TriangleMesh() {
     if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
 }
 
-void TriangleMesh::draw(Shader& shader) {
+void TriangleMesh::draw(const Shader& shader) {
     if(!bound) { bind_buffers(); }
 
     shader.use();

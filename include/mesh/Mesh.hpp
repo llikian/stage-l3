@@ -27,7 +27,7 @@ public:
      * @brief Performs a draw call with a certain shader.
      * @param shader The shader to perform the draw call with.
      */
-    virtual void draw(Shader& shader) = 0;
+    virtual void draw(const Shader& shader) = 0;
 
     /**
      * @return The mesh's primitive.

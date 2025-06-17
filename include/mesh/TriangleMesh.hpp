@@ -51,7 +51,7 @@ public:
      * @brief Performs a draw call with a certain shader.
      * @param shader The shader to perform the draw call with.
      */
-    void draw(Shader& shader) override;
+    void draw(const Shader& shader) override;
 
     /**
      * @return The mesh's primitive: GL_TRIANGLES.

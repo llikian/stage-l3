@@ -14,7 +14,7 @@ PointMesh::PointMesh(const std::vector<Vertex>& vertices)
     PointMesh::bind_buffers();
 }
 
-void PointMesh::draw(Shader& shader) {
+void PointMesh::draw(const Shader& shader) {
     if(!bound) { bind_buffers(); }
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, vertices.size());
