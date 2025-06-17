@@ -53,6 +53,21 @@ public:
      */
     vec3 get_position() const;
 
+    /**
+     * @return The direction is looking towards.
+     */
+    vec3 get_direction() const;
+
+    /**
+     * @return The direction pointing right of where the camera is looking.
+     */
+    vec3 get_right_vector() const;
+
+    /**
+     * @return The direction pointing up of where the camera is looking.
+     */
+    vec3 get_up_vector() const;
+
 private:
     /**
      * @brief Recalculates the direction, right and up vectors depending on the camera's pitch and

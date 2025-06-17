@@ -65,6 +65,18 @@ vec3 Camera::get_position() const {
     return position;
 }
 
+vec3 Camera::get_direction() const {
+    return direction;
+}
+
+vec3 Camera::get_right_vector() const {
+    return right;
+}
+
+vec3 Camera::get_up_vector() const {
+    return up;
+}
+
 void Camera::update_vectors_and_view_matrix() {
     direction.x = std::cos(pitch) * std::cos(yaw);
     direction.y = std::sin(pitch);
