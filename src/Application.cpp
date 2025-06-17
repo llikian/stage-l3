@@ -15,7 +15,7 @@
 
 Application::Application()
     : window("Projet Stage L3", this),
-      shader({ "shaders/default.vert", "shaders/default.frag" }, "default"),
+      shader({ "shaders/default.vert", "shaders/blinn-phong.frag" }, "default"),
       camera(vec3(0.0f, 0.0f, 0.0f)),
       fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       event_handler(&window, &camera) {
