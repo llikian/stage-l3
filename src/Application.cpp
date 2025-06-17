@@ -32,8 +32,8 @@ Application::Application()
     });
 
     /* ---- Shaders ---- */
-    shaders.emplace("blinn-phong", Shader({ "shaders/default.vert", "shaders/blinn-phong.frag" }, "blinn-phong"));
-    shaders.emplace("flat", Shader({ "shaders/position-only.vert", "shaders/flat.frag" }, "flat"));
+    shaders.emplace("blinn-phong", Shader({ "shaders/vertex/default.vert", "shaders/fragment/blinn-phong.frag" }));
+    shaders.emplace("flat", Shader({ "shaders/vertex/position-only.vert", "shaders/fragment/flat.frag" }));
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
