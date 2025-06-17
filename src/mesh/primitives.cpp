@@ -17,7 +17,6 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
 
     for(unsigned int i = 0 ; i <= horizontal_slices ; ++i) {
         float theta = PI_HALF_F - i * theta_step;
-        std::cout << theta << '\n';
         float cos_theta = std::cos(theta);
         vec3 point(0.0f, std::sin(theta), 0.0f);
 
