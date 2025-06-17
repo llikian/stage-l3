@@ -24,7 +24,7 @@ struct Material {
      * @brief Updates a shader's values with the material's data.
      * @param shader The shader whose uniforms need to be updated.
      */
-    void update_shader_uniforms(const Shader& shader) const;
+    void update_shader_uniforms(const Shader& shader);
 
     vec3 ambient; ///< Ambient color.
     vec3 diffuse; ///< Diffuse color.

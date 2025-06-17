@@ -93,7 +93,7 @@ public:
      * @brief Set the mesh's material.
      * @param material The material to use.
      */
-    void set_material(const Material* material);
+    void set_material(Material* material);
 
     /**
      * @return The amount of vertices in the mesh.
@@ -116,5 +116,5 @@ private:
     std::vector<Vertex> vertices;      ///< The mesh's vertices.
     std::vector<unsigned int> indices; ///< The mesh's indices.
 
-    const Material* material; ///< The mesh's material.
+    Material* material; ///< The mesh's material.
 };

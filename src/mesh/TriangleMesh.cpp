@@ -65,7 +65,7 @@ void TriangleMesh::add_face(unsigned int topL, unsigned int bottomL, unsigned in
     indices.push_back(topR);
 }
 
-void TriangleMesh::set_material(const Material* material) {
+void TriangleMesh::set_material(Material* material) {
     this->material = material;
 }
 
