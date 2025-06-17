@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
@@ -33,7 +34,8 @@ public:
      * @param paths_list The paths to each of the different shaders.
      * @param shader_program_name The name of the shader program.
      */
-    Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name);
+    Shader(const std::initializer_list<std::filesystem::path>& paths_list,
+           const std::string& shader_program_name = "");
 
     /**
      * @brief Copy constructor.
@@ -67,14 +69,15 @@ public:
      * @param paths_list The paths to each of the different shaders.
      * @param shader_program_name The name of the shader program.
      */
-    void create(std::initializer_list<std::string> paths_list, const std::string& shader_program_name);
+    void create(const std::initializer_list<std::filesystem::path>& paths_list,
+                const std::string& shader_program_name = "");
 
     /**
      * @brief Compiles a shader and returns its corresponding id.
      * @param path The path to the shader file.
      * @return The shader's corresponding id.
      */
-    static unsigned int compile_shader(const std::string& path);
+    static unsigned int compile_shader(const std::filesystem::path& path);
 
     /**
      * @brief Uses the shader program.

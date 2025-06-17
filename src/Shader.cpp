@@ -11,7 +11,8 @@
 
 Shader::Shader() : id(0) { }
 
-Shader::Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name = "")
+Shader::Shader(const std::initializer_list<std::filesystem::path>& paths_list,
+               const std::string& shader_program_name)
     : id(0) {
     create(paths_list, shader_program_name);
 }
@@ -29,14 +30,28 @@ Shader& Shader::operator=(const Shader& shader) {
 void Shader::free() {
     glDeleteProgram(id);
     uniform_locations.clear();
+    std::cout << "Freed shader program '" << name << "'.\n";
 }
 
-void Shader::create(std::initializer_list<std::string> paths_list, const std::string& shader_program_name) {
+void Shader::create(const std::initializer_list<std::filesystem::path>& paths_list,
+                    const std::string& shader_program_name) {
     id = glCreateProgram();
-    name = shader_program_name.empty() ? "shader_" + std::to_string(id) : shader_program_name;
+
+    if(shader_program_name.empty()) {
+        for(const std::filesystem::path& path : paths_list) {
+            if(path.extension() == ".frag") {
+                name = path.stem();
+                break;
+            }
+        }
+
+        if(name.empty()) { name = "shader_" + std::to_string(id); }
+    } else {
+        name = shader_program_name;
+    }
 
     /* ---- Shaders ---- */
-    for(const std::string& path : paths_list) {
+    for(const std::filesystem::path& path : paths_list) {
         unsigned int shader_id = compile_shader(path);
         glAttachShader(id, shader_id);
         glDeleteShader(shader_id);
@@ -57,14 +72,16 @@ void Shader::create(std::initializer_list<std::string> paths_list, const std::st
     }
 
     get_uniforms();
+
+    std::cout << "Created shader program '" << name << "'.\n";
 }
 
-unsigned int Shader::compile_shader(const std::string& path) {
-    std::string extension = path.substr(path.find_last_of('.') + 1);
-
+unsigned int Shader::compile_shader(const std::filesystem::path& path) {
+    std::string extension = path.extension();
     std::string shader_type_name;
     unsigned int shader_type;
-    switch(extension[0]) {
+
+    switch(extension[1]) {
         case 'v':
             shader_type_name = "vertex";
             shader_type = GL_VERTEX_SHADER;
@@ -74,7 +91,7 @@ unsigned int Shader::compile_shader(const std::string& path) {
             shader_type = GL_FRAGMENT_SHADER;
             break;
         case 't':
-            if(extension[3] == 'c') {
+            if(extension[4] == 'c') {
                 shader_type_name = "tesselation control";
                 shader_type = GL_TESS_CONTROL_SHADER;
             } else {
@@ -110,7 +127,8 @@ unsigned int Shader::compile_shader(const std::string& path) {
     if(message_length > 0) {
         char* message = new char[message_length];
         glGetShaderInfoLog(shader_id, message_length, nullptr, message);
-        std::string error_message = "Failed to compile " + shader_type_name + " shader '" + path + "':\n" + message;
+        std::string error_message = "Failed to compile " + shader_type_name + " shader '"
+                                    + path.string() + "':\n" + message;
 
         delete[] message;
         throw std::runtime_error(error_message);
