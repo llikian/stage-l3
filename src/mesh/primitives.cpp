@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include "maths/constants.hpp"
+#include "maths/geometry.hpp"
 
 void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     const float theta_step = PI_F / horizontal_slices; // theta in [-PI/2 ; PI/2]
@@ -48,4 +49,15 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
             );
         }
     }
+}
+
+void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+    const vec3 BA(A - B);
+    const vec3 BC(C - B);
+    const vec3 normal(normalize(cross(BA, BC)));
+    mesh.add_vertex(A, normal, vec2(0.0f, 1.0f));
+    mesh.add_vertex(B, normal, vec2(0.0f, 0.0f));
+    mesh.add_vertex(C, normal, vec2(1.0f, 0.0f));
+    mesh.add_vertex(B + BA + BC, normal, vec2(1.0f, 1.0f));
+    mesh.add_face(0, 1, 2, 3);
 }
