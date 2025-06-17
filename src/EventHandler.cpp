@@ -138,3 +138,7 @@ float EventHandler::get_time() const {
 float EventHandler::get_delta() const {
     return delta;
 }
+
+bool EventHandler::is_wireframe_on() const {
+    return is_wireframe_enabled;
+}

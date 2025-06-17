@@ -96,6 +96,11 @@ public:
      */
     float get_delta() const;
 
+    /**
+     * @return Whether wireframe mode is enabled.
+     */
+    bool is_wireframe_on() const;
+
 private:
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
