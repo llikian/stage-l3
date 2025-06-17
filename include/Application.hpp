@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <unordered_map>
 #include "Camera.hpp"
 #include "EventHandler.hpp"
 #include "Shader.hpp"
@@ -23,6 +24,11 @@ public:
     Application();
 
     /**
+     * @brief Frees all resources.
+     */
+    ~Application();
+
+    /**
      * @brief Executes the main loop of the application.
      */
     void run();
@@ -35,13 +41,14 @@ public:
 private:
     /**
      * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader.
+     * @param shader The shader whose uniforms need to be updated.
      * @param model The model matrix used in the next draw call.
      */
-    void update_mvp(const mat4& model) const;
+    void update_mvp(const Shader& shader, const mat4& model) const;
 
     Window window; ///< Contains the GLFW window. Needs to be initialized first.
 
-    Shader shader; ///< The default shader used for draw calls.
+    std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
     Camera camera; ///< The active camera.
 
     float fov; ///< The field of view angle.
