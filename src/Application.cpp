@@ -6,6 +6,7 @@
 #include "Application.hpp"
 
 #include <cmath>
+#include <ranges>
 #include <glad/glad.h>
 #include "callbacks.hpp"
 #include "maths/mat3.hpp"
@@ -31,15 +32,15 @@ Application::Application()
     });
 
     /* ---- Shaders ---- */
-    shaders["blinn-phong"] = Shader({ "shaders/default.vert", "shaders/blinn-phong.frag" }, "blinn-phong");
-    shaders["flat"] = Shader({ "shaders/position-only.vert", "shaders/flat.frag" }, "flat");
+    shaders.emplace("blinn-phong", Shader({ "shaders/default.vert", "shaders/blinn-phong.frag" }, "blinn-phong"));
+    shaders.emplace("flat", Shader({ "shaders/position-only.vert", "shaders/flat.frag" }, "flat"));
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
 }
 
 Application::~Application() {
-    for(auto& [_, shader] : shaders) { shader.free(); }
+    for(Shader& shader : shaders | std::views::values) { shader.free(); }
 }
 
 void Application::run() {
@@ -58,7 +59,7 @@ void Application::run() {
 
         view_projection = projection * camera.get_view_matrix();
 
-        /* Blinn-Phong */ {
+        /* Blinn-Phong Shader */ {
             const Shader& shader = shaders["blinn-phong"];
             shader.use();
 
@@ -73,7 +74,7 @@ void Application::run() {
             // vokselia.draw(shader);
         }
 
-        /* Flat */ {
+        /* Flat Shader */ {
             const Shader& shader = shaders["flat"];
             shader.use();
 
