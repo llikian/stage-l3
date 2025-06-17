@@ -61,11 +61,6 @@ void Application::run() {
     vec3 light_color(1.0f);
     vec3 light_position(0.0f, 20.0f, 0.0f);
 
-    vec2 resolution = window.get_resolution();
-    vec2 uv = (2.0f * vec2(0.0f, 0.0f) - resolution) / resolution.y;
-    std::cout << normalize(camera.get_direction() + uv.x * camera.get_right_vector() + uv.y * camera.get_up_vector()) << '\n';
-    std::cout << normalize(camera.get_view_matrix() * vec3(uv.x, uv.y, -1.0f)) << '\n';
-
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
