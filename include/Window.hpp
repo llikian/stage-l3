@@ -11,6 +11,8 @@
 #include <string>
 #include <GLFW/glfw3.h>
 
+#include "maths/vec2.hpp"
+
 /**
  * @class Window
  * @brief Acts as a layer above the GLFW window.
@@ -61,6 +63,11 @@ public:
      * @param height The window's current height.
      */
     void update_size(int width, int height);
+
+    /**
+     * @return A vec2 with the width of the window as the x component and its height as the y component.
+     */
+    vec2 get_resolution() const;
 
 private:
     GLFWwindow* window; ///< The GLFW window pointer.

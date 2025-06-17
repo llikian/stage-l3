@@ -175,3 +175,7 @@ void Window::update_size(int width, int height) {
     this->width = width;
     this->height = height;
 }
+
+vec2 Window::get_resolution() const {
+    return vec2(width, height);
+}
