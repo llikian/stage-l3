@@ -1,6 +1,6 @@
 /***************************************************************************************************
- * @file  default.frag
- * @brief Default fragment shader
+ * @file  blinn-phong.frag
+ * @brief Fragment shader implementing the blinn-phong lighting model
  **************************************************************************************************/
 
 #version 460 core

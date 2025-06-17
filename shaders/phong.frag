@@ -1,6 +1,6 @@
 /***************************************************************************************************
- * @file  default.frag
- * @brief Default fragment shader
+ * @file  phong.frag
+ * @brief Fragment shader implementing the phong lighting model
  **************************************************************************************************/
 
 #version 460 core
