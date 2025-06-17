@@ -38,8 +38,8 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
                           index(horizontal_slices, j));
     }
 
-    for(int i = 1 ; i < horizontal_slices ; ++i) {
-        for(int j = 0 ; j < vertical_slices ; ++j) {
+    for(unsigned int i = 1 ; i < horizontal_slices ; ++i) {
+        for(unsigned int j = 0 ; j < vertical_slices ; ++j) {
             mesh.add_face(
                 index(i + 1, j + 1),
                 index(i + 1, j),
