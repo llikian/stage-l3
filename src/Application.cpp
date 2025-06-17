@@ -9,6 +9,7 @@
 #include <ranges>
 #include <glad/glad.h>
 #include "callbacks.hpp"
+#include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/Model.hpp"
@@ -33,7 +34,11 @@ Application::Application()
 
     /* ---- Shaders ---- */
     shaders.emplace("blinn-phong", Shader({ "shaders/vertex/default.vert", "shaders/fragment/blinn-phong.frag" }));
-    shaders.emplace("flat", Shader({ "shaders/vertex/position-only.vert", "shaders/fragment/flat.frag" }));
+    shaders.emplace("flat", Shader({ "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" }));
+    shaders.emplace("background", Shader({
+                        "shaders/vertex/position_only-no_mvp.vert",
+                        "shaders/fragment/background.frag"
+                    }));
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
@@ -50,14 +55,42 @@ void Application::run() {
     TriangleMesh sphere;
     create_sphere_mesh(sphere, 8, 16);
 
+    TriangleMesh screen;
+    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
+
     vec3 light_color(1.0f);
     vec3 light_position(0.0f, 20.0f, 0.0f);
+
+    vec2 resolution = window.get_resolution();
+    vec2 uv = (2.0f * vec2(0.0f, 0.0f) - resolution) / resolution.y;
+    std::cout << normalize(camera.get_direction() + uv.x * camera.get_right_vector() + uv.y * camera.get_up_vector()) << '\n';
+    std::cout << normalize(camera.get_view_matrix() * vec3(uv.x, uv.y, -1.0f)) << '\n';
 
     while(!glfwWindowShouldClose(window)) {
         event_handler.poll_and_handle_events();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         view_projection = projection * camera.get_view_matrix();
+
+        /* Background Shader */ {
+            const Shader& shader = shaders["background"];
+            shader.use();
+
+            shader.set_uniform("u_resolution", window.get_resolution());
+            shader.set_uniform("u_camera_direction", camera.get_direction());
+            shader.set_uniform("u_camera_right", camera.get_right_vector());
+            shader.set_uniform("u_camera_up", camera.get_up_vector());
+
+            glDepthMask(GL_FALSE);
+            glDisable(GL_DEPTH_TEST);
+            if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+            screen.draw(shader);
+
+            if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_TRUE);
+        }
 
         /* Blinn-Phong Shader */ {
             const Shader& shader = shaders["blinn-phong"];
