@@ -23,7 +23,12 @@
 class Shader {
 public:
     /**
-     * @brief Creates a shader program and compiles then attaches the shaders at the specified paths
+     * @brief Default constructor. Sets the shader id to 0.
+     */
+    Shader();
+
+    /**
+     * @brief Constructs a shader program and compiles then attaches the shaders at the specified paths
      * to it.
      * @param paths_list The paths to each of the different shaders.
      * @param shader_program_name The name of the shader program.
@@ -31,9 +36,38 @@ public:
     Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name);
 
     /**
+     * @brief Copy constructor.
+     * @warning The responsibility of freeing the shader program goes to the user, so if multiple
+     * copies of the same shader program exist, be sure that all copies are no longer in use before
+     * freeing.
+     * @param shader The shader to copy.
+     */
+    Shader(const Shader& shader);
+
+    /**
+     * @brief Copy operator.
+     * @warning The responsibility of freeing the shader program goes to the user, so if multiple
+     * copies of the same shader program exist, be sure that all copies are no longer in use before
+     * freeing.
+     * @param shader The shader to copy.
+     */
+    Shader& operator=(const Shader& shader);
+
+    /**
      * @brief Deletes the shader program.
      */
-    ~Shader();
+    void free();
+
+    /**
+     * @brief Creates a shader program and compiles then attaches the shaders at the specified paths
+     * to it.
+     * @warning The responsibility of freeing the shader program goes to the user, so if this instance
+     * of the Shader class already had a shader program (id != 0) and you no longer wish to use that
+     * shader program, be sure to call the free method.
+     * @param paths_list The paths to each of the different shaders.
+     * @param shader_program_name The name of the shader program.
+     */
+    void create(std::initializer_list<std::string> paths_list, const std::string& shader_program_name);
 
     /**
      * @brief Compiles a shader and returns its corresponding id.
@@ -68,7 +102,9 @@ public:
     void set_uniform(const std::string& uniform, Value... value) const {
         try {
             set_uniform(uniform_locations.at(uniform), value...);
-        } catch(const std::out_of_range&) { }
+        } catch(const std::out_of_range&) {
+            std::cerr << "Unknown uniform '" << uniform << "' in 'set_uniform' call for shader '" << name << "'.\n";
+        }
     }
 
 private:

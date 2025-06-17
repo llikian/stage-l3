@@ -9,9 +9,32 @@
 #include <sstream>
 #include <glad/glad.h>
 
+Shader::Shader() : id(0) { }
+
 Shader::Shader(std::initializer_list<std::string> paths_list, const std::string& shader_program_name = "")
-    : id(glCreateProgram()),
-      name(shader_program_name.empty() ? "shader" + std::to_string(id) : shader_program_name) {
+    : id(0) {
+    create(paths_list, shader_program_name);
+}
+
+Shader::Shader(const Shader& shader) : id(shader.id), name(shader.name), uniform_locations(shader.uniform_locations) { }
+
+Shader& Shader::operator=(const Shader& shader) {
+    id = shader.id;
+    name = shader.name;
+    uniform_locations = shader.uniform_locations;
+
+    return *this;
+}
+
+void Shader::free() {
+    glDeleteProgram(id);
+    uniform_locations.clear();
+}
+
+void Shader::create(std::initializer_list<std::string> paths_list, const std::string& shader_program_name) {
+    id = glCreateProgram();
+    name = shader_program_name.empty() ? "shader_" + std::to_string(id) : shader_program_name;
+
     /* ---- Shaders ---- */
     for(const std::string& path : paths_list) {
         unsigned int shader_id = compile_shader(path);
@@ -34,10 +57,6 @@ Shader::Shader(std::initializer_list<std::string> paths_list, const std::string&
     }
 
     get_uniforms();
-}
-
-Shader::~Shader() {
-    glDeleteProgram(id);
 }
 
 unsigned int Shader::compile_shader(const std::string& path) {
