@@ -26,6 +26,7 @@ LineMesh::~LineMesh() {
 void LineMesh::draw(const Shader& shader) {
     if(!bound) { bind_buffers(); }
 
+    shader.use();
     glBindVertexArray(VAO);
 
     if(indices.empty()) {
