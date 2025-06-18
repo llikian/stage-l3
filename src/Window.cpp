@@ -15,9 +15,9 @@ static void opengl_error_callback(unsigned int source,
                                   unsigned int type,
                                   unsigned int id,
                                   unsigned int severity,
-                                  int length,
+                                  int /* length */,
                                   const GLchar* message,
-                                  const void* userParam) {
+                                  const void* /* userParam */) {
     if(severity == GL_DEBUG_SEVERITY_NOTIFICATION) { return; }
 
     std::cerr << "OpenGL Message:"
@@ -151,11 +151,7 @@ Window::~Window() {
     glfwTerminate();
 }
 
-Window::operator GLFWwindow*() const {
-    return window;
-}
-
-GLFWwindow* Window::get_GLFW_window() const {
+GLFWwindow* Window::get() const {
     return window;
 }
 
@@ -178,4 +174,12 @@ void Window::update_size(int width, int height) {
 
 vec2 Window::get_resolution() const {
     return vec2(width, height);
+}
+
+bool Window::should_close() const {
+    return glfwWindowShouldClose(window);
+}
+
+void Window::swap_buffers() const {
+    glfwSwapBuffers(window);
 }

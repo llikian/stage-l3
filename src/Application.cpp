@@ -8,7 +8,6 @@
 #include <cmath>
 #include <ranges>
 #include <glad/glad.h>
-#include "callbacks.hpp"
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
@@ -19,11 +18,7 @@ Application::Application()
     : window("Projet Stage L3", this),
       camera(vec3(0.0f, 0.0f, 0.0f)),
       fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
-      event_handler(&window, &camera) {
-    glfwSetWindowSizeCallback(window, window_size_callback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
+      event_handler(window, &camera) {
 
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
@@ -60,7 +55,7 @@ void Application::run() {
     vec3 light_color(1.0f);
     vec3 light_position(0.0f, 20.0f, 0.0f);
 
-    while(!glfwWindowShouldClose(window)) {
+    while(!window.should_close()) {
         event_handler.poll_and_handle_events();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -92,7 +87,7 @@ void Application::run() {
             sphere.draw(shader);
         }
 
-        glfwSwapBuffers(window);
+        window.swap_buffers();
     }
 }
 

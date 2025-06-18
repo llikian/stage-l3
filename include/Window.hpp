@@ -32,14 +32,9 @@ public:
     ~Window();
 
     /**
-     * @brief Conversion operator to allow to use the Window as if it were the underlying GLFWwindow.
-     */
-    operator GLFWwindow*() const;
-
-    /**
      * @return The GLFW window pointer.
      */
-    GLFWwindow* get_GLFW_window() const;
+    GLFWwindow* get() const;
 
     /**
      * @return The width of the window.
@@ -68,6 +63,16 @@ public:
      * @return A vec2 with the width of the window as the x component and its height as the y component.
      */
     vec2 get_resolution() const;
+
+    /**
+     * @return Whether the window should close.
+     */
+    bool should_close() const;
+
+    /**
+     * @brief Swaps the front and back buffers of the window.
+     */
+    void swap_buffers() const;
 
 private:
     GLFWwindow* window; ///< The GLFW window pointer.
