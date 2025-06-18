@@ -9,7 +9,9 @@
 
 using vec2 = vector2<float>;
 // using dvec2 = vector2<double>;
-using ivec2 = vector2<int>;
+// using ivec2 = vector2<int>;
 // using uvec2 = vector2<unsigned int>;
-// using ulvec2 = vector2<unsigned long int>;
-// using ullvec2 = vector2<unsigned long long int>;
+// using lvec2 = vector2<long>;
+// using llvec2 = vector2<long long>;
+// using ulvec2 = vector2<unsigned long>;
+// using ullvec2 = vector2<unsigned long long>;
