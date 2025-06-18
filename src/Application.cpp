@@ -19,7 +19,6 @@ Application::Application()
       camera(vec3(0.0f, 0.0f, 0.0f)),
       fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       event_handler(window, &camera) {
-
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
     event_handler.set_window_size_event_action([this] {
@@ -46,8 +45,9 @@ Application::~Application() {
 }
 
 void Application::run() {
-    Model sponza("data/sponza/sponza.obj", scale(0.05f));
+    // Model sponza("data/sponza/sponza.obj", scale(0.05f));
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
+    Model bmw("data/bmw/bmw.obj", scale(0.05f));
 
     TriangleMesh sphere;
     create_sphere_mesh(sphere, 8, 16);
@@ -71,11 +71,14 @@ void Application::run() {
             shader.set_uniform("u_light_color", light_color);
             shader.set_uniform("u_light_position", light_position);
 
-            update_mvp(shader, sponza.model_matrix);
-            sponza.draw(shader);
+            // update_mvp(shader, sponza.model_matrix);
+            // sponza.draw(shader);
 
-            // update_mvp(vokselia.model);
+            // update_mvp(shader, vokselia.model_matrix);
             // vokselia.draw(shader);
+
+            update_mvp(shader, bmw.model_matrix);
+            bmw.draw(shader);
         }
 
         /* Flat Shader */ {
