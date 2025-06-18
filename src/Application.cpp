@@ -51,8 +51,8 @@ Application::~Application() {
 }
 
 void Application::run() {
-    Model sponza("data/sponza/sponza.obj", scale(0.05f), true);
-    // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f), true);
+    Model sponza("data/sponza/sponza.obj", scale(0.05f));
+    // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
 
     TriangleMesh sphere;
     create_sphere_mesh(sphere, 8, 16);
