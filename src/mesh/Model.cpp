@@ -61,14 +61,18 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
             std::vector<llvec3> face;
 
             while(stream >> buffer) {
-                face.emplace_back();
-                int count = std::sscanf(buffer.c_str(), "%lld/%lld/%lld", &face.back().x, &face.back().z, &face.back().y);
+                llvec3& vertex = face.emplace_back();
+                int count = std::sscanf(buffer.c_str(), "%lld/%lld/%lld", &vertex.x, &vertex.z, &vertex.y);
 
                 if(count == 1) {
-                    std::sscanf(buffer.c_str(), "%lld//%lld", &face.back().x, &face.back().y);
+                    std::sscanf(buffer.c_str(), "%lld//%lld", &vertex.x, &vertex.y);
                 } else if(count == 0) {
                     throw std::runtime_error("Format error in .obj file, no vertex attribute.");
                 }
+
+                vertex.x = vertex.x < 0 ? positions.size() + vertex.x : vertex.x - 1;
+                vertex.y = vertex.y < 0 ? normals.size() + vertex.y : vertex.y - 1;
+                vertex.z = vertex.z < 0 ? tex_coords.size() + vertex.z : vertex.z;
             }
 
             if(face.size() < 3) {
@@ -94,13 +98,13 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
             parse_mtl_file(path.parent_path() / buffer);
         }
     }
-#ifdef DEBUG_LOG_MODEL_READ_INFO&
+
+#ifdef DEBUG_LOG_MODEL_READ_INFO
     std::cout << "Read model from file '" << path.filename().string() << "':\n";
 #endif
 
-    size_t original_normals_amount = normals.size();
     for(auto& [material_name, material] : materials) {
-        add_mesh(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
+        add_mesh(positions, normals, tex_coords, vertex_indices[material_name]);
         meshes.back().set_material(&material);
     }
 
@@ -154,8 +158,7 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
 void Model::add_mesh(const std::vector<vec3>& positions,
                      std::vector<vec3>& normals,
                      const std::vector<vec2>& tex_coords,
-                     std::vector<llvec3>& vertex_indices,
-                     size_t original_normals_amount) {
+                     std::vector<llvec3>& vertex_indices) {
     TriangleMesh& mesh = meshes.emplace_back();
 
     std::unordered_map<llvec3, long long, vector3_hash<long long>> unique_attribute_triplets;
@@ -171,12 +174,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
         long long indices[3];
 
         for(int j = 0 ; j < 3 ; ++j) {
-            llvec3& vertex = vertex_indices[i + j];
-
-            vertex.x += vertex.x < 0 ? positions.size() : -1;
-            vertex.y += vertex.y < 0 ? original_normals_amount : -1;
-            if(vertex.z < 0) { vertex.z += tex_coords.size() - 1; }
-
+            const llvec3& vertex = vertex_indices[i + j];
             auto [index, was_inserted] = unique_attribute_triplets.try_emplace(vertex, mesh.get_vertices_amount());
             if(was_inserted) { mesh.add_vertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }
             indices[j] = index->second;

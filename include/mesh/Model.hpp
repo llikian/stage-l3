@@ -53,13 +53,11 @@ private:
      * @param normals The normals indexed by the second component of each vertex index.
      * @param tex_coords The texture coordinates indexed by the thord component of each vertex index.
      * @param vertex_indices The vertex indices.
-     * @param original_normals_amount The amount of normals in normals before any were added.
      */
     void add_mesh(const std::vector<vec3>& positions,
                   std::vector<vec3>& normals,
                   const std::vector<vec2>& tex_coords,
-                  std::vector<llvec3>& vertex_indices,
-                  size_t original_normals_amount);
+                  std::vector<llvec3>& vertex_indices);
 
     std::vector<TriangleMesh> meshes;                    ///< The meshes composing the model.
     std::unordered_map<std::string, Material> materials; ///< The model's materials.
