@@ -46,17 +46,20 @@ void Shader::create(const std::initializer_list<std::filesystem::path>& paths_li
                     const std::string& shader_program_name) {
     id = glCreateProgram();
 
+    name = std::to_string(id) + '-';
     if(shader_program_name.empty()) {
+        unsigned int len = name.size();
+
         for(const std::filesystem::path& path : paths_list) {
             if(path.extension() == ".frag") {
-                name = path.stem();
+                name += path.stem();
                 break;
             }
         }
 
-        if(name.empty()) { name = "shader_" + std::to_string(id); }
+        if(name.size() == len) { name += "shader"; }
     } else {
-        name = shader_program_name;
+        name += shader_program_name;
     }
 
     /* ---- Shaders ---- */
@@ -85,6 +88,8 @@ void Shader::create(const std::initializer_list<std::filesystem::path>& paths_li
 #ifdef DEBUG_LOG_SHADER_LIFETIME
     std::cout << "Created shader program '" << name << "'.\n";
 #endif
+
+    glUseProgram(0);
 }
 
 unsigned int Shader::compile_shader(const std::filesystem::path& path) {
