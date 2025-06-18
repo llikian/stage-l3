@@ -32,10 +32,12 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
     std::vector<vec2> tex_coords;
 
     std::string current_material_name;
-    std::unordered_map<std::string, std::vector<ivec3>> vertex_indices;
+    std::unordered_map<std::string, std::vector<llvec3>> vertex_indices;
     // x is the index for the position, y for the normal and z for the tex coords
 
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
+
+    uint64_t total_indices = 0;
 
     std::string line;
 
@@ -56,14 +58,14 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
                 tex_coords.emplace_back(x, y);
             }
         } else if(buffer[0] == 'f') { // Face
-            std::vector<ivec3> face;
+            std::vector<llvec3> face;
 
             while(stream >> buffer) {
                 face.emplace_back();
-                int count = std::sscanf(buffer.c_str(), "%d/%d/%d", &face.back().x, &face.back().z, &face.back().y);
+                int count = std::sscanf(buffer.c_str(), "%lld/%lld/%lld", &face.back().x, &face.back().z, &face.back().y);
 
                 if(count == 1) {
-                    std::sscanf(buffer.c_str(), "%d//%d", &face.back().x, &face.back().y);
+                    std::sscanf(buffer.c_str(), "%lld//%lld", &face.back().x, &face.back().y);
                 } else if(count == 0) {
                     throw std::runtime_error("Format error in .obj file, no vertex attribute.");
                 }
@@ -78,9 +80,9 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
                 materials.emplace(current_material_name, Material());
             }
 
-            std::vector<ivec3>& indices = vertex_indices[current_material_name];
-
+            std::vector<llvec3>& indices = vertex_indices[current_material_name];
             for(unsigned int i = 1 ; i + 1 < face.size() ; ++i) {
+                total_indices += 3;
                 indices.push_back(face[0]);
                 indices.push_back(face[i]);
                 indices.push_back(face[i + 1]);
@@ -92,17 +94,17 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
             parse_mtl_file(path.parent_path() / buffer);
         }
     }
+#ifdef DEBUG_LOG_MODEL_READ_INFO&
+    std::cout << "Read model from file '" << path.filename().string() << "':\n";
+#endif
 
-    uint64_t total_indices = 0;
     size_t original_normals_amount = normals.size();
     for(auto& [material_name, material] : materials) {
         add_mesh(positions, normals, tex_coords, vertex_indices[material_name], original_normals_amount);
         meshes.back().set_material(&material);
-        total_indices += meshes.back().get_indices_amount();
     }
 
 #ifdef DEBUG_LOG_MODEL_READ_INFO
-    std::cout << "Read model from file '" << path.filename().string() << "':\n";
     std::cout << '\t' << positions.size() << " vertex positions\n";
     if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals\n"; }
     if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() << " texture coordinates\n"; }
@@ -152,11 +154,11 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
 void Model::add_mesh(const std::vector<vec3>& positions,
                      std::vector<vec3>& normals,
                      const std::vector<vec2>& tex_coords,
-                     std::vector<ivec3>& vertex_indices,
+                     std::vector<llvec3>& vertex_indices,
                      size_t original_normals_amount) {
     TriangleMesh& mesh = meshes.emplace_back();
 
-    std::unordered_map<ivec3, unsigned int, ivec3_hash> unique_attribute_triplets;
+    std::unordered_map<llvec3, long long, vector3_hash<long long>> unique_attribute_triplets;
 
     for(size_t i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
         if(vertex_indices[i].y == 0) {
@@ -166,14 +168,14 @@ void Model::add_mesh(const std::vector<vec3>& positions,
         }
 
         // Handling negative indices & Vertex Deduplication
-        unsigned int indices[3];
+        long long indices[3];
 
         for(int j = 0 ; j < 3 ; ++j) {
-            ivec3& vertex = vertex_indices[i + j];
+            llvec3& vertex = vertex_indices[i + j];
 
             vertex.x += vertex.x < 0 ? positions.size() : -1;
             vertex.y += vertex.y < 0 ? original_normals_amount : -1;
-            if(vertex.z < 0) { vertex.z += tex_coords.size(); }
+            if(vertex.z < 0) { vertex.z += tex_coords.size() - 1; }
 
             auto [index, was_inserted] = unique_attribute_triplets.try_emplace(vertex, mesh.get_vertices_amount());
             if(was_inserted) { mesh.add_vertex(positions[vertex.x], normals[vertex.y], tex_coords[vertex.z]); }

@@ -58,7 +58,7 @@ private:
     void add_mesh(const std::vector<vec3>& positions,
                   std::vector<vec3>& normals,
                   const std::vector<vec2>& tex_coords,
-                  std::vector<ivec3>& vertex_indices,
+                  std::vector<llvec3>& vertex_indices,
                   size_t original_normals_amount);
 
     std::vector<TriangleMesh> meshes;                    ///< The meshes composing the model.
