@@ -27,7 +27,7 @@ Application::Application()
     });
 
     /* ---- Shaders ---- */
-    shaders.emplace("blinn-phong", Shader({ "shaders/vertex/default.vert", "shaders/fragment/blinn-phong.frag" }));
+    shaders.emplace("blinn-phong", Shader({ "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" }));
     shaders.emplace("flat", Shader({ "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" }));
     shaders.emplace("background", Shader({
                         "shaders/vertex/position_only-no_mvp.vert",
