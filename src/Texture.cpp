@@ -7,6 +7,10 @@
 
 #include <glad/glad.h>
 
+#ifdef DEBUG
+#include "debug.hpp"
+#endif
+
 Texture::Texture() : id(0) { }
 
 Texture::Texture(const std::string& path)
@@ -40,14 +44,18 @@ Texture& Texture::operator=(const Texture& texture) {
 
 void Texture::init() {
     glGenTextures(1, &id);
+#ifdef DEBUG_LOG_TEXTURE_LIFETIME
     std::cout << "Created texture " << id << ".\n";
+#endif
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture::free() {
     if(id == 0) { return; }
     glDeleteTextures(1, &id);
+#ifdef DEBUG_LOG_TEXTURE_LIFETIME
     std::cout << "Freed texture " << id << ".\n";
+#endif
     id = 0;
 }
 

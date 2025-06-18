@@ -23,9 +23,8 @@ public:
      * @brief Creates a mesh by reading the file at a certain path. Currently supports only .obj files.
      * @param path The path to the file.
      * @param model The model's model matrix.
-     * @param verbose Whether the funtion will log information about what it's doing.
      */
-    explicit Model(const std::filesystem::path& path, const mat4& model = mat4(1.0f), bool verbose = false);
+    explicit Model(const std::filesystem::path& path, const mat4& model = mat4(1.0f));
 
     /**
      * @brief Performs a draw call for each of the model's meshes with a certain shader.
@@ -39,9 +38,8 @@ private:
     /**
      * @brief Parse a .obj file and reads all of its data into the model's buffers.
      * @param path The path to the .obj file.
-     * @param verbose Whether the funtion will log information about what it's doing.
      */
-    void parse_obj_file(const std::filesystem::path& path, bool verbose);
+    void parse_obj_file(const std::filesystem::path& path);
 
     /**
      * @brief Parse a .mtl file and reads all of the materials it describes.

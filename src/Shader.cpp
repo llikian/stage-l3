@@ -9,6 +9,10 @@
 #include <sstream>
 #include <glad/glad.h>
 
+#ifdef DEBUG
+#include "debug.hpp"
+#endif
+
 Shader::Shader() : id(0) { }
 
 Shader::Shader(const std::initializer_list<std::filesystem::path>& paths_list,
@@ -30,7 +34,9 @@ Shader& Shader::operator=(const Shader& shader) {
 void Shader::free() {
     if(id == 0) { return; }
     glDeleteProgram(id);
+#ifdef DEBUG_LOG_SHADER_LIFETIME
     std::cout << "Freed shader program '" << name << "'.\n";
+#endif
     id = 0;
     name = "";
     uniform_locations.clear();
@@ -76,7 +82,9 @@ void Shader::create(const std::initializer_list<std::filesystem::path>& paths_li
 
     get_uniforms();
 
+#ifdef DEBUG_LOG_SHADER_LIFETIME
     std::cout << "Created shader program '" << name << "'.\n";
+#endif
 }
 
 unsigned int Shader::compile_shader(const std::filesystem::path& path) {

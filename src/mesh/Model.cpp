@@ -8,7 +8,11 @@
 #include "maths/geometry.hpp"
 #include "utility/hash.hpp"
 
-Model::Model(const std::filesystem::path& path, const mat4& model, bool verbose)
+#ifdef DEBUG
+#include "debug.hpp"
+#endif
+
+Model::Model(const std::filesystem::path& path, const mat4& model)
     : model_matrix(model) {
     std::string extension = path.extension().string();
 
@@ -16,12 +20,10 @@ Model::Model(const std::filesystem::path& path, const mat4& model, bool verbose)
         throw std::runtime_error("Cannot load '" + extension + "' file, file formats supported by Model are: .obj");
     }
 
-    if(verbose) { std::cout << "Reading Model from file '" << path.filename().string() << "':\n"; }
-
-    if(extension == ".obj") { parse_obj_file(path, verbose); }
+    if(extension == ".obj") { parse_obj_file(path); }
 }
 
-void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
+void Model::parse_obj_file(const std::filesystem::path& path) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
@@ -99,14 +101,15 @@ void Model::parse_obj_file(const std::filesystem::path& path, bool verbose) {
         total_indices += meshes.back().get_indices_amount();
     }
 
-    if(verbose) {
-        std::cout << '\t' << positions.size() << " vertex positions\n";
-        if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals\n"; }
-        if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() << " texture coordinates\n"; }
-        std::cout << '\t' << meshes.size() << " meshes\n";
-        std::cout << '\t' << materials.size() << " materials\n";
-        std::cout << '\t' << "For a total of " << total_indices / 3 << " triangles.\n";
-    }
+#ifdef DEBUG_LOG_MODEL_READ_INFO
+    std::cout << "Read model from file '" << path.filename().string() << "':\n";
+    std::cout << '\t' << positions.size() << " vertex positions\n";
+    if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals\n"; }
+    if(!tex_coords.empty()) { std::cout << '\t' << tex_coords.size() << " texture coordinates\n"; }
+    std::cout << '\t' << meshes.size() << " meshes\n";
+    std::cout << '\t' << materials.size() << " materials\n";
+    std::cout << '\t' << "For a total of " << total_indices / 3 << " triangles.\n";
+#endif
 }
 
 void Model::parse_mtl_file(const std::filesystem::path& path) {
