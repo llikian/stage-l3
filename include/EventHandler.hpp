@@ -25,7 +25,7 @@ public:
      * @param window The window.
      * @param camera The active camera.
      */
-    EventHandler(Window* window, Camera* camera);
+    EventHandler(Window& window, Camera* camera);
 
     /**
      * @brief Polls GLFW events, handles all of them and updates all event related variables.
@@ -113,7 +113,7 @@ private:
     float time;  ///< How much time elapsed since the beginning of the program.
     float delta; ///< How much time passed since the last frame.
 
-    Window* window;        ///< A pointer to the window.
+    Window& window;        ///< A pointer to the window.
     Camera* active_camera; ///< A pointer to the active camera.
 
     bool is_cursor_visible;       ///< Whether the mouse's cursor is visible.

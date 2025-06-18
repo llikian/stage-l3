@@ -7,22 +7,29 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "callbacks.hpp"
 
-EventHandler::EventHandler(Window* window, Camera* camera)
-    : mouse_position(window->get_width() / 2.0f, window->get_height() / 2.0f),
+EventHandler::EventHandler(Window& window, Camera* camera)
+    : mouse_position(window.get_width() / 2.0f, window.get_height() / 2.0f),
       time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
-      is_cursor_visible(glfwGetInputMode(window->get_GLFW_window(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
+      is_cursor_visible(glfwGetInputMode(window.get(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
       is_face_culling_enabled(true), is_wireframe_enabled(false) {
-    if(camera == nullptr) {
-        throw std::runtime_error("Cannot set active_camera to nullptr");
-    }
+    GLFWwindow* win = window.get();
+    glfwSetWindowSizeCallback(win, window_size_callback);
+    glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
+    glfwSetKeyCallback(win, key_callback);
+    glfwSetCursorPosCallback(win, cursor_position_callback);
 
-    associate_action_to_key(GLFW_KEY_ESCAPE, false, [this] { glfwSetWindowShouldClose(*this->window, true); });
+    if(camera == nullptr) { throw std::runtime_error("Cannot set active_camera to nullptr"); }
 
-    /* ---- Toggles ---- */
-    associate_action_to_key(GLFW_KEY_TAB, false, [this] {
-        glfwSetInputMode(*this->window, GLFW_CURSOR, is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    /* ---- Key Actions ---- */
+    /* General */
+    associate_action_to_key(GLFW_KEY_ESCAPE, false, [this, &window] { glfwSetWindowShouldClose(window.get(), true); });
+
+    /* Toggles */
+    associate_action_to_key(GLFW_KEY_TAB, false, [this, &window] {
+        glfwSetInputMode(window.get(), GLFW_CURSOR, is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
         is_cursor_visible = !is_cursor_visible;
     });
     associate_action_to_key(GLFW_KEY_C, false, [this] {
@@ -34,7 +41,7 @@ EventHandler::EventHandler(Window* window, Camera* camera)
         is_wireframe_enabled = !is_wireframe_enabled;
     });
 
-    /* ---- Camera ---- */
+    /* Camera */
     associate_action_to_key(GLFW_KEY_W, true, [this] {
         active_camera->move_around(MovementDirection::FORWARD, delta);
     });
@@ -98,7 +105,7 @@ void EventHandler::set_window_size_event_action(const Action& action) {
 }
 
 void EventHandler::handle_window_size_event(int width, int height) {
-    window->update_size(width, height);
+    window.update_size(width, height);
     if(window_size_event_action) {
         window_size_event_action();
     }
