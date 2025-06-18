@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "maths/mat4.hpp"
+#include "mesh/TriangleMesh.hpp"
 
 /**
  * @class Application
@@ -46,6 +47,11 @@ private:
      */
     void update_mvp(const Shader& shader, const mat4& model) const;
 
+    /**
+     * @brief Draws the background.
+     */
+    void draw_background();
+
     Window window; ///< Contains the GLFW window. Needs to be initialized first.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
@@ -58,4 +64,6 @@ private:
     mat4 view_projection;
 
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
+
+    TriangleMesh screen;
 };

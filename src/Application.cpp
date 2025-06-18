@@ -14,7 +14,6 @@
 #include "maths/transforms.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/primitives.hpp"
-#include "mesh/TriangleMesh.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -40,6 +39,9 @@ Application::Application()
                         "shaders/fragment/background.frag"
                     }));
 
+    /* ---- Meshes ---- */
+    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
+
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
 }
@@ -55,9 +57,6 @@ void Application::run() {
     TriangleMesh sphere;
     create_sphere_mesh(sphere, 8, 16);
 
-    TriangleMesh screen;
-    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
-
     vec3 light_color(1.0f);
     vec3 light_position(0.0f, 20.0f, 0.0f);
 
@@ -67,28 +66,10 @@ void Application::run() {
 
         view_projection = projection * camera.get_view_matrix();
 
-        /* Background Shader */ {
-            const Shader& shader = shaders["background"];
-            shader.use();
-
-            shader.set_uniform("u_resolution", window.get_resolution());
-            shader.set_uniform("u_camera_direction", camera.get_direction());
-            shader.set_uniform("u_camera_right", camera.get_right_vector());
-            shader.set_uniform("u_camera_up", camera.get_up_vector());
-
-            glDepthMask(GL_FALSE);
-            glDisable(GL_DEPTH_TEST);
-            if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-
-            screen.draw(shader);
-
-            if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(GL_TRUE);
-        }
+        draw_background();
 
         /* Blinn-Phong Shader */ {
-            const Shader& shader = shaders["blinn-phong"];
+            const Shader& shader = shaders.at("blinn-phong");
             shader.use();
 
             shader.set_uniform("u_camera_position", camera.get_position());
@@ -103,7 +84,7 @@ void Application::run() {
         }
 
         /* Flat Shader */ {
-            const Shader& shader = shaders["flat"];
+            const Shader& shader = shaders.at("flat");
             shader.use();
 
             shader.set_uniform("u_color", light_color);
@@ -123,4 +104,24 @@ void Application::update_mvp(const Shader& shader, const mat4& model) const {
     shader.set_uniform("u_mvp", view_projection * model);
     shader.set_uniform("u_model", model);
     shader.set_uniform("u_normals_model_matrix", transpose_inverse(model));
+}
+
+void Application::draw_background() {
+    const Shader& shader = shaders.at("background");
+    shader.use();
+
+    shader.set_uniform("u_resolution", window.get_resolution());
+    shader.set_uniform("u_camera_direction", camera.get_direction());
+    shader.set_uniform("u_camera_right", camera.get_right_vector());
+    shader.set_uniform("u_camera_up", camera.get_up_vector());
+
+    glDepthMask(GL_FALSE);
+    glDisable(GL_DEPTH_TEST);
+    if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+    screen.draw(shader);
+
+    if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
 }
