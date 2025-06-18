@@ -65,5 +65,5 @@ private:
 
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 
-    TriangleMesh screen;
+    TriangleMesh screen; ///< Mesh used to render a quad as the background.
 };
