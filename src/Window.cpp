@@ -5,6 +5,7 @@
 
 #include "Window.hpp"
 
+#include <unordered_set>
 #include <glad/glad.h>
 
 static void glfw_error_callback(int code, const char* message) {
@@ -18,7 +19,13 @@ static void opengl_error_callback(unsigned int source,
                                   int /* length */,
                                   const GLchar* message,
                                   const void* /* userParam */) {
-    if(severity == GL_DEBUG_SEVERITY_NOTIFICATION) { return; }
+    static const std::unordered_set<unsigned int> ignore_list{
+        // Buffer detailed info: Buffer object ... (bound to GL_ELEMENT_ARRAY_BUFFER_ARB, usage hint
+        // is GL_STATIC_DRAW) will use VIDEO memory as the source for buffer object operations.
+        131185,
+    };
+
+    if(ignore_list.contains(id)) { return; }
 
     std::cerr << "OpenGL Message:"
         << "\n\tID: " << id
