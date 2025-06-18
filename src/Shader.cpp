@@ -28,9 +28,12 @@ Shader& Shader::operator=(const Shader& shader) {
 }
 
 void Shader::free() {
+    if(id == 0) { return; }
     glDeleteProgram(id);
-    uniform_locations.clear();
     std::cout << "Freed shader program '" << name << "'.\n";
+    id = 0;
+    name = "";
+    uniform_locations.clear();
 }
 
 void Shader::create(const std::initializer_list<std::filesystem::path>& paths_list,

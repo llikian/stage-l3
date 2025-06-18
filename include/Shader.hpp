@@ -50,7 +50,9 @@ public:
      * @brief Copy operator.
      * @warning The responsibility of freeing the shader program goes to the user, so if multiple
      * copies of the same shader program exist, be sure that all copies are no longer in use before
-     * freeing.
+     * freeing. Additionally, if this instance of the Shader class already had a shader program
+     * (id != 0) and you no longer wish to use that shader program, be sure to call the free method
+     * beforehand.
      * @param shader The shader to copy.
      */
     Shader& operator=(const Shader& shader);
@@ -65,7 +67,7 @@ public:
      * to it.
      * @warning The responsibility of freeing the shader program goes to the user, so if this instance
      * of the Shader class already had a shader program (id != 0) and you no longer wish to use that
-     * shader program, be sure to call the free method.
+     * shader program, be sure to call the free method beforehand.
      * @param paths_list The paths to each of the different shaders.
      * @param shader_program_name The name of the shader program.
      */

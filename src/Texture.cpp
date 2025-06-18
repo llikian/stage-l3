@@ -29,8 +29,26 @@ Texture::Texture(unsigned char r, unsigned char g, unsigned char b)
     create(r, g, b);
 }
 
-Texture::~Texture() {
+Texture::Texture(const Texture& texture) {
+    id = texture.id;
+}
+
+Texture& Texture::operator=(const Texture& texture) {
+    id = texture.id;
+    return *this;
+}
+
+void Texture::init() {
+    glGenTextures(1, &id);
+    std::cout << "Created texture " << id << ".\n";
+    glBindTexture(GL_TEXTURE_2D, id);
+}
+
+void Texture::free() {
+    if(id == 0) { return; }
     glDeleteTextures(1, &id);
+    std::cout << "Freed texture " << id << ".\n";
+    id = 0;
 }
 
 void Texture::create(const std::string& path) {
@@ -38,13 +56,12 @@ void Texture::create(const std::string& path) {
 }
 
 void Texture::create(const Image& image) {
-    if(id != 0) { glDeleteTextures(1, &id); }
-
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
+    init();
 
     unsigned int format = image.get_color_format();
-    glTexImage2D(GL_TEXTURE_2D, 0, format, image.get_width(), image.get_height(), 0, format, GL_UNSIGNED_BYTE,
+    glTexImage2D(GL_TEXTURE_2D, 0, format,
+                 image.get_width(), image.get_height(), 0,
+                 format, GL_UNSIGNED_BYTE,
                  image.get_data());
     glGenerateMipmap(GL_TEXTURE_2D);
 }
@@ -56,12 +73,8 @@ void Texture::create(const vec3& color) {
 }
 
 void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
-    if(id != 0) { glDeleteTextures(1, &id); }
-
+    init();
     unsigned char c[3]{ r, g, b };
-
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
 }
 
