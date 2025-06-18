@@ -21,6 +21,11 @@ struct Material {
     Material();
 
     /**
+     * @brief Frees textures.
+     */
+    ~Material();
+
+    /**
      * @brief Updates a shader's values with the material's data.
      * @param shader The shader whose uniforms need to be updated.
      */

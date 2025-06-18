@@ -11,6 +11,11 @@ Material::Material()
       specular(1.0f),
       specular_exponent(10.0f) { }
 
+Material::~Material() {
+    ambient_map.free();
+    diffuse_map.free();
+}
+
 void Material::update_shader_uniforms(const Shader& shader) {
     shader.set_uniform("u_ambient", ambient);
     shader.set_uniform("u_diffuse", diffuse);
