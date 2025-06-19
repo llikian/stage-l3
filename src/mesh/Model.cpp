@@ -5,6 +5,7 @@
 
 #include "mesh/Model.hpp"
 
+#include <ranges>
 #include "maths/geometry.hpp"
 #include "utility/hash.hpp"
 
@@ -27,22 +28,71 @@ Model::Model(const std::filesystem::path& path, const mat4& model)
 void Model::parse_obj_file(const std::filesystem::path& path) {
 #ifdef DEBUG_LOG_MODEL_READ_INFO
     LifetimeLogger lifetime_logger("\tTook ");
+    std::cout << "Reading model from file '" << path.filename().string() << "':\n";
+    uint64_t total_indices = 0;
 #endif
 
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
+    unsigned int positions_amount = 0;
+    unsigned int normals_amount = 0;
+    unsigned int tex_coords_amount = 0;
+    std::string current_material_name = "default_material";
+    std::unordered_map<std::string, unsigned int> indices_amount;
+    for(std::string line ; std::getline(file, line) ;) {
+        if(line[0] == 'f') {
+            indices_amount[current_material_name]++;
+        }
+
+        if(line[0] != 'v') {
+            if(line[0] == 'm') { // mtllib
+                std::istringstream stream(line);
+                std::string buffer;
+                stream >> buffer >> buffer;
+                parse_mtl_file(path.parent_path() / buffer);
+            } else if(line[0] == 'u') { // usemtl
+                std::istringstream stream(line);
+                std::string buffer;
+                stream >> buffer >> current_material_name;
+            } else {
+                continue;
+            }
+        }
+
+        switch(line[1]) {
+            case ' ':
+                positions_amount++;
+                break;
+            case 'n':
+                normals_amount++;
+                break;
+            case 't':
+                tex_coords_amount++;
+                break;
+            default:
+                break;
+        }
+    }
+
+    current_material_name = "default_material";
+
+    file.clear();
+    file.seekg(0, std::ios::beg);
+
     std::vector<vec3> positions;
     std::vector<vec3> normals;
     std::vector<vec2> tex_coords;
 
-    std::string current_material_name;
-    std::unordered_map<std::string, std::vector<llvec3>> vertex_indices;
-    // x is the index for the position, y for the normal and z for the tex coords
-
+    normals.reserve(normals_amount);
+    positions.reserve(positions_amount);
+    tex_coords.reserve(tex_coords_amount + 1);
     tex_coords.emplace_back(0.0f, 0.0f); // When no texture coordinates are provided, just put it to (0.0, 0.0).
 
-    uint64_t total_indices = 0;
+    // x is the index for the position, y for the normal and z for the tex coords
+    std::unordered_map<std::string, std::vector<llvec3>> vertex_indices;
+    vertex_indices.reserve(materials.size());
+    for(auto& [name, amount] : indices_amount) { vertex_indices[name].reserve(amount); }
 
     for(std::string line ; std::getline(file, line) ;) {
         std::istringstream stream(line);
@@ -84,29 +134,20 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
                 throw std::runtime_error("Format error in .obj file, less than 3 vertices in face.");
             }
 
-            if(current_material_name.empty()) {
-                current_material_name = "default_material";
-                materials.emplace(current_material_name, Material());
-            }
+#ifdef DEBUG_LOG_MODEL_READ_INFO
+            total_indices += 3 * (face.size() - 2);
+#endif
 
             std::vector<llvec3>& indices = vertex_indices[current_material_name];
             for(unsigned int i = 1 ; i + 1 < face.size() ; ++i) {
-                total_indices += 3;
                 indices.push_back(face[0]);
                 indices.push_back(face[i]);
                 indices.push_back(face[i + 1]);
             }
-        } else if(buffer == "usemtl") {
+        } else if(buffer[0] == 'u') { // usemtl
             stream >> current_material_name;
-        } else if(buffer == "mtllib") {
-            stream >> buffer;
-            parse_mtl_file(path.parent_path() / buffer);
         }
     }
-
-#ifdef DEBUG_LOG_MODEL_READ_INFO
-    std::cout << "Read model from file '" << path.filename().string() << "':\n";
-#endif
 
     for(auto& [material_name, material] : materials) {
         add_mesh(positions, normals, tex_coords, vertex_indices[material_name]);
