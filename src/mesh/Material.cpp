@@ -21,9 +21,6 @@ void Material::update_shader_uniforms(const Shader& shader) {
     shader.set_uniform("u_specular", specular);
     shader.set_uniform("u_specular_exponent", specular_exponent);
 
-    if(diffuse_map.is_default_texture()) {
-        diffuse_map.create(255, 255, 255);
-    } else {
-        diffuse_map.bind(1);
-    }
+    if(diffuse_map.is_default_texture()) { diffuse_map.create(255, 255, 255); }
+    diffuse_map.bind(0);
 }
