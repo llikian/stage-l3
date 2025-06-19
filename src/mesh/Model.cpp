@@ -44,12 +44,12 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
 
     uint64_t total_indices = 0;
 
-    std::string line;
-
-    while(std::getline(file, line)) {
+    for(std::string line ; std::getline(file, line) ;) {
         std::istringstream stream(line);
         std::string buffer;
         stream >> buffer; // Get the line's data type specifier (v, vn, vt, f, etc...)
+
+        if(buffer[0] == '#') { continue; }
 
         if(buffer[0] == 'v') {
             float x, y, z;
