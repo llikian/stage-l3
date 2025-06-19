@@ -10,6 +10,7 @@
 
 #ifdef DEBUG
 #include "debug.hpp"
+#include "utility/LifetimeLogger.hpp"
 #endif
 
 Model::Model(const std::filesystem::path& path, const mat4& model)
@@ -24,6 +25,10 @@ Model::Model(const std::filesystem::path& path, const mat4& model)
 }
 
 void Model::parse_obj_file(const std::filesystem::path& path) {
+#ifdef DEBUG_LOG_MODEL_READ_INFO
+    LifetimeLogger lifetime_logger("\tTook ");
+#endif
+
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
