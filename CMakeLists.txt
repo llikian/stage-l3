@@ -45,6 +45,7 @@ set(SOURCES
 
         # Utility Module
         src/utility/hash.cpp
+        src/utility/LifetimeLogger.cpp
 
         # Libraries
         lib/glad/src/glad.c
