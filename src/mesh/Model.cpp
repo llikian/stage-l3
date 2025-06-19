@@ -124,6 +124,11 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
 }
 
 void Model::parse_mtl_file(const std::filesystem::path& path) {
+#ifdef DEBUG_LOG_MATERIAL_LIBRARY_READ_INFO
+    LifetimeLogger logger("\t\tTook: ");
+    std::cout << "\tReading material library from file '" << path.filename().string() << "':\n";
+#endif
+
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
@@ -148,16 +153,18 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
             stream >> material->specular;
         } else if(buffer == "Ns") {
             stream >> material->specular_exponent;
-        } else if(buffer == "map_Ka") {
-            stream >> buffer;
-            for(char& c : buffer) { if(c == '\\') { c = '/'; } }
-            material->ambient_map.create(path.parent_path() / buffer);
         } else if(buffer == "map_Kd") {
-            stream >> buffer;
-            for(char& c : buffer) { if(c == '\\') { c = '/'; } }
-            material->diffuse_map.create(path.parent_path() / buffer);
+            std::string texture_path;
+            stream >> texture_path;
+            while(stream >> buffer) { texture_path += ' ' + buffer; }
+            for(char& c : texture_path) { if(c == '\\') { c = '/'; } }
+            material->diffuse_map.create(path.parent_path() / texture_path);
         }
     }
+
+#ifdef DEBUG_LOG_MATERIAL_LIBRARY_READ_INFO
+    std::cout << "\t\t" << materials.size() << " materials.\n";
+#endif
 }
 
 void Model::add_mesh(const std::vector<vec3>& positions,
