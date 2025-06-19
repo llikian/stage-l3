@@ -19,7 +19,6 @@ uniform vec3 u_ambient;
 uniform vec3 u_diffuse;
 uniform vec3 u_specular;
 uniform float u_specular_exponent;
-uniform sampler2D u_ambient_map;
 uniform sampler2D u_diffuse_map;
 
 void main() {
@@ -31,9 +30,8 @@ void main() {
     vec3 normal = normalize(v_normal);
     vec3 light_direction = normalize(u_light_position - v_position);
 
-    vec4 ambient_map = texture(u_ambient_map, v_tex_coords);
     float ambient_strength = 0.2f;
-    vec3 ambient = ambient_strength * u_ambient * ambient_map.rgb;
+    vec3 ambient = ambient_strength * u_ambient * diffuse_map.rgb;
 
     float diffuse_strength = max(dot(normal, light_direction), 0.0f);
     vec3 diffuse = diffuse_strength * u_diffuse * diffuse_map.rgb;
@@ -43,5 +41,5 @@ void main() {
     float specular_strength = pow(max(dot(view_direction, reflected_direction), 0.0f), u_specular_exponent);
     vec3 specular = specular_strength * u_specular;
 
-    frag_color.rgb = (ambient + diffuse + specular) * u_light_color;
+    frag_color.rgb = ambient + (diffuse + specular) * u_light_color;
 }

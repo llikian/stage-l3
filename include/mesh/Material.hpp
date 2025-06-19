@@ -36,6 +36,5 @@ struct Material {
     vec3 specular; ///< Specular color
     float specular_exponent; ///< Specular Exponent.
 
-    Texture ambient_map; ///< Ambient map.
     Texture diffuse_map; ///< Diffuse map.
 };
