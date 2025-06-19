@@ -164,7 +164,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
     std::unordered_map<llvec3, long long, vector3_hash<long long>> unique_attribute_triplets;
 
     for(size_t i = 0 ; i + 2 < vertex_indices.size() ; i += 3) {
-        if(vertex_indices[i].y == 0) {
+        if(vertex_indices[i].y == -1) {
             normals.push_back(normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
                                               positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
             vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size();
