@@ -28,6 +28,7 @@ set(SOURCES
         src/Window.cpp
 
         # Maths Module
+        src/maths/functions.cpp
         src/maths/geometry.cpp
         src/maths/mat3.cpp
         src/maths/mat4.cpp
