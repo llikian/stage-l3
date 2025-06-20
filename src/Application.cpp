@@ -11,7 +11,6 @@
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
-#include "mesh/Model.hpp"
 #include "mesh/primitives.hpp"
 
 Application::Application()
@@ -45,7 +44,7 @@ Application::~Application() {
 }
 
 void Application::run() {
-    // Model sponza("data/sponza/sponza.obj", scale(0.05f));
+    Model sponza("data/sponza/sponza.obj", scale(0.05f));
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
     Model bmw("data/bmw/bmw.obj", scale(0.05f));
 
@@ -71,14 +70,9 @@ void Application::run() {
             shader.set_uniform("u_light_color", light_color);
             shader.set_uniform("u_light_position", light_position);
 
-            // update_mvp(shader, sponza.model_matrix);
-            // sponza.draw(shader);
-
-            // update_mvp(shader, vokselia.model_matrix);
-            // vokselia.draw(shader);
-
-            update_mvp(shader, bmw.model_matrix);
-            bmw.draw(shader);
+            update_mvp_and_draw(shader, sponza);
+            // update_mvp_and_draw(shader, vokselia);
+            update_mvp_and_draw(shader, bmw);
         }
 
         /* Flat Shader */ {
@@ -98,10 +92,17 @@ EventHandler& Application::get_event_handler() {
     return event_handler;
 }
 
-void Application::update_mvp(const Shader& shader, const mat4& model) const {
-    shader.set_uniform("u_mvp", view_projection * model);
-    shader.set_uniform("u_model", model);
-    shader.set_uniform("u_normals_model_matrix", transpose_inverse(model));
+void Application::update_mvp(const Shader& shader, const mat4& model_matrix) const {
+    shader.set_uniform("u_mvp", view_projection * model_matrix);
+    shader.set_uniform("u_model", model_matrix);
+    shader.set_uniform("u_normals_model_matrix", transpose_inverse(model_matrix));
+}
+
+void Application::update_mvp_and_draw(const Shader& shader, Model& model) const {
+    shader.set_uniform("u_mvp", view_projection * model.model_matrix);
+    shader.set_uniform("u_model", model.model_matrix);
+    shader.set_uniform("u_normals_model_matrix", transpose_inverse(model.model_matrix));
+    model.draw(shader);
 }
 
 void Application::draw_background() {

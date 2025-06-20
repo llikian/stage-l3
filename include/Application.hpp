@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "maths/mat4.hpp"
+#include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
 
 /**
@@ -43,9 +44,16 @@ private:
     /**
      * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader.
      * @param shader The shader whose uniforms need to be updated.
-     * @param model The model matrix used in the next draw call.
+     * @param model_matrix The model matrix used in the next draw call.
      */
-    void update_mvp(const Shader& shader, const mat4& model) const;
+    void update_mvp(const Shader& shader, const mat4& model_matrix) const;
+
+    /**
+     * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader and draws the model.
+     * @param shader The shader whose uniforms need to be updated.
+     * @param model The model to draw.
+     */
+    void update_mvp_and_draw(const Shader& shader, Model& model) const;
 
     /**
      * @brief Draws the background.
@@ -55,9 +63,9 @@ private:
     Window window; ///< Contains the GLFW window. Needs to be initialized first.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
-    Camera camera; ///< The active camera.
+    Camera camera;                                   ///< The active camera.
 
-    float fov; ///< The field of view angle.
+    float fov;       ///< The field of view angle.
     mat4 projection; ///< The projection matrix. Used every frame in the mvp matrix calculation.
 
     /// Holds the projection matrix multiplied by the view matrix in order to only do the calculation once per frame.
