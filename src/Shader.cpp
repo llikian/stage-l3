@@ -129,7 +129,7 @@ unsigned int Shader::compile_shader(const std::filesystem::path& path) {
 
     std::ifstream file(path);
     if(!file.is_open()) {
-        throw std::runtime_error(std::string("Failed to open " + shader_type_name + " shader."));
+        throw std::runtime_error("Failed to open " + shader_type_name + " shader '" + path.string() + "'.");
     }
 
     std::string raw_code = (std::stringstream() << file.rdbuf()).str();
