@@ -13,6 +13,10 @@
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 Application::Application()
     : window("Projet Stage L3", this),
       camera(vec3(0.0f, 0.0f, 0.0f)),
@@ -23,6 +27,14 @@ Application::Application()
     event_handler.set_window_size_event_action([this] {
         projection(0, 0) = 1.0f / (window.get_size_ratio() * tanf(0.5f * fov));
     });
+
+    /* ---- ImGui ---- */
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui::GetIO().IniFilename = "data/imgui.ini";
+    ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
+    ImGui_ImplOpenGL3_Init();
 
     /* ---- Shaders ---- */
     add_shader("point mesh", { "shaders/point_mesh/point_mesh.vert", "shaders/point_mesh/point_mesh.frag" });
@@ -40,6 +52,10 @@ Application::Application()
 
 Application::~Application() {
     for(Shader& shader : shaders | std::views::values) { shader.free(); }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Application::run() {
@@ -55,6 +71,10 @@ void Application::run() {
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         view_projection = projection * camera.get_view_matrix();
@@ -83,6 +103,19 @@ void Application::run() {
             sphere.draw(shader);
         }
 
+        /* ImGui */ {
+            ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+            ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
+            ImGui::Text("delta: %fs", event_handler.get_delta());
+
+    ImGui::SetWindowSize("Debug", ImVec2(0.1f * window.get_width(), 0.0f));
+
+            ImGui::End();
+        }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         window.swap_buffers();
     }
 }

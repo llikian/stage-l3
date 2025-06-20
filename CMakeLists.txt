@@ -50,6 +50,15 @@ set(SOURCES
 
         # Libraries
         lib/glad/src/glad.c
+
+        lib/imgui/imgui.cpp
+        lib/imgui/imgui_draw.cpp
+        lib/imgui/imgui_tables.cpp
+        lib/imgui/imgui_widgets.cpp
+        lib/imgui/backends/imgui_impl_glfw.cpp
+        lib/imgui/backends/imgui_impl_opengl3.cpp
+        lib/imgui/misc/cpp/imgui_stdlib.cpp
+
         lib/stb/stb_image.cpp
 )
 
@@ -58,6 +67,8 @@ set(INCLUDES
 
         # Libraries
         lib/glad/include
+        lib/imgui
+        lib/imgui/backends
         lib/stb
 )
 
