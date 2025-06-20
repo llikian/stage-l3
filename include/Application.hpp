@@ -42,6 +42,13 @@ public:
 
 private:
     /**
+     * @brief Add a shader to the unordered_map.
+     * @param name The name of the shader (key).
+     * @param paths_list The paths to each of the different shaders (parameter to the value's constructor).
+     */
+    void add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
+
+    /**
      * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader.
      * @param shader The shader whose uniforms need to be updated.
      * @param model_matrix The model matrix used in the next draw call.

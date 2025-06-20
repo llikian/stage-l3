@@ -25,12 +25,11 @@ Application::Application()
     });
 
     /* ---- Shaders ---- */
-    shaders.emplace("blinn-phong", Shader({ "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" }));
-    shaders.emplace("flat", Shader({ "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" }));
-    shaders.emplace("background", Shader({
-                        "shaders/vertex/position_only-no_mvp.vert",
-                        "shaders/fragment/background.frag"
-                    }));
+    add_shader("point mesh", { "shaders/point_mesh/point_mesh.vert", "shaders/point_mesh/point_mesh.frag" });
+    add_shader("line mesh", { "shaders/line_mesh/line_mesh.vert", "shaders/line_mesh/line_mesh.frag" });
+    add_shader("background", { "shaders/vertex/position_only-no_mvp.vert", "shaders/fragment/background.frag" });
+    add_shader("flat", { "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" });
+    add_shader("blinn-phong", { "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" });
 
     /* ---- Meshes ---- */
     create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
@@ -46,7 +45,7 @@ Application::~Application() {
 void Application::run() {
     Model sponza("data/sponza/sponza.obj", scale(0.05f));
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
-    Model bmw("data/bmw/bmw.obj", scale(0.05f));
+    // Model bmw("data/bmw/bmw.obj", scale(0.05f));
 
     TriangleMesh sphere;
     create_sphere_mesh(sphere, 8, 16);
@@ -72,7 +71,7 @@ void Application::run() {
 
             update_mvp_and_draw(shader, sponza);
             // update_mvp_and_draw(shader, vokselia);
-            update_mvp_and_draw(shader, bmw);
+            // update_mvp_and_draw(shader, bmw);
         }
 
         /* Flat Shader */ {
@@ -90,6 +89,10 @@ void Application::run() {
 
 EventHandler& Application::get_event_handler() {
     return event_handler;
+}
+
+void Application::add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list) {
+    shaders.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(paths_list, name));
 }
 
 void Application::update_mvp(const Shader& shader, const mat4& model_matrix) const {
