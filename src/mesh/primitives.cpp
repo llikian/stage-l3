@@ -61,3 +61,17 @@ void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const ve
     mesh.add_vertex(B + BA + BC, normal, vec2(1.0f, 1.0f));
     mesh.add_face(0, 1, 2, 3);
 }
+
+void create_axes_mesh(LineMesh& mesh, float length) {
+    const vec3 origin(0.0f, 0.0f, 0.0f);
+    const vec3 axes[3]{
+        vec3(1.0f, 0.0f, 0.0f),
+        vec3(0.0f, 1.0f, 0.0f),
+        vec3(0.0f, 0.0f, 1.0f)
+    };
+
+    for(const vec3& axis : axes) {
+        mesh.add_vertex(origin, axis);
+        mesh.add_vertex(length * axis, axis);
+    }
+}

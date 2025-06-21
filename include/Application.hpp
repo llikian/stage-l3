@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "maths/mat4.hpp"
+#include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
 
@@ -81,4 +82,6 @@ private:
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 
     TriangleMesh screen; ///< Mesh used to render a quad as the background.
+    LineMesh axes;       ///< Mesh used to render axes in order to determine the view direction.
+    bool are_axes_drawn; ///< Whether the axes are drawn.
 };

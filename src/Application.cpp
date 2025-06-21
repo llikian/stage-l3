@@ -21,12 +21,14 @@ Application::Application()
     : window("Projet Stage L3", this),
       camera(vec3(0.0f, 0.0f, 0.0f)),
       fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
-      event_handler(window, &camera) {
+      event_handler(window, &camera),
+      are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
     event_handler.set_window_size_event_action([this] {
         projection(0, 0) = 1.0f / (window.get_size_ratio() * tanf(0.5f * fov));
     });
+    event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
 
     /* ---- ImGui ---- */
     IMGUI_CHECKVERSION();
@@ -45,6 +47,7 @@ Application::Application()
 
     /* ---- Meshes ---- */
     create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
+    create_axes_mesh(axes, 0.5f);
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
@@ -77,6 +80,8 @@ void Application::run() {
         ImGui::NewFrame();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        vec3 camera_position = camera.get_position();
+        vec3 camera_direction = camera.get_direction();
         view_projection = projection * camera.get_view_matrix();
 
         draw_background();
@@ -85,7 +90,7 @@ void Application::run() {
             const Shader& shader = shaders.at("blinn-phong");
             shader.use();
 
-            shader.set_uniform("u_camera_position", camera.get_position());
+            shader.set_uniform("u_camera_position", camera_position);
             shader.set_uniform("u_light_color", light_color);
             shader.set_uniform("u_light_position", light_position);
 
@@ -103,13 +108,22 @@ void Application::run() {
             sphere.draw(shader);
         }
 
+        /* Line Mesh Shader */
+        if(are_axes_drawn) {
+            const Shader& shader = shaders.at("line mesh");
+            shader.use();
+
+            shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
+            axes.draw(shader);
+        }
+
         /* ImGui */ {
             ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
             ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
             ImGui::Text("delta: %fs", event_handler.get_delta());
 
-    ImGui::SetWindowSize("Debug", ImVec2(0.1f * window.get_width(), 0.0f));
+            ImGui::SetWindowSize("Debug", ImVec2(0.1f * window.get_width(), 0.0f));
 
             ImGui::End();
         }

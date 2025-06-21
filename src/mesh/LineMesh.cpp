@@ -79,10 +79,6 @@ void LineMesh::bind_buffers() {
     glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(sizeof(vec3)));
     glEnableVertexAttribArray(1);
 
-    /* Thickness */
-    glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(2 * sizeof(vec3)));
-    glEnableVertexAttribArray(2);
-
     /* Indices & EBO */
     if(!indices.empty()) {
         glGenBuffers(1, &EBO);

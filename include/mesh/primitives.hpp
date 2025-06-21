@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "LineMesh.hpp"
 #include "TriangleMesh.hpp"
 
 /**
@@ -31,3 +32,13 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
  * @param C The lower right point of the quad.
  */
 void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const vec3& C);
+
+/**
+ * @brief Creates a mesh representing the 3 unit axes in their corrosponding colors:\n
+ * x=(1, 0, 0) in red\n
+ * y=(0, 1, 0) in green\n
+ * z=(0, 0, 1) in blue
+ * @param mesh The mesh to create the axes in.
+ * @param length The length of the axes.
+ */
+void create_axes_mesh(LineMesh& mesh, float length);
