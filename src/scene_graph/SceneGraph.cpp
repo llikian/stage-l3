@@ -7,7 +7,7 @@
 
 #include "imgui.h"
 
-SceneGraph::SceneGraph(): root("Root"), selected_entity(nullptr) { }
+SceneGraph::SceneGraph() : root("Root"), selected_entity(nullptr) { }
 
 void SceneGraph::draw_imgui_window(const std::string& imgui_window_name) {
     ImGui::Begin(imgui_window_name.c_str());
