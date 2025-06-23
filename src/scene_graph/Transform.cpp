@@ -27,6 +27,34 @@ void Transform::set_local_scale(const vec3& scale) {
     is_dirty = true;
 }
 
+void Transform::set_local_model_to_dirty() {
+    is_dirty = true;
+}
+
+vec3 Transform::get_local_position() const {
+    return local_position;
+}
+
+vec3& Transform::get_local_position_reference() {
+    return local_position;
+}
+
+vec3 Transform::get_local_rotation() const {
+    return local_rotation;
+}
+
+vec3& Transform::get_local_rotation_reference() {
+    return local_rotation;
+}
+
+vec3 Transform::get_local_scale() const {
+    return local_scale;
+}
+
+vec3& Transform::get_local_scale_reference() {
+    return local_scale;
+}
+
 mat4 Transform::get_local_model() const {
     return translate(local_position)
           .rotate_y(local_rotation.y)

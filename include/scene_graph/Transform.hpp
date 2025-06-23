@@ -22,6 +22,17 @@ public:
 
     void set_local_scale(const vec3& scale);
 
+    void set_local_model_to_dirty();
+
+    vec3 get_local_position() const;
+    vec3& get_local_position_reference();
+
+    vec3 get_local_rotation() const;
+    vec3& get_local_rotation_reference();
+
+    vec3 get_local_scale() const;
+    vec3& get_local_scale_reference();
+
     mat4 get_local_model() const;
 
     mat4 get_global_model() const;
