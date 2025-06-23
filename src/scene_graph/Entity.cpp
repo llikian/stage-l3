@@ -5,6 +5,8 @@
 
 #include "scene_graph/Entity.hpp"
 
+#include "imgui.h"
+
 Entity::Entity(const std::string& name) : name(name), parent(nullptr) { }
 
 Entity::~Entity() {
@@ -32,6 +34,16 @@ void Entity::draw_drawables(const mat4& view_projection_matrix) {
 
 bool Entity::is_drawable() const {
     return false;
+}
+
+void Entity::add_to_object_editor() {
+    ImGui::Text("Selected Entity: '%s'", name.c_str());
+
+    bool is_dirty = ImGui::InputFloat3("Local Position", &transform.get_local_position_reference().x);
+    is_dirty = is_dirty || ImGui::InputFloat3("Local Rotation", &transform.get_local_rotation_reference().x);
+    is_dirty = is_dirty || ImGui::InputFloat3("Local Scale", &transform.get_local_scale_reference().x);
+
+    if(is_dirty) { transform.set_local_model_to_dirty(); }
 }
 
 DrawableEntity::DrawableEntity(const std::string& name, Shader* shader) : Entity(name), shader(shader) { }
@@ -79,4 +91,17 @@ void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
     } else {
         std::cout << "[WARNING] TriangleMeshEntity '" << name << "' with nullptr shader.\n";
     }
+}
+
+FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color)
+    : TriangleMeshEntity(name, shader), color(color) { }
+
+void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) const {
+    TriangleMeshEntity::update_uniforms(view_projection_matrix);
+    shader->set_uniform_if_exists("u_color", color);
+}
+
+void FlatShadedMeshEntity::add_to_object_editor() {
+    TriangleMeshEntity::add_to_object_editor();
+    ImGui::ColorEdit3("Object color", &color.x);
 }

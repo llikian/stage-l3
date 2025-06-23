@@ -31,6 +31,8 @@ struct Entity {
 
     virtual bool is_drawable() const;
 
+    virtual void add_to_object_editor();
+
     std::string name;
     std::list<Entity*> children;
     Entity* parent;
@@ -38,7 +40,7 @@ struct Entity {
 };
 
 struct DrawableEntity : Entity {
-    explicit DrawableEntity(const std::string& name, Shader* shader);
+    DrawableEntity(const std::string& name, Shader* shader);
 
     virtual void draw(const mat4& view_projection_matrix) = 0;
     virtual void update_uniforms(const mat4& view_projection_matrix) const;
@@ -49,7 +51,7 @@ struct DrawableEntity : Entity {
 };
 
 struct ModelEntity : DrawableEntity {
-    explicit ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path);
+    ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path);
 
     void draw(const mat4& view_projection_matrix) override;
 
@@ -57,9 +59,19 @@ struct ModelEntity : DrawableEntity {
 };
 
 struct TriangleMeshEntity : DrawableEntity {
-    explicit TriangleMeshEntity(const std::string& name, Shader* shader);
+    TriangleMeshEntity(const std::string& name, Shader* shader);
 
     void draw(const mat4& view_projection_matrix) override;
 
     TriangleMesh mesh;
+};
+
+struct FlatShadedMeshEntity : TriangleMeshEntity {
+    FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color = vec3(1.0f));
+
+    void update_uniforms(const mat4& view_projection_matrix) const override;
+
+    void add_to_object_editor() override;
+
+    vec3 color;
 };

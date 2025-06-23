@@ -31,6 +31,14 @@ void SceneGraph::add_entity_to_imgui_window(Entity* entity) {
     }
 }
 
+void SceneGraph::add_selected_entity_editor_to_imgui_window() const {
+    if(selected_entity == nullptr) {
+        ImGui::Text("No Entity is Selected");
+    } else {
+        selected_entity->add_to_object_editor();
+    }
+}
+
 void SceneGraph::draw(const mat4& view_projection_matrix) {
     root.draw_drawables(view_projection_matrix);
 }
