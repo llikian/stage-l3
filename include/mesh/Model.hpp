@@ -22,17 +22,14 @@ public:
     /**
      * @brief Creates a mesh by reading the file at a certain path. Currently supports only .obj files.
      * @param path The path to the file.
-     * @param model The model's model matrix.
      */
-    explicit Model(const std::filesystem::path& path, const mat4& model = mat4(1.0f));
+    explicit Model(const std::filesystem::path& path);
 
     /**
      * @brief Performs a draw call for each of the model's meshes with a certain shader.
      * @param shader The shader to perform the draw calls with.
      */
     void draw(const Shader& shader);
-
-    mat4 model_matrix; ///< The model's model matrix.
 
 private:
     /**

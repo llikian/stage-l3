@@ -14,8 +14,7 @@
 #include "utility/LifetimeLogger.hpp"
 #endif
 
-Model::Model(const std::filesystem::path& path, const mat4& model)
-    : model_matrix(model) {
+Model::Model(const std::filesystem::path& path) {
     std::string extension = path.extension().string();
 
     if(extension != ".obj") {
