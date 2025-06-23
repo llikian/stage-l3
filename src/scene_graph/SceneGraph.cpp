@@ -7,13 +7,12 @@
 
 #include "imgui.h"
 
-SceneGraph::SceneGraph() : root("Root"), selected_entity(nullptr) { }
+SceneGraph::SceneGraph() : root("Scene Graph"), selected_entity(nullptr) { }
 
 void SceneGraph::draw_imgui_node_tree(const std::string& imgui_window_name) {
     ImGui::Begin(imgui_window_name.c_str());
 
-    ImGui::Text("Scene Graph");
-    for(Entity* child : root.children) { add_entity_to_imgui_node_tree(child); }
+    add_entity_to_imgui_node_tree(&root);
 
     ImGui::End();
 }
@@ -23,7 +22,27 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
     if(entity->children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }
     if(selected_entity == entity) { flags |= ImGuiTreeNodeFlags_Selected; }
 
-    if(ImGui::TreeNodeEx(entity->name.c_str(), flags)) {
+    std::string label;
+    switch(entity->get_type()) {
+        case ENTITY_TYPE_DEFAULT:
+            label += "o";
+            break;
+        case ENTITY_TYPE_MODEL:
+            label += "M";
+            break;
+        case ENTITY_TYPE_TRIANGLE_MESH:
+            label += "T";
+            break;
+        case ENTITY_TYPE_FLAT_SHADED_MESH:
+            label += "F";
+            break;
+        default:
+            label += '?';
+            break;
+    }
+    label += ' ' + entity->name;
+
+    if(ImGui::TreeNodeEx(label.c_str(), flags)) {
         if(ImGui::IsItemClicked()) { selected_entity = entity; }
 
         for(Entity* child : entity->children) { add_entity_to_imgui_node_tree(child); }
