@@ -16,6 +16,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "maths/functions.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -67,14 +68,30 @@ void Application::run() {
 
     Entity* root = &scene_graph.root;
 
-    ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj");
-    sponza->transform.set_local_scale(vec3(0.05f));
-
-    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("light_sphere", &shaders.at("flat"));
+    /* Light */
+    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light", &shaders.at("flat"));
     create_sphere_mesh(light->mesh, 8, 16);
     light->transform.set_local_position(vec3(0.0f, 20.0f, 0.0f));
-    const vec3& light_color = light->color;
     const vec3& light_position = light->transform.get_local_position_reference();
+
+    // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj");
+    // sponza->transform.set_local_scale(vec3(0.05f));
+
+    /* Scene Graph Example */
+    if(false) {
+        FlatShadedMeshEntity* current = root->add_child<FlatShadedMeshEntity>("Sphere 0", &shaders.at("flat"),
+                                                                              hue_to_rgb(0));
+        create_sphere_mesh(current->mesh, 16, 32);
+        current->transform.set_local_scale(2.0f);
+        current->transform.set_local_orientation(45.0f, 0.0f, 90.0f);
+        for(int i = 1 ; i < 6 ; ++i) {
+            current = current->add_child<FlatShadedMeshEntity>("Sphere " + std::to_string(i), &shaders.at("flat"),
+                                                               hue_to_rgb(i * 360 / 5));
+            create_sphere_mesh(current->mesh, 16, 32);
+            current->transform.set_local_position(0.0f, 2.0f, 0.0f);
+            current->transform.set_local_scale(0.9f);
+        }
+    }
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
@@ -97,7 +114,7 @@ void Application::run() {
             shader.use();
 
             shader.set_uniform("u_camera_position", camera_position);
-            shader.set_uniform("u_light_color", light_color);
+            shader.set_uniform("u_light_color", light->color);
             shader.set_uniform("u_light_position", light_position);
         }
 
@@ -127,7 +144,7 @@ void Application::run() {
 
             ImGui::End();
 
-            scene_graph.draw_imgui_window("Debug");
+            scene_graph.draw_imgui_node_tree("Debug");
         }
 
         /* ImGui Object Editor Window */ {
@@ -138,7 +155,7 @@ void Application::run() {
 
             win_pos.x = 0.7f * window.get_width();
             ImGui::SetWindowPos(win_pos);
-            win_size.x = 0.3f * window.get_width();
+            win_size.x = window.get_width() - win_pos.x;
             ImGui::SetWindowSize(win_size);
 
             scene_graph.add_selected_entity_editor_to_imgui_window();
