@@ -9,6 +9,14 @@
 #include "Transform.hpp"
 #include "mesh/Model.hpp"
 
+enum EntityType {
+    ENTITY_TYPE_DEFAULT,
+    ENTITY_TYPE_DRAWABLE,
+    ENTITY_TYPE_MODEL,
+    ENTITY_TYPE_TRIANGLE_MESH,
+    ENTITY_TYPE_FLAT_SHADED_MESH,
+};
+
 /**
  * @class Entity
  * @brief An entity in the scene graph, implements a tree-like classure with an std::list of pointers
@@ -29,15 +37,15 @@ public:
 
     /**
      * @brief Add a child to the entity.
-     * @tparam EntityType The type of entity to add.
+     * @tparam EntityClass The type of entity to add.
      * @tparam Args The types of the arguments of the new child's conclassor.
      * @param child_name The name of the child entity.
      * @param args The arguments of the new child's conclassor.
      * @return The new child's pointer.
      */
-    template <typename EntityType, typename... Args>
-    EntityType* add_child(const std::string& child_name, const Args&... args) {
-        EntityType* child = new EntityType(child_name, args...);
+    template <typename EntityClass, typename... Args>
+    EntityClass* add_child(const std::string& child_name, const Args&... args) {
+        EntityClass* child = new EntityClass(child_name, args...);
         children.push_back(child);
         child->parent = this;
         return child;
@@ -73,6 +81,12 @@ public:
      * - The transform's local scale
      */
     virtual void add_to_object_editor();
+
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_DEFAULT.
+     */
+    virtual constexpr EntityType get_entity_type() const { return ENTITY_TYPE_DEFAULT; }
 
     std::string name;            ///< The entity's name.
     std::list<Entity*> children; ///< The entity's children
@@ -130,6 +144,12 @@ public:
      */
     void add_to_object_editor() override;
 
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_DRAWABLE.
+     */
+    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_DRAWABLE; }
+
     Shader* shader; ///< A pointer to the shader used when rendering.
 
 protected:
@@ -157,6 +177,12 @@ public:
      */
     void draw(const mat4& view_projection_matrix) override;
 
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_MODEL.
+     */
+    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_MODEL; }
+
     Model model; ///< The model to render.
 };
 
@@ -179,6 +205,12 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
     void draw(const mat4& view_projection_matrix) override;
+
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_TRIANGLE_MESH.
+     */
+    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_TRIANGLE_MESH; }
 
     TriangleMesh mesh; ///< The mesh to render.
 };
@@ -216,6 +248,12 @@ public:
      * - The mesh's color
      */
     void add_to_object_editor() override;
+
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_FLAT_SHADED_MESH.
+     */
+    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_FLAT_SHADED_MESH; }
 
     vec3 color; ///< The color the mesh should be rendered in.
 };
