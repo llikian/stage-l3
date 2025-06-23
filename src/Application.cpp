@@ -52,6 +52,7 @@ Application::Application()
 
     /* ---- Other ---- */
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
+    glfwSwapInterval(0); // disable vsync
 }
 
 Application::~Application() {
@@ -63,19 +64,23 @@ Application::~Application() {
 }
 
 void Application::run() {
-    // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
-    // Model bmw("data/bmw/bmw.obj", scale(0.05f));
-
     Entity* root = &scene_graph.root;
 
     /* Light */
     FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light", &shaders.at("flat"));
     create_sphere_mesh(light->mesh, 8, 16);
-    light->transform.set_local_position(vec3(0.0f, 20.0f, 0.0f));
+    light->transform.set_local_position(0.0f, 20.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
 
-    // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj");
-    // sponza->transform.set_local_scale(vec3(0.05f));
+    /* Models */
+    root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
+        ->transform.set_local_scale(0.05f);
+
+    // root->add_child<ModelEntity>("vokselia", &shaders.at("blinn-phong"), "data/vokselia_spawn/vokselia_spawn.obj")
+    //     ->transform.set_local_scale(10.0f);
+
+    // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
+    //     ->transform.set_local_scale(0.05f);
 
     /* Scene Graph Example */
     if(false) {
@@ -86,7 +91,7 @@ void Application::run() {
         current->transform.set_local_orientation(45.0f, 0.0f, 90.0f);
         for(int i = 1 ; i < 6 ; ++i) {
             current = current->add_child<FlatShadedMeshEntity>("Sphere " + std::to_string(i), &shaders.at("flat"),
-                                                               hue_to_rgb(i * 360 / 5));
+                                                               hue_to_rgb(i * 360 / 6));
             create_sphere_mesh(current->mesh, 16, 32);
             current->transform.set_local_position(0.0f, 2.0f, 0.0f);
             current->transform.set_local_scale(0.9f);
@@ -135,7 +140,7 @@ void Application::run() {
 
             ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-            win_size.x = 0.1f * window.get_width();
+            win_size.x = 0.2f * window.get_width();
             ImGui::SetWindowPos(win_pos);
             ImGui::SetWindowSize(win_size);
 
