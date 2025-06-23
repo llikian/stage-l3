@@ -50,6 +50,11 @@ public:
     void update_transform_and_children();
 
     /**
+     * @brief Update the local model of this entity and all its children.
+     */
+    void force_update_transform_and_children();
+
+    /**
      * @brief Check if the entity is drawable, draws it if it is and do the same thing for all children.
      * @param view_projection_matrix 
      */

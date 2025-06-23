@@ -15,16 +15,20 @@ Entity::~Entity() {
 
 void Entity::update_transform_and_children() {
     if(transform.is_local_model_dirty()) {
-        if(parent != nullptr) {
-            transform.update_global_model(parent->transform.get_global_model());
-        } else {
-            transform.update_global_model();
-        }
+        force_update_transform_and_children();
+    } else {
+        for(Entity* child : children) { child->update_transform_and_children(); }
+    }
+}
+
+void Entity::force_update_transform_and_children() {
+    if(parent != nullptr) {
+        transform.update_global_model(parent->transform.get_global_model());
+    } else {
+        transform.update_global_model();
     }
 
-    for(Entity* child : children) {
-        child->update_transform_and_children();
-    }
+    for(Entity* child : children) { child->force_update_transform_and_children(); }
 }
 
 void Entity::draw_drawables(const mat4& view_projection_matrix) {
