@@ -17,13 +17,39 @@ void Transform::set_local_position(const vec3& position) {
     is_dirty = true;
 }
 
+void Transform::set_local_position(float x, float y, float z) {
+    local_position.x = x;
+    local_position.y = y;
+    local_position.z = z;
+    is_dirty = true;
+}
+
 void Transform::set_local_orientation(const vec3& rotation) {
     local_orientation = rotation;
     is_dirty = true;
 }
 
+void Transform::set_local_orientation(float x, float y, float z) {
+    local_orientation.x = x;
+    local_orientation.y = y;
+    local_orientation.z = z;
+    is_dirty = true;
+}
+
 void Transform::set_local_scale(const vec3& scale) {
     local_scale = scale;
+    is_dirty = true;
+}
+
+void Transform::set_local_scale(float scale) {
+    local_scale.x = local_scale.y = local_scale.z = scale;
+    is_dirty = true;
+}
+
+void Transform::set_local_scale(float x, float y, float z) {
+    local_scale.x = x;
+    local_scale.y = y;
+    local_scale.z = z;
     is_dirty = true;
 }
 

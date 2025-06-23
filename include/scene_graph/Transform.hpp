@@ -29,16 +29,46 @@ public:
     void set_local_position(const vec3& position);
 
     /**
+     * @brief Changes the local position of the transform.
+     * @param x The transform's new position on the x axis.
+     * @param y The transform's new position on the y axis.
+     * @param z The transform's new position on the z axis.
+     */
+    void set_local_position(float x, float y, float z);
+
+    /**
      * @brief Changes the local orientation of the transform.
      * @param orientation The transform's new orientation.
      */
     void set_local_orientation(const vec3& orientation);
 
     /**
+     * @brief Changes the local orientation of the transform.
+     * @param x The transform's new orientation around the x axis.
+     * @param y The transform's new orientation around the y axis.
+     * @param z The transform's new orientation around the z axis.
+     */
+    void set_local_orientation(float x, float y, float z);
+
+    /**
      * @brief Changes the local scale of the transform.
      * @param scale The transform's new scale.
      */
     void set_local_scale(const vec3& scale);
+
+    /**
+     * @brief Changes the local scale of the transform uniformly along each axes.
+     * @param scale The transform's new scale.
+     */
+    void set_local_scale(float scale);
+
+    /**
+     * @brief Changes the local scale of the transform.
+     * @param x The transform's new scale along the x axis.
+     * @param y The transform's new scale along the y axis.
+     * @param z The transform's new scale along the z axis.
+     */
+    void set_local_scale(float x, float y, float z);
 
     /**
      * @brief Sets the is_dirty flag to true, meaning the local model needs to be recalculated.
