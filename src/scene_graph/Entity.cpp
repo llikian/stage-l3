@@ -68,6 +68,11 @@ bool DrawableEntity::is_drawable() const {
     return true;
 }
 
+void DrawableEntity::add_to_object_editor() {
+    ImGui::Checkbox("Is Object Hidden", &is_hidden);
+    Entity::add_to_object_editor();
+}
+
 ModelEntity::ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path)
     : DrawableEntity(name, shader), model(path) { }
 
@@ -107,6 +112,6 @@ void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
 }
 
 void FlatShadedMeshEntity::add_to_object_editor() {
-    TriangleMeshEntity::add_to_object_editor();
+    DrawableEntity::add_to_object_editor();
     ImGui::ColorEdit3("Object color", &color.x);
 }

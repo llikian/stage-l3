@@ -110,6 +110,15 @@ public:
      */
     bool is_drawable() const override;
 
+    /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - The transform's local position\n
+     * - The transform's local orientation\n
+     * - The transform's local scale\n
+     * - Whether the entity is hidden
+     */
+    void add_to_object_editor() override;
+
     Shader* shader; ///< A pointer to the shader used when rendering.
     bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
 };
