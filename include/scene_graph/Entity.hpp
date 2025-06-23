@@ -95,6 +95,12 @@ public:
     DrawableEntity(const std::string& name, Shader* shader);
 
     /**
+     * @brief Changes the mesh's visibility for this entity and all its children.
+     * @param is_hidden Whether the mesh is hidden.
+     */
+    void set_visibility(bool is_hidden);
+
+    /**
      * @brief Updates uniforms then draws the entity.
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
@@ -125,6 +131,8 @@ public:
     void add_to_object_editor() override;
 
     Shader* shader; ///< A pointer to the shader used when rendering.
+
+protected:
     bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
 };
 

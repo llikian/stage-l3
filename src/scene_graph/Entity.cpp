@@ -53,6 +53,13 @@ void Entity::add_to_object_editor() {
 DrawableEntity::DrawableEntity(const std::string& name, Shader* shader)
     : Entity(name), shader(shader), is_hidden(false) { }
 
+void DrawableEntity::set_visibility(bool is_hidden) {
+    this->is_hidden = is_hidden;
+    for(Entity* child : children) {
+        if(child->is_drawable()) { static_cast<DrawableEntity*>(child)->set_visibility(is_hidden); }
+    }
+}
+
 void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
     int u_mvp_location = shader->get_uniform_location("u_mvp");
     if(u_mvp_location != -1) {
@@ -73,7 +80,11 @@ bool DrawableEntity::is_drawable() const {
 }
 
 void DrawableEntity::add_to_object_editor() {
-    ImGui::Checkbox("Is Object Hidden", &is_hidden);
+    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
+        for(Entity* child : children) {
+            if(child->is_drawable()) { static_cast<DrawableEntity*>(child)->set_visibility(is_hidden); }
+        }
+    }
     Entity::add_to_object_editor();
 }
 
