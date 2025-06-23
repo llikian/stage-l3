@@ -9,20 +9,45 @@
 
 /**
  * @class SceneGraph
- * @brief
+ * @brief A scene graph that holds the root of the graph and contains functionality for rendering it
+ * with ImGui along with selecting an entity in the graph and modifying certain fields in an object
+ * editor.
  */
 class SceneGraph {
 public:
+    /**
+     * @brief Default constructor.
+     */
     SceneGraph();
 
-    void draw_imgui_window(const std::string& imgui_window_name);
-    void add_entity_to_imgui_window(Entity* entity);
+    /**
+     * @brief Draws the scene graph as an ImGui node tree.
+     * @param imgui_window_name The name of the ImGui window to create the tree in.
+     */
+    void draw_imgui_node_tree(const std::string& imgui_window_name);
+
+    /**
+     * @brief Add an entity to the ImGui node tree.
+     * @param entity The entity to add to the tree.
+     */
+    void add_entity_to_imgui_node_tree(Entity* entity);
+
+    /**
+     * @brief Add an object editor for the selected entity (if one is selected) to the current ImGui
+     * window.
+     * @warning Need to be called within an ImGui window, between a call to ImGui::Begin(...) and
+     * ImGui::End().
+     */
     void add_selected_entity_editor_to_imgui_window() const;
 
+    /**
+     * @brief Draw every drawable object within the scene graph.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
     void draw(const mat4& view_projection_matrix);
 
-    Entity root;
+    Entity root; ///< The root of the scene graph.
 
 private:
-    Entity* selected_entity;
+    Entity* selected_entity; ///< The currently selected entity.
 };
