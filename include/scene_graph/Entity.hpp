@@ -86,7 +86,7 @@ public:
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_DEFAULT.
      */
-    virtual constexpr EntityType get_entity_type() const { return ENTITY_TYPE_DEFAULT; }
+    virtual constexpr EntityType get_type() const { return ENTITY_TYPE_DEFAULT; }
 
     std::string name;            ///< The entity's name.
     std::list<Entity*> children; ///< The entity's children
@@ -148,7 +148,7 @@ public:
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_DRAWABLE.
      */
-    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_DRAWABLE; }
+    constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
     Shader* shader; ///< A pointer to the shader used when rendering.
 
@@ -181,7 +181,7 @@ public:
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_MODEL.
      */
-    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_MODEL; }
+    constexpr EntityType get_type() const override { return ENTITY_TYPE_MODEL; }
 
     Model model; ///< The model to render.
 };
@@ -210,7 +210,7 @@ public:
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_TRIANGLE_MESH.
      */
-    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_TRIANGLE_MESH; }
+    constexpr EntityType get_type() const override { return ENTITY_TYPE_TRIANGLE_MESH; }
 
     TriangleMesh mesh; ///< The mesh to render.
 };
@@ -253,7 +253,7 @@ public:
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_FLAT_SHADED_MESH.
      */
-    constexpr EntityType get_entity_type() const override { return ENTITY_TYPE_FLAT_SHADED_MESH; }
+    constexpr EntityType get_type() const override { return ENTITY_TYPE_FLAT_SHADED_MESH; }
 
     vec3 color; ///< The color the mesh should be rendered in.
 };
