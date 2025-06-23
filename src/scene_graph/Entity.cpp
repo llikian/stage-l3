@@ -18,10 +18,10 @@ void Entity::update_transform_and_children() {
         } else {
             transform.compute_global_model();
         }
+    }
 
-        for(Entity* child : children) {
-            child->update_transform_and_children();
-        }
+    for(Entity* child : children) {
+        child->update_transform_and_children();
     }
 }
 
@@ -36,6 +36,21 @@ bool Entity::is_drawable() const {
 
 DrawableEntity::DrawableEntity(const std::string& name, Shader* shader) : Entity(name), shader(shader) { }
 
+void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) const {
+    int u_mvp_location = shader->get_uniform_location("u_mvp");
+    if(u_mvp_location != -1) {
+        Shader::set_uniform(u_mvp_location, view_projection_matrix * transform.get_global_model());
+    }
+
+    shader->set_uniform_if_exists("u_model", transform.get_global_model_reference());
+
+    int u_normals_model_matrix_location = shader->get_uniform_location("u_normals_model_matrix");
+    if(u_normals_model_matrix_location != -1) {
+        Shader::set_uniform(u_normals_model_matrix_location,
+                            transpose_inverse(transform.get_global_model_reference()));
+    }
+}
+
 bool DrawableEntity::is_drawable() const {
     return true;
 }
@@ -46,21 +61,7 @@ ModelEntity::ModelEntity(const std::string& name, Shader* shader, const std::fil
 void ModelEntity::draw(const mat4& view_projection_matrix) {
     if(shader != nullptr) {
         shader->use();
-
-        /* ---- Uniforms ---- */
-        int u_mvp_location = shader->get_uniform_location("u_mvp");
-        if(u_mvp_location != -1) {
-            Shader::set_uniform(u_mvp_location, view_projection_matrix * transform.get_global_model());
-        }
-
-        shader->set_uniform_if_exists("u_model", transform.get_global_model_reference());
-
-        int u_normals_model_matrix_location = shader->get_uniform_location("u_normals_model_matrix");
-        if(u_normals_model_matrix_location != -1) {
-            Shader::set_uniform(u_normals_model_matrix_location,
-                                transpose_inverse(transform.get_global_model_reference()));
-        }
-
+        update_uniforms(view_projection_matrix);
         model.draw(*shader);
     } else {
         std::cout << "[WARNING] ModelEntity '" << name << "' with nullptr shader.\n";
@@ -72,6 +73,8 @@ TriangleMeshEntity::TriangleMeshEntity(const std::string& name, Shader* shader)
 
 void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
     if(shader != nullptr) {
+        shader->use();
+        update_uniforms(view_projection_matrix);
         mesh.draw(*shader);
     } else {
         std::cout << "[WARNING] TriangleMeshEntity '" << name << "' with nullptr shader.\n";

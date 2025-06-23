@@ -42,6 +42,7 @@ struct DrawableEntity : Entity {
     explicit DrawableEntity(const std::string& name, Shader* shader);
 
     virtual void draw(const mat4& view_projection_matrix) = 0;
+    virtual void update_uniforms(const mat4& view_projection_matrix) const;
 
     bool is_drawable() const override;
 
