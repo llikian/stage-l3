@@ -47,7 +47,7 @@ void Entity::add_to_object_editor() {
 }
 
 DrawableEntity::DrawableEntity(const std::string& name, Shader* shader)
-    : Entity(name), shader(shader), is_hidden(true) { }
+    : Entity(name), shader(shader), is_hidden(false) { }
 
 void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
     int u_mvp_location = shader->get_uniform_location("u_mvp");
