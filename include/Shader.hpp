@@ -99,16 +99,33 @@ public:
     std::string get_name() const;
 
     /**
-     * @brief Sets the value of a uniform of any of the available types.
+     * @brief Sets the value of a uniform of any of the available types. Prints a warning if the
+     * uniform is not found.
      * @param uniform The uniform's name.
      * @param value The new value of the uniform.
      */
     template <typename... Value>
     void set_uniform(const std::string& uniform, Value... value) const {
-        try {
-            set_uniform(uniform_locations.at(uniform), value...);
-        } catch(const std::out_of_range&) {
-            std::cerr << "Unknown uniform '" << uniform << "' in 'set_uniform' call for shader '" << name << "'.\n";
+        std::unordered_map<std::string, int>::const_iterator uniform_iterator = uniform_locations.find(uniform);
+        if(uniform_iterator != uniform_locations.end()) {
+            set_uniform(uniform_iterator->second, value...);
+        } else {
+            std::cout << "[WARNING] Unknown uniform '" << uniform << "' in 'set_uniform' call for shader '" << name <<
+                "'.\n";
+        }
+    }
+
+    /**
+     * @brief Sets the value of a uniform of any of the available types. Does not print a warning if
+     * the uniform is not found.
+     * @param uniform The uniform's name.
+     * @param value The new value of the uniform.
+     */
+    template <typename... Value>
+    void set_uniform_if_exists(const std::string& uniform, Value... value) const {
+        std::unordered_map<std::string, int>::const_iterator uniform_iterator = uniform_locations.find(uniform);
+        if(uniform_iterator != uniform_locations.end()) {
+            set_uniform(uniform_iterator->second, value...);
         }
     }
 
