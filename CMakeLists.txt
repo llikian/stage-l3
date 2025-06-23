@@ -44,6 +44,11 @@ set(SOURCES
         src/mesh/primitives.cpp
         src/mesh/TriangleMesh.cpp
 
+        # Scene Graph Module
+        src/scene_graph/Entity.cpp
+        src/scene_graph/SceneGraph.cpp
+        src/scene_graph/Transform.cpp
+
         # Utility Module
         src/utility/hash.cpp
         src/utility/LifetimeLogger.cpp
