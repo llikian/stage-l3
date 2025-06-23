@@ -19,9 +19,9 @@
 
 Application::Application()
     : window("Projet Stage L3", this),
-      camera(vec3(0.0f, 0.0f, 0.0f)),
-      fov(M_PI_4), projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       event_handler(window, &camera),
+      camera(vec3(0.0f, 0.0f, 0.0f)), fov(M_PI_4),
+      projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
@@ -62,15 +62,21 @@ Application::~Application() {
 }
 
 void Application::run() {
-    Model sponza("data/sponza/sponza.obj", scale(0.05f));
+    vec3 light_color(1.0f);
+    vec3 light_position(0.0f, 20.0f, 0.0f);
+
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
     // Model bmw("data/bmw/bmw.obj", scale(0.05f));
 
-    TriangleMesh sphere;
-    create_sphere_mesh(sphere, 8, 16);
+    Entity* root = &scene_graph.root;
 
-    vec3 light_color(1.0f);
-    vec3 light_position(0.0f, 20.0f, 0.0f);
+    ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders["blinn-phong"], "data/sponza/sponza.obj");
+    sponza->transform.set_local_scale(vec3(0.05f));
+    sponza->update_transform_and_children();
+
+    TriangleMeshEntity* light_sphere = root->add_child<TriangleMeshEntity>("light_sphere", &shaders["flat"]);
+    create_sphere_mesh(light_sphere->mesh, 8, 16);
+    light_sphere->transform.set_local_position(light_position);
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
@@ -93,10 +99,6 @@ void Application::run() {
             shader.set_uniform("u_camera_position", camera_position);
             shader.set_uniform("u_light_color", light_color);
             shader.set_uniform("u_light_position", light_position);
-
-            update_mvp_and_draw(shader, sponza);
-            // update_mvp_and_draw(shader, vokselia);
-            // update_mvp_and_draw(shader, bmw);
         }
 
         /* Flat Shader */ {
@@ -104,8 +106,6 @@ void Application::run() {
             shader.use();
 
             shader.set_uniform("u_color", light_color);
-            shader.set_uniform("u_mvp", view_projection * translate(light_position));
-            sphere.draw(shader);
         }
 
         /* Line Mesh Shader */
@@ -117,6 +117,8 @@ void Application::run() {
             axes.draw(shader);
         }
 
+        scene_graph.draw(view_projection);
+
         /* ImGui */ {
             ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
@@ -126,6 +128,8 @@ void Application::run() {
             ImGui::SetWindowSize("Debug", ImVec2(0.1f * window.get_width(), 0.0f));
 
             ImGui::End();
+
+            scene_graph.draw_imgui_window("Debug");
         }
 
         ImGui::Render();
@@ -146,13 +150,6 @@ void Application::update_mvp(const Shader& shader, const mat4& model_matrix) con
     shader.set_uniform("u_mvp", view_projection * model_matrix);
     shader.set_uniform("u_model", model_matrix);
     shader.set_uniform("u_normals_model_matrix", transpose_inverse(model_matrix));
-}
-
-void Application::update_mvp_and_draw(const Shader& shader, Model& model) const {
-    shader.set_uniform("u_mvp", view_projection * model.model_matrix);
-    shader.set_uniform("u_model", model.model_matrix);
-    shader.set_uniform("u_normals_model_matrix", transpose_inverse(model.model_matrix));
-    model.draw(shader);
 }
 
 void Application::draw_background() {
