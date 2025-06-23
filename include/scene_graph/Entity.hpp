@@ -119,6 +119,7 @@ public:
  * @brief A drawable entity that holds a model.
  */
 class ModelEntity : public DrawableEntity {
+public:
     /**
      * @brief Creates an entity with a certain name, a pointer to the shader that will be used
      * when rendering and the path to the model to render.
