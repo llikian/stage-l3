@@ -129,11 +129,18 @@ public:
         }
     }
 
-private:
     /**
-     * @brief Finds and adds all the shader's uniforms' id's to the map.
+     * @param uniform The uniform's name
+     * @return Whether a uniform exists in this shader program.
      */
-    void get_uniforms();
+    bool does_uniform_exist(const std::string& uniform) const;
+
+    /**
+     * @brief Get the location of a uniform.
+     * @param uniform The uniform's name.
+     * @return The location of the uniform if it exists in the shader program, -1 otherwise.
+     */
+    int get_uniform_location(const std::string& uniform) const;
 
     /**
      * @brief Sets the value of a uniform of type int.
@@ -251,6 +258,12 @@ private:
      * @param matrix The new value of the uniform.
      */
     static void set_uniform(int location, const mat4& matrix);
+
+private:
+    /**
+     * @brief Finds and adds all the shader's uniforms' id's to the map.
+     */
+    void get_uniforms();
 
     unsigned int id;  ///< The shader program's id.
     std::string name; ///< The shader's name.

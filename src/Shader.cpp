@@ -157,37 +157,13 @@ void Shader::use() const {
     glUseProgram(id);
 }
 
-void Shader::get_uniforms() {
-    use();
+bool Shader::does_uniform_exist(const std::string& uniform) const {
+    return uniform_locations.contains(uniform);
+}
 
-    int max_name_length;
-    glGetProgramiv(id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
-
-    int length;
-    int size;
-    unsigned int type;
-    char* uniform_name = new char[max_name_length];
-
-    int count;
-    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
-
-    for(int i = 0 ; i < count ; ++i) {
-        glGetActiveUniform(id, i, max_name_length, &length, &size, &type, uniform_name);
-
-        if(size == 1) { // Single value
-            uniform_locations.emplace(uniform_name, glGetUniformLocation(id, uniform_name));
-        } else { // Array
-            std::string index;
-            for(int j = 0 ; j < size ; ++j) {
-                uniform_name[length - 2] = '\0';
-                index = uniform_name;
-                index += std::to_string(j) + ']';
-                uniform_locations.emplace(index, glGetUniformLocation(id, index.c_str()));
-            }
-        }
-    }
-
-    delete[] uniform_name;
+int Shader::get_uniform_location(const std::string& uniform) const {
+    std::unordered_map<std::string, int>::const_iterator uniform_iterator = uniform_locations.find(uniform);
+    return uniform_iterator == uniform_locations.end() ? -1 : uniform_iterator->second;
 }
 
 unsigned int Shader::get_id() const {
@@ -256,4 +232,37 @@ void Shader::set_uniform(int location, const mat3& matrix) {
 
 void Shader::set_uniform(int location, const mat4& matrix) {
     glUniformMatrix4fv(location, 1, false, &(matrix(0, 0)));
+}
+
+void Shader::get_uniforms() {
+    use();
+
+    int max_name_length;
+    glGetProgramiv(id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
+
+    int length;
+    int size;
+    unsigned int type;
+    char* uniform_name = new char[max_name_length];
+
+    int count;
+    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
+
+    for(int i = 0 ; i < count ; ++i) {
+        glGetActiveUniform(id, i, max_name_length, &length, &size, &type, uniform_name);
+
+        if(size == 1) { // Single value
+            uniform_locations.emplace(uniform_name, glGetUniformLocation(id, uniform_name));
+        } else { // Array
+            std::string index;
+            for(int j = 0 ; j < size ; ++j) {
+                uniform_name[length - 2] = '\0';
+                index = uniform_name;
+                index += std::to_string(j) + ']';
+                uniform_locations.emplace(index, glGetUniformLocation(id, index.c_str()));
+            }
+        }
+    }
+
+    delete[] uniform_name;
 }
