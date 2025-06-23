@@ -11,12 +11,30 @@
 
 /**
  * @class Entity
- * @brief
+ * @brief An entity in the scene graph, implements a tree-like classure with an std::list of pointers
+ * to its children entities. Handles the propagation of its local transform to its children.
  */
-struct Entity {
+class Entity {
+public:
+    /**
+     * @brief Creates an entity with a specified name.
+     * @param name The name of the entity, should be unique.
+     */
     explicit Entity(const std::string& name);
+
+    /**
+     * @brief Frees the children.
+     */
     virtual ~Entity();
 
+    /**
+     * @brief Add a child to the entity.
+     * @tparam EntityType The type of entity to add.
+     * @tparam Args The types of the arguments of the new child's conclassor.
+     * @param child_name The name of the child entity.
+     * @param args The arguments of the new child's conclassor.
+     * @return The new child's pointer.
+     */
     template <typename EntityType, typename... Args>
     EntityType* add_child(const std::string& child_name, const Args&... args) {
         EntityType* child = new EntityType(child_name, args...);
@@ -25,53 +43,156 @@ struct Entity {
         return child;
     }
 
+    /**
+     * @brief Check if the local model was modified, updates it if it was and do the same thing for
+     * all children.
+     */
     void update_transform_and_children();
 
+    /**
+     * @brief Check if the entity is drawable, draws it if it is and do the same thing for all children.
+     * @param view_projection_matrix 
+     */
     void draw_drawables(const mat4& view_projection_matrix);
 
+    /**
+     * @brief Returns whether this entity is drawable.
+     * @return false.
+     */
     virtual bool is_drawable() const;
 
+    /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - The transform's local position\n
+     * - The transform's local orientation\n
+     * - The transform's local scale
+     */
     virtual void add_to_object_editor();
 
-    std::string name;
-    std::list<Entity*> children;
-    Entity* parent;
-    Transform transform;
+    std::string name;            ///< The entity's name.
+    std::list<Entity*> children; ///< The entity's children
+    Entity* parent;              ///< The entity's parent.
+    Transform transform;         ///< The entity's transform.
 };
 
-struct DrawableEntity : Entity {
+/**
+ * @class DrawableEntity
+ * @brief Pure virtual class that represents an entity that can be drawn.
+ */
+class DrawableEntity : public Entity {
+public:
+    /**
+     * @brief Creates an entity with a certain name and a pointer to the shader that will be used
+     * when rendering.
+     * @param name The name of the entity.
+     * @param shader A pointer to the shader used when rendering.
+     */
     DrawableEntity(const std::string& name, Shader* shader);
 
+    /**
+     * @brief Updates uniforms then draws the entity.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
     virtual void draw(const mat4& view_projection_matrix) = 0;
-    virtual void update_uniforms(const mat4& view_projection_matrix) const;
 
+    /**
+     * @brief Updates these uniforms if they exist in the shader:\n
+     * - u_mvp\n
+     * - u_model\n
+     * - u_normals_model_matrix
+     * @param view_projection_matrix
+     */
+    virtual void update_uniforms(const mat4& view_projection_matrix);
+
+    /**
+     * @brief Returns whether this entity is drawable.
+     * @return true.
+     */
     bool is_drawable() const override;
 
-    Shader* shader;
+    Shader* shader; ///< A pointer to the shader used when rendering.
+    bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
 };
 
-struct ModelEntity : DrawableEntity {
+/**
+ * @class ModelEntity
+ * @brief A drawable entity that holds a model.
+ */
+class ModelEntity : public DrawableEntity {
+    /**
+     * @brief Creates an entity with a certain name, a pointer to the shader that will be used
+     * when rendering and the path to the model to render.
+     * @param name The name of the entity.
+     * @param shader A pointer to the shader used when rendering.
+     * @param path The path to the model to render.
+     */
     ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path);
 
+    /**
+     * @brief Updates uniforms then draws the model.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
     void draw(const mat4& view_projection_matrix) override;
 
-    Model model;
+    Model model; ///< The model to render.
 };
 
-struct TriangleMeshEntity : DrawableEntity {
+/**
+ * @class TriangleMeshEntity
+ * @brief A drawable entity that holds a triangle mesh.
+ */
+class TriangleMeshEntity : public DrawableEntity {
+public:
+    /**
+     * @brief Creates an entity with a certain name and a pointer to the shader that will be used
+     * when rendering.
+     * @param name The name of the entity.
+     * @param shader A pointer to the shader used when rendering.
+     */
     TriangleMeshEntity(const std::string& name, Shader* shader);
 
+    /**
+     * @brief Updates uniforms then draws the mesh.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
     void draw(const mat4& view_projection_matrix) override;
 
-    TriangleMesh mesh;
+    TriangleMesh mesh; ///< The mesh to render.
 };
 
-struct FlatShadedMeshEntity : TriangleMeshEntity {
+/**
+ * @class FlatShadedMeshEntity
+ * @brief A drawable that holds a mesh and a color in order to render it with flat shading.
+ */
+class FlatShadedMeshEntity : public TriangleMeshEntity {
+public:
+    /**
+     * @brief Creates an entity with a certain name, a pointer to the shader that will be used
+     * when rendering and the color of the mesh.
+     * @param name The name of the entity.
+     * @param shader A pointer to the shader used when rendering.
+     * @param color The color the mesh should be rendered in.
+     */
     FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color = vec3(1.0f));
 
-    void update_uniforms(const mat4& view_projection_matrix) const override;
+    /**
+     * @brief Updates these uniforms if they exist in the shader:\n
+     * - u_mvp\n
+     * - u_model\n
+     * - u_normals_model_matrix\n
+     * - u_color
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
+    void update_uniforms(const mat4& view_projection_matrix) override;
 
+    /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - The transform's local position\n
+     * - The transform's local orientation\n
+     * - The transform's local scale\n
+     * - The mesh's color
+     */
     void add_to_object_editor() override;
 
-    vec3 color;
+    vec3 color; ///< The color the mesh should be rendered in.
 };

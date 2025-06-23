@@ -16,9 +16,9 @@ Entity::~Entity() {
 void Entity::update_transform_and_children() {
     if(transform.is_local_model_dirty()) {
         if(parent != nullptr) {
-            transform.compute_global_model(parent->transform.get_global_model());
+            transform.update_global_model(parent->transform.get_global_model());
         } else {
-            transform.compute_global_model();
+            transform.update_global_model();
         }
     }
 
@@ -40,26 +40,27 @@ void Entity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
     bool is_dirty = ImGui::InputFloat3("Local Position", &transform.get_local_position_reference().x);
-    is_dirty = is_dirty || ImGui::InputFloat3("Local Rotation", &transform.get_local_rotation_reference().x);
+    is_dirty = is_dirty || ImGui::InputFloat3("Local Orientation", &transform.get_local_orientation_reference().x);
     is_dirty = is_dirty || ImGui::InputFloat3("Local Scale", &transform.get_local_scale_reference().x);
 
     if(is_dirty) { transform.set_local_model_to_dirty(); }
 }
 
-DrawableEntity::DrawableEntity(const std::string& name, Shader* shader) : Entity(name), shader(shader) { }
+DrawableEntity::DrawableEntity(const std::string& name, Shader* shader)
+    : Entity(name), shader(shader), is_hidden(true) { }
 
-void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) const {
+void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
     int u_mvp_location = shader->get_uniform_location("u_mvp");
     if(u_mvp_location != -1) {
         Shader::set_uniform(u_mvp_location, view_projection_matrix * transform.get_global_model());
     }
 
-    shader->set_uniform_if_exists("u_model", transform.get_global_model_reference());
+    const mat4& global_model = transform.get_global_model_reference();
+    shader->set_uniform_if_exists("u_model", global_model);
 
     int u_normals_model_matrix_location = shader->get_uniform_location("u_normals_model_matrix");
     if(u_normals_model_matrix_location != -1) {
-        Shader::set_uniform(u_normals_model_matrix_location,
-                            transpose_inverse(transform.get_global_model_reference()));
+        Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
     }
 }
 
@@ -71,6 +72,8 @@ ModelEntity::ModelEntity(const std::string& name, Shader* shader, const std::fil
     : DrawableEntity(name, shader), model(path) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) {
+    if(is_hidden) { return; }
+
     if(shader != nullptr) {
         shader->use();
         update_uniforms(view_projection_matrix);
@@ -84,6 +87,8 @@ TriangleMeshEntity::TriangleMeshEntity(const std::string& name, Shader* shader)
     : DrawableEntity(name, shader) { }
 
 void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
+    if(is_hidden) { return; }
+
     if(shader != nullptr) {
         shader->use();
         update_uniforms(view_projection_matrix);
@@ -96,7 +101,7 @@ void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
 FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color)
     : TriangleMeshEntity(name, shader), color(color) { }
 
-void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) const {
+void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
     TriangleMeshEntity::update_uniforms(view_projection_matrix);
     shader->set_uniform_if_exists("u_color", color);
 }
