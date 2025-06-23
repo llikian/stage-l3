@@ -6,7 +6,6 @@
 #pragma once
 
 #include <list>
-#include <memory>
 #include "Transform.hpp"
 #include "mesh/Model.hpp"
 
