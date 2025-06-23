@@ -62,21 +62,19 @@ Application::~Application() {
 }
 
 void Application::run() {
-    vec3 light_color(1.0f);
-    vec3 light_position(0.0f, 20.0f, 0.0f);
-
     // Model vokselia("data/vokselia_spawn/vokselia_spawn.obj", scale(10.0f));
     // Model bmw("data/bmw/bmw.obj", scale(0.05f));
 
     Entity* root = &scene_graph.root;
 
-    ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders["blinn-phong"], "data/sponza/sponza.obj");
+    ModelEntity* sponza = root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj");
     sponza->transform.set_local_scale(vec3(0.05f));
-    sponza->update_transform_and_children();
 
-    TriangleMeshEntity* light_sphere = root->add_child<TriangleMeshEntity>("light_sphere", &shaders["flat"]);
-    create_sphere_mesh(light_sphere->mesh, 8, 16);
-    light_sphere->transform.set_local_position(light_position);
+    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("light_sphere", &shaders.at("flat"));
+    create_sphere_mesh(light->mesh, 8, 16);
+    light->transform.set_local_position(vec3(0.0f, 20.0f, 0.0f));
+    const vec3& light_color = light->color;
+    const vec3& light_position = light->transform.get_local_position_reference();
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
@@ -90,6 +88,8 @@ void Application::run() {
         vec3 camera_direction = camera.get_direction();
         view_projection = projection * camera.get_view_matrix();
 
+        root->update_transform_and_children();
+
         draw_background();
 
         /* Blinn-Phong Shader */ {
@@ -99,13 +99,6 @@ void Application::run() {
             shader.set_uniform("u_camera_position", camera_position);
             shader.set_uniform("u_light_color", light_color);
             shader.set_uniform("u_light_position", light_position);
-        }
-
-        /* Flat Shader */ {
-            const Shader& shader = shaders.at("flat");
-            shader.use();
-
-            shader.set_uniform("u_color", light_color);
         }
 
         /* Line Mesh Shader */
@@ -119,17 +112,38 @@ void Application::run() {
 
         scene_graph.draw(view_projection);
 
-        /* ImGui */ {
+        /* ImGui Debug Window */ {
+            static ImVec2 win_pos(0.0f, 0.0f);
+            static ImVec2 win_size(0.0f, 0.0f);
+
             ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+            win_size.x = 0.1f * window.get_width();
+            ImGui::SetWindowPos(win_pos);
+            ImGui::SetWindowSize(win_size);
 
             ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
             ImGui::Text("delta: %fs", event_handler.get_delta());
 
-            ImGui::SetWindowSize("Debug", ImVec2(0.1f * window.get_width(), 0.0f));
-
             ImGui::End();
 
             scene_graph.draw_imgui_window("Debug");
+        }
+
+        /* ImGui Object Editor Window */ {
+            static ImVec2 win_pos(0.0f, 0.0f);
+            static ImVec2 win_size(0.0f, 0.0f);
+
+            ImGui::Begin("Object Editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+            win_pos.x = 0.7f * window.get_width();
+            ImGui::SetWindowPos(win_pos);
+            win_size.x = 0.3f * window.get_width();
+            ImGui::SetWindowSize(win_size);
+
+            scene_graph.add_selected_entity_editor_to_imgui_window();
+
+            ImGui::End();
         }
 
         ImGui::Render();
