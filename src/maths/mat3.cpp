@@ -276,3 +276,11 @@ mat3 operator /(const mat3& mat, float scalar) {
 
     return result;
 }
+
+vec3 operator*(const mat3& mat, const vec3& vec) {
+    return vec3(
+        mat(0, 0) * vec.x + mat(0, 1) * vec.y + mat(0, 2) * vec.z,
+        mat(1, 0) * vec.x + mat(1, 1) * vec.y + mat(1, 2) * vec.z,
+        mat(2, 0) * vec.x + mat(2, 1) * vec.y + mat(2, 2) * vec.z
+    );
+}

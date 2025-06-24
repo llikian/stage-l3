@@ -6,6 +6,7 @@
 #pragma once
 
 #include <ostream>
+#include "vec3.hpp"
 
 struct mat4; // Forward-Definition of mat4
 
@@ -186,3 +187,11 @@ mat3 operator *(float scalar, const mat3& mat);
  *  @return The component-wise division of a mat3 by a scalar.
  */
 mat3 operator /(const mat3& mat, float scalar);
+
+/**
+ * @brief Multiplies a mat3 by a 3-component vector interpreted as the 3x1 column mat3 (vec.x, vec.y, vec.z).
+ * @param mat The mat3.
+ * @param vec The vector.
+ * @return The result of mat * (vec.x, vec.y, vec.z).
+ */
+vec3 operator*(const mat3& mat, const vec3& vec);
