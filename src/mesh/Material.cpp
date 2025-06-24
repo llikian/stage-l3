@@ -5,14 +5,26 @@
 
 #include "mesh/Material.hpp"
 
-Material::Material()
-    : ambient(1.0f),
+#ifdef DEBUG
+#include "debug.hpp"
+#endif
+
+Material::Material(const std::string& name)
+    : name(name),
+      ambient(1.0f),
       diffuse(1.0f),
       specular(1.0f),
-      specular_exponent(10.0f) { }
+      specular_exponent(10.0f) {
+#ifdef DEBUG_LOG_MATERIAL_LIFETIME
+    std::cout << "Created material '" << name << "'.\n";
+#endif
+}
 
 Material::~Material() {
     diffuse_map.free();
+#ifdef DEBUG_LOG_MATERIAL_LIFETIME
+    std::cout << "Destroyed material '" << name << "'.\n";
+#endif
 }
 
 void Material::update_shader_uniforms(const Shader& shader) {

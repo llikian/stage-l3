@@ -17,8 +17,9 @@
 struct Material {
     /**
      * @brief Sets default values for the material's data.
+     * @param name The material's name.
      */
-    Material();
+    explicit Material(const std::string& name);
 
     /**
      * @brief Frees textures.
@@ -30,6 +31,8 @@ struct Material {
      * @param shader The shader whose uniforms need to be updated.
      */
     void update_shader_uniforms(const Shader& shader);
+
+    std::string name; ///< The material's name.
 
     vec3 ambient; ///< Ambient color.
     vec3 diffuse; ///< Diffuse color.
