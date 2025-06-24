@@ -47,11 +47,10 @@ Application::Application()
     add_shader("blinn-phong", { "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" });
 
     /* ---- Meshes ---- */
-    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f));
+    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     create_axes_mesh(axes, 0.5f);
 
     /* ---- Other ---- */
-    glClearColor(0.1, 0.1f, 0.1f, 1.0f);
     glfwSwapInterval(0); // disable vsync
 }
 
@@ -197,13 +196,7 @@ void Application::draw_background() {
     shader.set_uniform("u_camera_right", camera.get_right_vector());
     shader.set_uniform("u_camera_up", camera.get_up_vector());
 
-    glDepthMask(GL_FALSE);
-    glDisable(GL_DEPTH_TEST);
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-
     screen.draw(shader);
-
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
 }

@@ -137,8 +137,13 @@ Window::Window(const std::string& window_name, void* user_pointer)
 
     /* ---- OpenGL ---- */
     glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
+
     glEnable(GL_CULL_FACE);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glClearColor(0.1, 0.1f, 0.1f, 1.0f);
+    glClearDepth(1.0f);
 
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
