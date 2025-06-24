@@ -7,10 +7,15 @@
 
 #include "imgui.h"
 
-Entity::Entity(const std::string& name) : name(name), parent(nullptr) { }
+Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_hidden(false) { }
 
 Entity::~Entity() {
     for(const Entity* child : children) { delete child; }
+}
+
+void Entity::set_visibility(bool is_hidden) {
+    this->is_hidden = is_hidden;
+    for(Entity* child : children) { child->set_visibility(is_hidden); }
 }
 
 void Entity::update_transform_and_children() {
@@ -43,6 +48,10 @@ bool Entity::is_drawable() const {
 void Entity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
+    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
+        for(Entity* child : children) { child->set_visibility(is_hidden); }
+    }
+
     bool is_dirty = ImGui::DragFloat3("Local Position", &transform.get_local_position_reference().x);
     is_dirty = is_dirty || ImGui::DragFloat3("Local Orientation", &transform.get_local_orientation_reference().x,
                                              1.0f, 0.0f, 360.0f, "%.3f", ImGuiSliderFlags_WrapAround);
@@ -52,14 +61,7 @@ void Entity::add_to_object_editor() {
 }
 
 DrawableEntity::DrawableEntity(const std::string& name, Shader* shader)
-    : Entity(name), shader(shader), is_hidden(false) { }
-
-void DrawableEntity::set_visibility(bool is_hidden) {
-    this->is_hidden = is_hidden;
-    for(Entity* child : children) {
-        if(child->is_drawable()) { static_cast<DrawableEntity*>(child)->set_visibility(is_hidden); }
-    }
-}
+    : Entity(name), shader(shader) { }
 
 void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
     int u_mvp_location = shader->get_uniform_location("u_mvp");
@@ -78,15 +80,6 @@ void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
 
 bool DrawableEntity::is_drawable() const {
     return true;
-}
-
-void DrawableEntity::add_to_object_editor() {
-    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
-        for(Entity* child : children) {
-            if(child->is_drawable()) { static_cast<DrawableEntity*>(child)->set_visibility(is_hidden); }
-        }
-    }
-    Entity::add_to_object_editor();
 }
 
 ModelEntity::ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path)

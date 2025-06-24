@@ -52,6 +52,12 @@ public:
     }
 
     /**
+     * @brief Changes the visibility for this entity and all its children.
+     * @param is_hidden Whether this entity and its children are hidden.
+     */
+    void set_visibility(bool is_hidden);
+
+    /**
      * @brief Check if the local model was modified, updates it if it was and do the same thing for
      * all children.
      */
@@ -78,7 +84,8 @@ public:
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
      * - The transform's local position\n
      * - The transform's local orientation\n
-     * - The transform's local scale
+     * - The transform's local scale\n
+     * - Whether the entity is hidden
      */
     virtual void add_to_object_editor();
 
@@ -92,6 +99,9 @@ public:
     std::list<Entity*> children; ///< The entity's children
     Entity* parent;              ///< The entity's parent.
     Transform transform;         ///< The entity's transform.
+
+protected:
+    bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
 };
 
 /**
@@ -107,12 +117,6 @@ public:
      * @param shader A pointer to the shader used when rendering.
      */
     DrawableEntity(const std::string& name, Shader* shader);
-
-    /**
-     * @brief Changes the mesh's visibility for this entity and all its children.
-     * @param is_hidden Whether the mesh is hidden.
-     */
-    void set_visibility(bool is_hidden);
 
     /**
      * @brief Updates uniforms then draws the entity.
@@ -136,24 +140,12 @@ public:
     bool is_drawable() const override;
 
     /**
-     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
-     * - The transform's local position\n
-     * - The transform's local orientation\n
-     * - The transform's local scale\n
-     * - Whether the entity is hidden
-     */
-    void add_to_object_editor() override;
-
-    /**
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_DRAWABLE.
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
     Shader* shader; ///< A pointer to the shader used when rendering.
-
-protected:
-    bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
 };
 
 /**
