@@ -20,10 +20,10 @@ Camera::Camera(const vec3& position)
 }
 
 void Camera::look_around(float pitch_offset, float yaw_offset) {
-    static const float MAX_TILT_ANGLE = radians(80.0f);
+    static const float MAX_TILT_ANGLE = degrees_to_radians(80.0f);
 
-    pitch = std::clamp(pitch - CAMERA_SENSITIVITY * radians(pitch_offset), -MAX_TILT_ANGLE, MAX_TILT_ANGLE);
-    yaw += CAMERA_SENSITIVITY * radians(yaw_offset);
+    pitch = std::clamp(pitch - CAMERA_SENSITIVITY * degrees_to_radians(pitch_offset), -MAX_TILT_ANGLE, MAX_TILT_ANGLE);
+    yaw += CAMERA_SENSITIVITY * degrees_to_radians(yaw_offset);
 
     update_vectors_and_view_matrix();
 }

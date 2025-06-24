@@ -154,7 +154,7 @@ mat4& mat4::translate_z(float scalar) {
 }
 
 mat4& mat4::rotate_x(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);
@@ -175,7 +175,7 @@ mat4& mat4::rotate_x(float angle) {
 }
 
 mat4& mat4::rotate_y(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);
@@ -196,7 +196,7 @@ mat4& mat4::rotate_y(float angle) {
 }
 
 mat4& mat4::rotate_z(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);

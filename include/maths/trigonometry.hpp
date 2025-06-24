@@ -10,11 +10,11 @@
  * @param deg The angle in degrees.
  * @return The angle in radians.
  */
-float radians(float deg);
+float degrees_to_radians(float deg);
 
 /**
  * @brief Converts radians to degrees.
  * @param rad The angle in radians.
  * @return The angle in degrees.
  */
-float degrees(float rad);
+float radians_to_degrees(float rad);
