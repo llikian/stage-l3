@@ -31,6 +31,12 @@ public:
      */
     void draw(const Shader& shader);
 
+    /**
+     * @brief Applies a model matrix to each mesh in the model.
+     * @param model The model matrix to apply.
+     */
+    void apply_model_matrix(const mat4& model);
+
 private:
     /**
      * @brief Parse a .obj file and reads all of its data into the model's buffers.

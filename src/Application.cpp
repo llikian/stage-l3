@@ -73,13 +73,13 @@ void Application::run() {
 
     /* Models */
     root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
-        ->transform.set_local_scale(0.05f);
+        ->model.apply_model_matrix(scale(0.05f));
 
     // root->add_child<ModelEntity>("vokselia", &shaders.at("blinn-phong"), "data/vokselia_spawn/vokselia_spawn.obj")
-    //     ->transform.set_local_scale(10.0f);
+        // ->model.apply_model_matrix(scale(100.0f));
 
     // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
-    //     ->transform.set_local_scale(0.05f);
+        // ->model.apply_model_matrix(scale(0.05f));
 
     /* Scene Graph Example */
     if(false) {

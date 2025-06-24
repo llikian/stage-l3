@@ -7,6 +7,8 @@
 
 #include <glad/glad.h>
 
+#include "maths/geometry.hpp"
+
 TriangleMesh::TriangleMesh() : EBO(0), material(nullptr) { }
 
 TriangleMesh::TriangleMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
@@ -75,6 +77,19 @@ size_t TriangleMesh::get_vertices_amount() const {
 
 size_t TriangleMesh::get_indices_amount() const {
     return indices.size();
+}
+
+void TriangleMesh::apply_model_matrix(const mat4& model) {
+    mat3 normals_model = transpose_inverse(model);
+
+    for(Vertex& vertex : vertices) {
+        vec3 vec = vertex.position;
+        vertex.position.x = model(0, 0) * vec.x + model(0, 1) * vec.y + model(0, 2) * vec.z + model(0, 3);
+        vertex.position.y = model(1, 0) * vec.x + model(1, 1) * vec.y + model(1, 2) * vec.z + model(1, 3);
+        vertex.position.z = model(2, 0) * vec.x + model(2, 1) * vec.y + model(2, 2) * vec.z + model(2, 3);
+
+        vertex.normal = normalize(normals_model * vertex.normal);
+    }
 }
 
 void TriangleMesh::bind_buffers() {

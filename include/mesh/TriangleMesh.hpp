@@ -105,6 +105,12 @@ public:
      */
     size_t get_indices_amount() const;
 
+    /**
+     * @brief Applies a model matrix to each vertex in the mesh.
+     * @param model The model matrix to apply.
+     */
+    void apply_model_matrix(const mat4& model);
+
 private:
     /**
      * @brief Binds the OpenGL buffers.

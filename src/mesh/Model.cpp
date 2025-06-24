@@ -240,3 +240,7 @@ void Model::draw(const Shader& shader) {
     shader.use();
     for(TriangleMesh& mesh : meshes) { mesh.draw(shader); }
 }
+
+void Model::apply_model_matrix(const mat4& model) {
+    for(TriangleMesh& mesh : meshes) { mesh.apply_model_matrix(model); }
+}
