@@ -93,7 +93,7 @@ mat4 translate_z(float scalar) {
 }
 
 mat4 rotate(float angle, vec3 axis) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
     float cosine = cosf(angle);
     float sine = sinf(angle);
 
@@ -108,7 +108,7 @@ mat4 rotate(float angle, vec3 axis) {
 }
 
 mat4 rotate_x(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);
@@ -121,7 +121,7 @@ mat4 rotate_x(float angle) {
 }
 
 mat4 rotate_y(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);
@@ -134,7 +134,7 @@ mat4 rotate_y(float angle) {
 }
 
 mat4 rotate_z(float angle) {
-    angle = radians(angle);
+    angle = degrees_to_radians(angle);
 
     const float cosine = cosf(angle);
     const float sine = sinf(angle);
@@ -143,6 +143,31 @@ mat4 rotate_z(float angle) {
         cosine, -sine, 0.0f,
         sine, cosine, 0.0f,
         0.0f, 0.0f, 1.0f
+    );
+}
+
+mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale) {
+    vec3 radians(degrees_to_radians(rotation.x), degrees_to_radians(rotation.y), degrees_to_radians(rotation.z));
+    vec3 cosine(std::cos(radians.x), std::cos(radians.y), std::cos(radians.z));
+    vec3 sine(std::sin(radians.x), std::sin(radians.y), std::sin(radians.z));
+
+    return mat4(
+        scale.x * (cosine.y * cosine.z + sine.x * sine.y * sine.z),
+        scale.y * (-cosine.y * sine.z + sine.x * sine.y * cosine.z),
+        scale.z * cosine.x * sine.y,
+        translation.x,
+
+        scale.x * cosine.x * sine.z,
+        scale.y * cosine.x * cosine.z,
+        -scale.z * sine.x,
+        translation.y,
+
+        scale.x * (-sine.y * cosine.z + sine.x * cosine.y * sine.z),
+        scale.y * (sine.y * sine.z + sine.x * cosine.y * cosine.z),
+        scale.z * cosine.x * cosine.y,
+        translation.z,
+
+        0.0f, 0.0f, 0.0f, 1.0f
     );
 }
 

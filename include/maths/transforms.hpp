@@ -119,6 +119,17 @@ mat4 rotate_y(float angle);
 mat4 rotate_z(float angle);
 
 /**
+ * @brief Calculates the TRS matrix such that TRS=T*Ry*Rx*Rz*S, with T being a translation matrix,
+ * Rx, Ry, Rz being rotation matrices around their respective axis and S being a scale matrix.
+ * @param translation The value of the translation vector.
+ * @param rotation The values of the rotation angles.
+ * @param scale The values of the scaling factors.
+ * @return The matrix that scales then rotates then translates a point according to the given
+ * parameters.
+ */
+mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale);
+
+/**
  * @brief Calculates the 'look at' matrix. That allows to simulate a camera.
  * @param eye The position of the camera.
  * @param target The target of the camera.

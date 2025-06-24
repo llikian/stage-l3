@@ -82,11 +82,7 @@ vec3& Transform::get_local_scale_reference() {
 }
 
 mat4 Transform::compute_local_model() const {
-    return translate(local_position)
-          .rotate_y(local_orientation.y)
-          .rotate_x(local_orientation.x)
-          .rotate_z(local_orientation.z)
-          .scale(local_scale);
+    return TRS_matrix(local_position, local_orientation, local_scale);
 }
 
 mat4 Transform::get_global_model() const {
@@ -107,11 +103,6 @@ void Transform::update_global_model() {
 }
 
 void Transform::update_global_model(const mat4& parent_global_model) {
-    global_model = parent_global_model;
-    global_model.translate(local_position)
-                .rotate_y(local_orientation.y)
-                .rotate_x(local_orientation.x)
-                .rotate_z(local_orientation.z)
-                .scale(local_scale);
+    global_model = parent_global_model * compute_local_model();
     is_dirty = false;
 }
