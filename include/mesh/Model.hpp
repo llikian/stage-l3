@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <list>
 #include <vector>
 #include "Material.hpp"
 #include "Shader.hpp"
@@ -47,8 +48,10 @@ private:
     /**
      * @brief Parse a .mtl file and reads all of the materials it describes.
      * @param path The path to the .mtl file.
+     * @param material_indices Associates the name of a material with its index in the class.
      */
-    void parse_mtl_file(const std::filesystem::path& path);
+    void parse_mtl_file(const std::filesystem::path& path,
+                        std::unordered_map<std::string, unsigned int>& material_indices);
 
     /**
      * @brief Add a mesh to the model.
@@ -62,6 +65,6 @@ private:
                   const std::vector<vec2>& tex_coords,
                   std::vector<llvec3>& vertex_indices);
 
-    std::vector<TriangleMesh> meshes;                    ///< The meshes composing the model.
-    std::unordered_map<std::string, Material> materials; ///< The model's materials.
+    std::vector<TriangleMesh> meshes; ///< The meshes composing the model.
+    std::vector<Material> materials;  ///< The model's materials.
 };
