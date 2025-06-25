@@ -150,6 +150,8 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(opengl_error_callback, user_pointer);
 
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+
     // Sets the default texture to a plain magenta color
     constexpr unsigned char magenta[3]{ 255, 0, 255 };
     glActiveTexture(GL_TEXTURE0);

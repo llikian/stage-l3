@@ -17,11 +17,12 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "maths/functions.hpp"
+#include "mesh/Terrain.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
-      camera(vec3(0.0f, 0.0f, 0.0f)), fov(M_PI_4),
+      camera(vec3(0.0f, 10.0f, 0.0f)), fov(M_PI_4),
       projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
@@ -45,6 +46,12 @@ Application::Application()
     add_shader("background", { "shaders/vertex/position_only-no_mvp.vert", "shaders/fragment/background.frag" });
     add_shader("flat", { "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" });
     add_shader("blinn-phong", { "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" });
+    add_shader("terrain", {
+                   "shaders/terrain/terrain.vert",
+                   "shaders/terrain/terrain.tesc",
+                   "shaders/terrain/terrain.tese",
+                   "shaders/terrain/terrain.frag"
+               });
 
     /* ---- Meshes ---- */
     create_quad_mesh(screen, vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
@@ -68,18 +75,20 @@ void Application::run() {
     /* Light */
     FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light", &shaders.at("flat"));
     create_sphere_mesh(light->mesh, 8, 16);
-    light->transform.set_local_position(0.0f, 20.0f, 0.0f);
+    light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
 
     /* Models */
-    root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
-        ->model.apply_model_matrix(scale(0.05f));
+    // root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
+    //     ->model.apply_model_matrix(scale(0.05f));
 
     // root->add_child<ModelEntity>("vokselia", &shaders.at("blinn-phong"), "data/vokselia_spawn/vokselia_spawn.obj")
-        // ->model.apply_model_matrix(scale(100.0f));
+    //     ->model.apply_model_matrix(scale(100.0f));
 
     // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
-        // ->model.apply_model_matrix(scale(0.05f));
+    //     ->model.apply_model_matrix(scale(0.05f));
+
+    Terrain terrain(shaders.at("terrain"), 1.0f, 10.0f);
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
@@ -116,6 +125,7 @@ void Application::run() {
         }
 
         scene_graph.draw(view_projection);
+        terrain.draw(view_projection);
 
         /* ImGui Debug Window */ {
             static ImVec2 win_pos(0.0f, 0.0f);
