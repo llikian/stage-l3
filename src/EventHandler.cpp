@@ -10,8 +10,7 @@
 #include "callbacks.hpp"
 
 EventHandler::EventHandler(Window& window, Camera* camera)
-    : mouse_position(window.get_width() / 2.0f, window.get_height() / 2.0f),
-      time(glfwGetTime()), delta(0.0f),
+    : time(glfwGetTime()), delta(0.0f),
       window(window), active_camera(camera),
       is_cursor_visible(glfwGetInputMode(window.get(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
       is_face_culling_enabled(true), is_wireframe_enabled(false) {
