@@ -18,10 +18,10 @@ Terrain::Terrain(const Shader& shader, float chunk_size, unsigned int chunks_on_
 
     for(unsigned int i = 0 ; i < chunks_on_line ; ++i) {
         for(unsigned int j = 0 ; j < chunks_on_line ; ++j) {
-            indices.push_back(get_index(i, j + 1));
             indices.push_back(get_index(i, j));
-            indices.push_back(get_index(i + 1, j));
+            indices.push_back(get_index(i, j + 1));
             indices.push_back(get_index(i + 1, j + 1));
+            indices.push_back(get_index(i + 1, j));
         }
     }
 
@@ -53,6 +53,7 @@ Terrain::~Terrain() {
 void Terrain::draw(const mat4& view_projection) const {
     shader.use();
     shader.set_uniform("u_view_projection", view_projection);
+    shader.set_uniform("u_chunk_size", chunk_size);
     glBindVertexArray(VAO);
     glDrawElements(GL_PATCHES, indices.size(), GL_UNSIGNED_INT, nullptr);
 }

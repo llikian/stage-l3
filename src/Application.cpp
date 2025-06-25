@@ -23,7 +23,7 @@ Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
       camera(vec3(0.0f, 10.0f, 0.0f)), fov(M_PI_4),
-      projection(perspective(fov, window.get_size_ratio(), 0.1f, 500.0f)),
+      projection(perspective(fov, window.get_size_ratio(), 0.1f, 4096.0f)),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.set_active_camera(&camera);
@@ -88,7 +88,7 @@ void Application::run() {
     // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
     //     ->model.apply_model_matrix(scale(0.05f));
 
-    Terrain terrain(shaders.at("terrain"), 1.0f, 10.0f);
+    Terrain terrain(shaders.at("terrain"), 32.0f, 128);
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
