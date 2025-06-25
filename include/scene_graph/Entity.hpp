@@ -176,6 +176,15 @@ public:
     void draw(const mat4& view_projection_matrix) override;
 
     /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - The transform's local position\n
+     * - The transform's local orientation\n
+     * - The transform's local scale\n
+     * - Whether the entity is hidden
+     */
+    virtual void add_to_object_editor();
+
+    /**
      * @brief Returns the type of the entity.
      * @return ENTITY_TYPE_MODEL.
      */

@@ -20,6 +20,8 @@
  */
 class Model {
 public:
+    friend class ModelEntity;
+
     /**
      * @brief Creates a mesh by reading the file at a certain path. Currently supports only .obj files.
      * @param path The path to the file.

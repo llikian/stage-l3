@@ -102,6 +102,30 @@ void ModelEntity::draw(const mat4& view_projection_matrix) {
     }
 }
 
+void ModelEntity::add_to_object_editor() {
+    DrawableEntity::add_to_object_editor();
+    ImGui::BeginTable("Materials", 1, ImGuiTableFlags_Borders);
+    ImGui::TableSetupColumn("Materials");
+    ImGui::TableHeadersRow();
+
+    static Material* selected = nullptr;
+
+    for(Material& material : model.materials) {
+        ImGui::TableNextColumn();
+        if(ImGui::Selectable(material.name.c_str())) {
+            selected = &material;
+        }
+    }
+    ImGui::EndTable();
+
+    if(selected != nullptr) {
+        ImGui::ColorEdit3("Ambient Color", &selected->ambient.x);
+        ImGui::ColorEdit3("Diffuse Color", &selected->diffuse.x);
+        ImGui::ColorEdit3("Specular Color", &selected->specular.x);
+        ImGui::DragFloat("Specular Exponent", &selected->specular_exponent);
+    }
+}
+
 TriangleMeshEntity::TriangleMeshEntity(const std::string& name, Shader* shader)
     : DrawableEntity(name, shader) { }
 
@@ -126,6 +150,6 @@ void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
 }
 
 void FlatShadedMeshEntity::add_to_object_editor() {
-    DrawableEntity::add_to_object_editor();
+    TriangleMeshEntity::add_to_object_editor();
     ImGui::ColorEdit3("Object color", &color.x);
 }
