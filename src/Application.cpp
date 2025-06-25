@@ -51,7 +51,7 @@ Application::Application()
     create_axes_mesh(axes, 0.5f);
 
     /* ---- Other ---- */
-    glfwSwapInterval(0); // disable vsync
+    // glfwSwapInterval(0); // disable vsync
 }
 
 Application::~Application() {
@@ -80,22 +80,6 @@ void Application::run() {
 
     // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
         // ->model.apply_model_matrix(scale(0.05f));
-
-    /* Scene Graph Example */
-    if(false) {
-        FlatShadedMeshEntity* current = root->add_child<FlatShadedMeshEntity>("Sphere 0", &shaders.at("flat"),
-                                                                              hue_to_rgb(0));
-        create_sphere_mesh(current->mesh, 16, 32);
-        current->transform.set_local_scale(2.0f);
-        current->transform.set_local_orientation(45.0f, 0.0f, 90.0f);
-        for(int i = 1 ; i < 6 ; ++i) {
-            current = current->add_child<FlatShadedMeshEntity>("Sphere " + std::to_string(i), &shaders.at("flat"),
-                                                               hue_to_rgb(i * 360 / 6));
-            create_sphere_mesh(current->mesh, 16, 32);
-            current->transform.set_local_position(0.0f, 2.0f, 0.0f);
-            current->transform.set_local_scale(0.9f);
-        }
-    }
 
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
