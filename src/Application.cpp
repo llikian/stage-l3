@@ -140,6 +140,10 @@ void Application::run() {
             ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
             ImGui::Text("delta: %fs", event_handler.get_delta());
 
+            ImGui::Text("Camera:");
+            ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
+            ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
+
             ImGui::End();
 
             scene_graph.draw_imgui_node_tree("Debug");

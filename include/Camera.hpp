@@ -68,6 +68,9 @@ public:
      */
     vec3 get_up_vector() const;
 
+    float sensitivity;    ///< The sensivity when looking around.
+    float movement_speed; ///< The sensitivity of the movement.
+
 private:
     /**
      * @brief Recalculates the direction, right and up vectors depending on the camera's pitch and
@@ -84,9 +87,6 @@ private:
     vec3 up;        ///< The direction pointing up of where the camera is looking.
 
     mat4 view_matrix; ///< The camera's view matrix. Used every frame in the mvp matrix calculation.
-
-    const float CAMERA_SENSITIVITY{ 0.1f }; ///< The sensivity when looking around.
-    const float MOVEMENT_SPEED{ 10.0f };    ///< The sensitivity of the movement.
 
     const vec3 WORLD_UP{ 0.0f, 1.0f, 0.0f }; ///< Where "up" is.
 };

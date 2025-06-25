@@ -13,7 +13,8 @@
 #define PIf (std::numbers::pi_v<float>)
 
 Camera::Camera(const vec3& position)
-    : position(position),
+    : sensitivity(0.1f), movement_speed(100.0f),
+      position(position),
       pitch(0.0f), yaw(-PIf / 2.0f),
       view_matrix(1.0f) {
     update_vectors_and_view_matrix();
@@ -22,8 +23,8 @@ Camera::Camera(const vec3& position)
 void Camera::look_around(float pitch_offset, float yaw_offset) {
     static const float MAX_TILT_ANGLE = degrees_to_radians(80.0f);
 
-    pitch = std::clamp(pitch - CAMERA_SENSITIVITY * degrees_to_radians(pitch_offset), -MAX_TILT_ANGLE, MAX_TILT_ANGLE);
-    yaw += CAMERA_SENSITIVITY * degrees_to_radians(yaw_offset);
+    pitch = std::clamp(pitch - sensitivity * degrees_to_radians(pitch_offset), -MAX_TILT_ANGLE, MAX_TILT_ANGLE);
+    yaw += sensitivity * degrees_to_radians(yaw_offset);
 
     update_vectors_and_view_matrix();
 }
@@ -31,22 +32,22 @@ void Camera::look_around(float pitch_offset, float yaw_offset) {
 void Camera::move_around(MovementDirection movement_direction, float delta) {
     switch(movement_direction) {
         case MovementDirection::FORWARD:
-            position += MOVEMENT_SPEED * delta * direction;
+            position += movement_speed * delta * direction;
             break;
         case MovementDirection::BACKWARD:
-            position -= MOVEMENT_SPEED * delta * direction;
+            position -= movement_speed * delta * direction;
             break;
         case MovementDirection::LEFT:
-            position -= MOVEMENT_SPEED * delta * right;
+            position -= movement_speed * delta * right;
             break;
         case MovementDirection::RIGHT:
-            position += MOVEMENT_SPEED * delta * right;
+            position += movement_speed * delta * right;
             break;
         case MovementDirection::UPWARD:
-            position += MOVEMENT_SPEED * delta * WORLD_UP;
+            position += movement_speed * delta * WORLD_UP;
             break;
         case MovementDirection::DOWNWARD:
-            position -= MOVEMENT_SPEED * delta * WORLD_UP;
+            position -= movement_speed * delta * WORLD_UP;
             break;
         default:
             break;
