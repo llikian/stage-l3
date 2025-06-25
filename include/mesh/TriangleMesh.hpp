@@ -17,6 +17,8 @@
  */
 class TriangleMesh : protected Mesh {
 public:
+    friend class TriangleMeshEntity;
+
     /**
      * @struct TriangleMesh::Vertex
      * @brief A structure holding a vertex's attributes.
@@ -45,7 +47,7 @@ public:
     /**
      * @brief Frees buffers.
      */
-    ~TriangleMesh();
+    ~TriangleMesh() override;
 
     /**
      * @brief Performs a draw call with a certain shader.
