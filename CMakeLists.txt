@@ -42,6 +42,7 @@ set(SOURCES
         src/mesh/Model.cpp
         src/mesh/PointMesh.cpp
         src/mesh/primitives.cpp
+        src/mesh/Terrain.cpp
         src/mesh/TriangleMesh.cpp
 
         # Scene Graph Module
