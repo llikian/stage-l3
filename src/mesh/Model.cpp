@@ -215,7 +215,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
         if(vertex_indices[i].y == -1) {
             normals.push_back(normalize(cross(positions[vertex_indices[i + 1].x] - positions[vertex_indices[i].x],
                                               positions[vertex_indices[i + 2].x] - positions[vertex_indices[i].x])));
-            vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size();
+            vertex_indices[i].y = vertex_indices[i + 1].y = vertex_indices[i + 2].y = normals.size() - 1;
         }
 
         // Handling negative indices & Vertex Deduplication
