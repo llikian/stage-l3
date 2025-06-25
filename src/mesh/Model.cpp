@@ -24,6 +24,10 @@ Model::Model(const std::filesystem::path& path) {
     if(extension == ".obj") { parse_obj_file(path); }
 }
 
+Model::~Model() {
+    for(Material& material : materials) { material.free(); }
+}
+
 void Model::parse_obj_file(const std::filesystem::path& path) {
 #ifdef DEBUG_LOG_MODEL_READ_INFO
     LifetimeLogger lifetime_logger("\tTook ");
@@ -34,10 +38,7 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
-    std::unordered_map<std::string, unsigned int> material_indices;
-
     // Load all materials first
-    material_indices.emplace("Default Material", 0);
     materials.emplace_back("Default Material");
     for(std::string line ; std::getline(file, line) ;) {
         if(line[0] == 'm') { // mtllib
@@ -47,12 +48,24 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
 
             if(buffer == "mtllib") {
                 stream >> buffer;
-                parse_mtl_file(path.parent_path() / buffer, material_indices);
+                parse_mtl_file(path.parent_path() / buffer);
             }
         }
     }
 
-    unsigned int current_material_index = 0;
+    unsigned int next_transparent_index = materials.size() - 1;
+    for(unsigned int i = 0 ; i < materials.size() ; ++i) {
+        if(materials[i].has_transparency()) {
+            while(materials[next_transparent_index].has_transparency()) { next_transparent_index--; }
+            if(next_transparent_index < i) { break; }
+            std::swap(materials[i], materials[next_transparent_index--]);
+        }
+    }
+
+    std::unordered_map<std::string, unsigned int> material_indices;
+    for(unsigned int i = 0 ; i < materials.size() ; ++i) { material_indices.emplace(materials[i].name, i); }
+
+    unsigned int current_material_index = material_indices["Default Material"];
 
     file.clear();
     file.seekg(0, std::ios::beg);
@@ -138,8 +151,7 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
 #endif
 }
 
-void Model::parse_mtl_file(const std::filesystem::path& path,
-                           std::unordered_map<std::string, unsigned int>& material_indices) {
+void Model::parse_mtl_file(const std::filesystem::path& path) {
 #ifdef DEBUG_LOG_MATERIAL_LIBRARY_READ_INFO
     LifetimeLogger logger("\t\tTook: ");
     std::cout << "\tReading material library from file '" << path.filename().string() << "':\n";
@@ -148,24 +160,16 @@ void Model::parse_mtl_file(const std::filesystem::path& path,
     std::ifstream file(path);
     if(!file.is_open()) { throw std::runtime_error("Couldn't open file '" + path.string() + '\''); }
 
+    unsigned int materials_amount = materials.size();
     std::string line;
     while(std::getline(file, line)) {
-        if(line[0] == 'n') {
-            std::istringstream stream(line);
-            std::string buffer;
-            stream >> buffer;
-
-            if(buffer == "newmtl") {
-                stream >> buffer;
-                material_indices.emplace(buffer, material_indices.size());
-            }
-        }
+        if(line[0] == 'n' && line.substr(0, 6) == "newmtl") { ++materials_amount; }
     }
 
     file.clear();
     file.seekg(0, std::ios::beg);
 
-    materials.reserve(material_indices.size());
+    materials.reserve(materials_amount);
     unsigned int material_index = 0;
 
     while(std::getline(file, line)) {

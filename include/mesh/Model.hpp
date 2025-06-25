@@ -29,6 +29,11 @@ public:
     explicit Model(const std::filesystem::path& path);
 
     /**
+     * @brief Frees all materials.
+     */
+    ~Model();
+
+    /**
      * @brief Performs a draw call for each of the model's meshes with a certain shader.
      * @param shader The shader to perform the draw calls with.
      */
@@ -50,10 +55,8 @@ private:
     /**
      * @brief Parse a .mtl file and reads all of the materials it describes.
      * @param path The path to the .mtl file.
-     * @param material_indices Associates the name of a material with its index in the class.
      */
-    void parse_mtl_file(const std::filesystem::path& path,
-                        std::unordered_map<std::string, unsigned int>& material_indices);
+    void parse_mtl_file(const std::filesystem::path& path);
 
     /**
      * @brief Add a mesh to the model.

@@ -144,8 +144,8 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glClearColor(0.1, 0.1f, 0.1f, 1.0f);
     glClearDepth(1.0f);
 
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(opengl_error_callback, user_pointer);
