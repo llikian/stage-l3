@@ -20,7 +20,7 @@ Material::Material(const std::string& name)
 #endif
 }
 
-Material::~Material() {
+void Material::free() {
     diffuse_map.free();
 #ifdef DEBUG_LOG_MATERIAL_LIFETIME
     std::cout << "Destroyed material '" << name << "'.\n";
@@ -35,4 +35,8 @@ void Material::update_shader_uniforms(const Shader& shader) {
 
     if(diffuse_map.is_default_texture()) { diffuse_map.create(255, 255, 255); }
     diffuse_map.bind(0);
+}
+
+bool Material::has_transparency() const {
+    return diffuse_map.has_transparency();
 }

@@ -119,11 +119,17 @@ public:
      */
     unsigned int get_id() const;
 
+    /**
+     * @return Whether the texture has transparency.
+     */
+    bool has_transparency() const;
+
 private:
     /**
      * @brief Creates a texture.
      */
     void init();
 
-    unsigned int id; ///< Texture id.
+    unsigned int id;         ///< Texture id.
+    bool b_has_transparency; ///< Whether the texture has transparency.
 };

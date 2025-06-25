@@ -11,34 +11,33 @@
 #include "debug.hpp"
 #endif
 
-Texture::Texture() : id(0) { }
+Texture::Texture() : id(0), b_has_transparency(false) { }
 
 Texture::Texture(const std::string& path)
-    : id(0) {
+    : id(0), b_has_transparency(false) {
     create(path);
 }
 
 Texture::Texture(const Image& image)
-    : id(0) {
+    : id(0), b_has_transparency(false) {
     create(image);
 }
 
 Texture::Texture(const vec3& color)
-    : id(0) {
+    : id(0), b_has_transparency(false) {
     create(color);
 }
 
 Texture::Texture(unsigned char r, unsigned char g, unsigned char b)
-    : id(0) {
+    : id(0), b_has_transparency(false) {
     create(r, g, b);
 }
 
-Texture::Texture(const Texture& texture) {
-    id = texture.id;
-}
+Texture::Texture(const Texture& texture) : id(texture.id), b_has_transparency(texture.has_transparency()) { }
 
 Texture& Texture::operator=(const Texture& texture) {
     id = texture.id;
+    b_has_transparency = texture.b_has_transparency;
     return *this;
 }
 
@@ -66,12 +65,24 @@ void Texture::create(const std::string& path) {
 void Texture::create(const Image& image) {
     init();
 
+    unsigned int width = image.get_width();
+    unsigned int height = image.get_height();
     unsigned int format = image.get_color_format();
-    glTexImage2D(GL_TEXTURE_2D, 0, format,
-                 image.get_width(), image.get_height(), 0,
-                 format, GL_UNSIGNED_BYTE,
-                 image.get_data());
+    const unsigned char* data = image.get_data();
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
+
+    b_has_transparency = false;
+    if(image.get_channels_amount() == 4) {
+        for(unsigned int j = 0 ; j < height ; ++j) {
+            for(unsigned int i = 0 ; i < width ; ++i) {
+                if(data[4 * (j * width + i) + 3] < 255) {
+                    b_has_transparency = true;
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void Texture::create(const vec3& color) {
@@ -84,6 +95,7 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
     init();
     unsigned char c[3]{ r, g, b };
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
+    b_has_transparency = false;
 }
 
 void Texture::bind(unsigned int texUnit) const {
@@ -97,4 +109,8 @@ bool Texture::is_default_texture() const {
 
 unsigned int Texture::get_id() const {
     return id;
+}
+
+bool Texture::has_transparency() const {
+    return b_has_transparency;
 }
