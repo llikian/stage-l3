@@ -58,6 +58,12 @@ public:
     void set_visibility(bool is_hidden);
 
     /**
+     * @brief Toggles the visibility for this entity and sets all of its children's visibility to
+     * the same value.
+     */
+    void toggle_visibility();
+
+    /**
      * @brief Check if the local model was modified, updates it if it was and do the same thing for
      * all children.
      */

@@ -18,6 +18,11 @@ void Entity::set_visibility(bool is_hidden) {
     for(Entity* child : children) { child->set_visibility(is_hidden); }
 }
 
+void Entity::toggle_visibility() {
+    is_hidden = !is_hidden;
+    for(Entity* child : children) { child->set_visibility(is_hidden); }
+}
+
 void Entity::update_transform_and_children() {
     if(transform.is_local_model_dirty()) {
         force_update_transform_and_children();
