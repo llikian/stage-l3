@@ -180,9 +180,10 @@ public:
      * - The transform's local position\n
      * - The transform's local orientation\n
      * - The transform's local scale\n
-     * - Whether the entity is hidden
+     * - Whether the entity is hidden\n
+     * - The model's materials: ambient, diffuse and specular colors, specular exponent
      */
-    virtual void add_to_object_editor();
+    void add_to_object_editor() override;
 
     /**
      * @brief Returns the type of the entity.
@@ -212,6 +213,16 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
     void draw(const mat4& view_projection_matrix) override;
+
+    /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - The transform's local position\n
+     * - The transform's local orientation\n
+     * - The transform's local scale\n
+     * - Whether the entity is hidden\n
+     * - The mesh's material: ambient, diffuse and specular colors, specular exponent
+     */
+    void add_to_object_editor() override;
 
     /**
      * @brief Returns the type of the entity.
