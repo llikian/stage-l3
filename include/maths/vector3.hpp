@@ -155,6 +155,17 @@ struct vector3 {
         return x != other.x || y != other.y || z != other.z;
     }
 
+    /**
+     * @brief Multiplies all of the current instance's components by -1.
+     * @return A reference to this instance.
+     */
+    vector3& operator -() {
+        x = -x;
+        y = -y;
+        z = -z;
+        return *this;
+    }
+
     Type x; ///< The x component of the vector3.
     Type y; ///< The y component of the vector3.
     Type z; ///< The z component of the vector3.

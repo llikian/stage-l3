@@ -146,6 +146,16 @@ struct vector2 {
         return x != other.x || y != other.y;
     }
 
+    /**
+     * @brief Multiplies all of the current instance's components by -1.
+     * @return A reference to this instance.
+     */
+    vector2& operator -() {
+        x = -x;
+        y = -y;
+        return *this;
+    }
+
     Type x; ///< The x component of the vector2.
     Type y; ///< The y component of the vector2.
 };
