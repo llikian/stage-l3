@@ -164,18 +164,6 @@ struct vector4 {
         return x != other.x || y != other.y || z != other.z || w != other.w;
     }
 
-    /**
-     * @brief Multiplies all of the current instance's components by -1.
-     * @return A reference to this instance.
-     */
-    vector4& operator -() {
-        x = -x;
-        y = -y;
-        z = -z;
-        w = -w;
-        return *this;
-    }
-
     Type x; ///< The x component of the vector4.
     Type y; ///< The y component of the vector4.
     Type z; ///< The z component of the vector4.
@@ -341,4 +329,14 @@ vector4<Type> operator /(const vector4<Type>& vec, Type value) {
         vec.z / value,
         vec.w / value
     );
+}
+
+/**
+ * @brief Multiplies all of a vector4's components by -1.
+ *  @param vec The vector4.
+ *  @return The component-wise product of a vector4 by -1.
+ */
+template <typename Type>
+vector4<Type> operator -(const vector4<Type>& vec) {
+    return vector4(-vec.x, -vec.y, -vec.z, -vec.w);
 }

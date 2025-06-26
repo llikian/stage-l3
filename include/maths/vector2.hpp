@@ -146,16 +146,6 @@ struct vector2 {
         return x != other.x || y != other.y;
     }
 
-    /**
-     * @brief Multiplies all of the current instance's components by -1.
-     * @return A reference to this instance.
-     */
-    vector2& operator -() {
-        x = -x;
-        y = -y;
-        return *this;
-    }
-
     Type x; ///< The x component of the vector2.
     Type y; ///< The y component of the vector2.
 };
@@ -300,4 +290,14 @@ vector2<Type> operator /(const vector2<Type>& vec, Type value) {
         vec.x / value,
         vec.y / value
     );
+}
+
+/**
+ * @brief Multiplies all of a vector2's components by -1.
+ *  @param vec The vector2.
+ *  @return The component-wise product of a vector2 by -1.
+ */
+template <typename Type>
+vector2<Type> operator -(const vector2<Type>& vec) {
+    return vector2(-vec.x, -vec.y);
 }
