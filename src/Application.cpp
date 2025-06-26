@@ -8,21 +8,18 @@
 #include <cmath>
 #include <ranges>
 #include <glad/glad.h>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "maths/functions.hpp"
-#include "mesh/Terrain.hpp"
-
 Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
-      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_4, window.get_size_ratio(), 0.1f, 4096.0f),
+      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 4096.0f),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -85,7 +82,10 @@ void Application::run() {
 
     /* Other Entities */
     root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
-        ->set_visibility(false);
+        ->set_visibility(true);
+
+    LineMesh frustum;
+    create_frustum_mesh(frustum, M_PI_4f, window.get_size_ratio(), 10.0f, 200.0f);
 
     /* Main Loop */
     while(!window.should_close()) {
@@ -102,7 +102,7 @@ void Application::run() {
 
         root->update_transform_and_children();
 
-        draw_background();
+        // draw_background();
 
         /* Blinn-Phong Shader */ {
             const Shader& shader = shaders.at("blinn-phong");
@@ -113,13 +113,17 @@ void Application::run() {
             shader.set_uniform("u_light_position", light_position);
         }
 
-        /* Line Mesh Shader */
-        if(are_axes_drawn) {
+        /* Line Mesh Shader */ {
             const Shader& shader = shaders.at("line mesh");
             shader.use();
 
-            shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
-            axes.draw(shader);
+            if(are_axes_drawn) {
+                shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
+                axes.draw(shader);
+            }
+
+            shader.set_uniform("u_mvp", view_projection);
+            frustum.draw(shader);
         }
 
         scene_graph.draw(view_projection);
