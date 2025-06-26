@@ -73,9 +73,8 @@ void EventHandler::poll_and_handle_events() {
         int key = pressed_keys.front();
         pressed_keys.pop();
 
-        if(key_actions.contains(key)) {
-            key_actions[key]();
-        }
+        std::unordered_map<int, Action>::iterator action_iterator = key_actions.find(key);
+        if(action_iterator != key_actions.end()) { action_iterator->second(); }
     }
 
     // Repeatable Keys
@@ -115,17 +114,17 @@ void EventHandler::handle_framebuffer_size_event(int width, int height) {
 }
 
 void EventHandler::handle_key_press_event(int key) {
-    if(repeatable_keys.contains(key)) {
-        repeatable_keys[key] = true;
+    std::unordered_map<int, bool>::iterator repeatable_key_iterator = repeatable_keys.find(key);
+    if(repeatable_key_iterator != repeatable_keys.end()) {
+        repeatable_key_iterator->second = true;
     } else {
         pressed_keys.push(key);
     }
 }
 
 void EventHandler::handle_key_release_event(int key) {
-    if(repeatable_keys.contains(key)) {
-        repeatable_keys[key] = false;
-    }
+    std::unordered_map<int, bool>::iterator repeatable_key_iterator = repeatable_keys.find(key);
+    if(repeatable_key_iterator != repeatable_keys.end()) { repeatable_key_iterator->second = false; }
 }
 
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
