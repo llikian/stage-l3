@@ -88,8 +88,11 @@ void Application::run() {
     // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
     //     ->model.apply_model_matrix(scale(0.05f));
 
-    Terrain terrain(shaders.at("terrain"), 32.0f, 128);
+    /* Other Entities */
+    root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
+        ->set_visibility(false);
 
+    /* Main Loop */
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
 
@@ -125,7 +128,6 @@ void Application::run() {
         }
 
         scene_graph.draw(view_projection);
-        terrain.draw(view_projection);
 
         /* ImGui Debug Window */ {
             static ImVec2 win_pos(0.0f, 0.0f);

@@ -8,6 +8,7 @@
 #include <list>
 #include "Transform.hpp"
 #include "mesh/Model.hpp"
+#include "mesh/Terrain.hpp"
 
 enum EntityType {
     ENTITY_TYPE_DEFAULT,
@@ -15,6 +16,7 @@ enum EntityType {
     ENTITY_TYPE_MODEL,
     ENTITY_TYPE_TRIANGLE_MESH,
     ENTITY_TYPE_FLAT_SHADED_MESH,
+    ENTITY_TYPE_TERRAIN,
 };
 
 /**
@@ -122,7 +124,7 @@ public:
      * @param name The name of the entity.
      * @param shader A pointer to the shader used when rendering.
      */
-    DrawableEntity(const std::string& name, Shader* shader);
+    DrawableEntity(const std::string& name, const Shader* shader);
 
     /**
      * @brief Updates uniforms then draws the entity.
@@ -151,7 +153,7 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
-    Shader* shader; ///< A pointer to the shader used when rendering.
+    const Shader* shader; ///< A pointer to the shader used when rendering.
 };
 
 /**
@@ -167,7 +169,7 @@ public:
      * @param shader A pointer to the shader used when rendering.
      * @param path The path to the model to render.
      */
-    ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path);
+    ModelEntity(const std::string& name, const Shader* shader, const std::filesystem::path& path);
 
     /**
      * @brief Updates uniforms then draws the model.
@@ -206,7 +208,7 @@ public:
      * @param name The name of the entity.
      * @param shader A pointer to the shader used when rendering.
      */
-    TriangleMeshEntity(const std::string& name, Shader* shader);
+    TriangleMeshEntity(const std::string& name, const Shader* shader);
 
     /**
      * @brief Updates uniforms then draws the mesh.
@@ -246,7 +248,7 @@ public:
      * @param shader A pointer to the shader used when rendering.
      * @param color The color the mesh should be rendered in.
      */
-    FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color = vec3(1.0f));
+    FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec3& color = vec3(1.0f));
 
     /**
      * @brief Updates these uniforms if they exist in the shader:\n
@@ -274,4 +276,42 @@ public:
     constexpr EntityType get_type() const override { return ENTITY_TYPE_FLAT_SHADED_MESH; }
 
     vec3 color; ///< The color the mesh should be rendered in.
+};
+
+/**
+ * @class TerrainEntity
+ * @brief A drawable entity that holds a terrain.
+ */
+class TerrainEntity : public DrawableEntity {
+public:
+    /**
+     * @brief Creates an entity with a certain name and a pointer to the shader that will be used
+     * when rendering and the terrain's chunk size and amount of chunks on a line.
+     * @param name The name of the entity.
+     * @param shader The shader used when rendering.
+     * @param chunk_size How large a chunk of the terrain is.
+     * @param chunks_on_line The amount of chunks on one line of the terrain.
+     */
+    TerrainEntity(const std::string& name, const Shader& shader, float chunk_size, unsigned int chunks_on_line);
+
+    /**
+     * @brief Updates uniforms then draws the mesh.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
+    void draw(const mat4& view_projection_matrix) override;
+
+    /**
+     * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
+     * - Whether the entity is hidden\n
+     * - The terrain's // TODO : update method and doc
+     */
+    void add_to_object_editor() override;
+
+    /**
+     * @brief Returns the type of the entity.
+     * @return ENTITY_TYPE_TRIANGLE_MESH.
+     */
+    constexpr EntityType get_type() const override { return ENTITY_TYPE_TERRAIN; }
+
+    Terrain terrain; ///< The terrain.
 };

@@ -25,16 +25,19 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
     std::string label;
     switch(entity->get_type()) {
         case ENTITY_TYPE_DEFAULT:
-            label += "o";
+            label += " o";
             break;
         case ENTITY_TYPE_MODEL:
-            label += "M";
+            label += " M";
             break;
         case ENTITY_TYPE_TRIANGLE_MESH:
-            label += "T";
+            label += "TM";
             break;
         case ENTITY_TYPE_FLAT_SHADED_MESH:
-            label += "F";
+            label += " F";
+            break;
+        case ENTITY_TYPE_TERRAIN:
+            label += " T";
             break;
         default:
             label += '?';

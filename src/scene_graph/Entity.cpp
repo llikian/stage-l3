@@ -65,7 +65,7 @@ void Entity::add_to_object_editor() {
     if(is_dirty) { transform.set_local_model_to_dirty(); }
 }
 
-DrawableEntity::DrawableEntity(const std::string& name, Shader* shader)
+DrawableEntity::DrawableEntity(const std::string& name, const Shader* shader)
     : Entity(name), shader(shader) { }
 
 void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
@@ -87,7 +87,7 @@ bool DrawableEntity::is_drawable() const {
     return true;
 }
 
-ModelEntity::ModelEntity(const std::string& name, Shader* shader, const std::filesystem::path& path)
+ModelEntity::ModelEntity(const std::string& name, const Shader* shader, const std::filesystem::path& path)
     : DrawableEntity(name, shader), model(path) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) {
@@ -125,7 +125,7 @@ void ModelEntity::add_to_object_editor() {
     }
 }
 
-TriangleMeshEntity::TriangleMeshEntity(const std::string& name, Shader* shader)
+TriangleMeshEntity::TriangleMeshEntity(const std::string& name, const Shader* shader)
     : DrawableEntity(name, shader) { }
 
 void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
@@ -153,7 +153,7 @@ void TriangleMeshEntity::add_to_object_editor() {
     }
 }
 
-FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, Shader* shader, const vec3& color)
+FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec3& color)
     : TriangleMeshEntity(name, shader), color(color) { }
 
 void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
@@ -164,4 +164,24 @@ void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
 void FlatShadedMeshEntity::add_to_object_editor() {
     TriangleMeshEntity::add_to_object_editor();
     ImGui::ColorEdit3("Object color", &color.x);
+}
+
+TerrainEntity::TerrainEntity(const std::string& name,
+                             const Shader& shader,
+                             float chunk_size,
+                             unsigned int chunks_on_line)
+    : DrawableEntity(name, &shader), terrain(shader, chunk_size, chunks_on_line) { }
+
+void TerrainEntity::draw(const mat4& view_projection_matrix) {
+    if(is_hidden) { return; }
+
+    terrain.draw(view_projection_matrix);
+}
+
+void TerrainEntity::add_to_object_editor() {
+    ImGui::Text("Selected Entity: '%s'", name.c_str());
+
+    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
+        for(Entity* child : children) { child->set_visibility(is_hidden); }
+    }
 }
