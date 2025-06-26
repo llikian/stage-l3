@@ -26,8 +26,12 @@ public:
     /**
      * @brief Creates a camera at a specific position looking towards the -z axis.
      * @param position The position of the camera.
+     * @param fov The camera's fov.
+     * @param aspect_ratio The window's aspect ratio.
+     * @param near_distance Distance of the near plane.
+     * @param far_distance Distance of the far plane.
      */
-    explicit Camera(const vec3& position);
+    Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance);
 
     /**
      * @brief Updates the camera's direction depending on how the mouse moved since the last frame.
@@ -37,16 +41,33 @@ public:
     void look_around(float pitch_offset, float yaw_offset);
 
     /**
-     * Moves the camera in a certain direction.
+     * @brief Moves the camera in a certain direction.
      * @param movement_direction The direction to move towards.
      * @param delta How much time passed since the last frame.
      */
     void move_around(MovementDirection movement_direction, float delta);
 
     /**
+     * @brief Updates the projection matrix with according to the window's new aspect ratio.
+     * @param aspect_ratio The window's new aspect ratio.
+     */
+    void update_projection_matrix(float aspect_ratio);
+
+    /**
      * @return A reference to the camera's view matrix.
      */
     const mat4& get_view_matrix() const;
+
+    /**
+     * @return A reference to the projection matrix.
+     */
+    const mat4& get_projection_matrix() const;
+
+    /**
+     * @brief Calculates the view projection matrix.
+     * @return The projection matrix multiplied by the view matrix.
+     */
+    mat4 get_view_projection_matrix() const;
 
     /**
      * @return The camera's position.
@@ -86,7 +107,13 @@ private:
     vec3 right;     ///< The direction pointing right of where the camera is looking.
     vec3 up;        ///< The direction pointing up of where the camera is looking.
 
-    mat4 view_matrix; ///< The camera's view matrix. Used every frame in the mvp matrix calculation.
+    // TODO: Remove const keyword and add ways to modify these.
+    const float fov;           ///< The camera's fov.
+    const float near_distance; ///< Distance of the near plane.
+    const float far_distance;  ///< Distance of the far plane.
+
+    mat4 view_matrix;       ///< The camera's view matrix. Used every frame in the mvp matrix calculation.
+    mat4 projection_matrix; ///< The projection matrix. Used every frame in the mvp matrix calculation.
 
     const vec3 WORLD_UP{ 0.0f, 1.0f, 0.0f }; ///< Where "up" is.
 };

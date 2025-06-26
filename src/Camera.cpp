@@ -8,15 +8,17 @@
 #include <cmath>
 #include <numbers>
 #include "maths/geometry.hpp"
+#include "maths/transforms.hpp"
 #include "maths/trigonometry.hpp"
 
 #define PIf (std::numbers::pi_v<float>)
 
-Camera::Camera(const vec3& position)
+Camera::Camera(const vec3& position, float fov, float aspect, float near_distance, float far_distance)
     : sensitivity(0.1f), movement_speed(100.0f),
       position(position),
       pitch(0.0f), yaw(-PIf / 2.0f),
-      view_matrix(1.0f) {
+      fov(fov), near_distance(near_distance), far_distance(far_distance),
+      view_matrix(1.0f), projection_matrix(perspective(fov, aspect, near_distance, far_distance)) {
     update_vectors_and_view_matrix();
 }
 
@@ -58,8 +60,20 @@ void Camera::move_around(MovementDirection movement_direction, float delta) {
     view_matrix(2, 3) = dot(position, direction);
 }
 
+void Camera::update_projection_matrix(float aspect_ratio) {
+    projection_matrix(0, 0) = 1.0f / (aspect_ratio * std::tan(0.5f * fov));
+}
+
 const mat4& Camera::get_view_matrix() const {
     return view_matrix;
+}
+
+const mat4& Camera::get_projection_matrix() const {
+    return projection_matrix;
+}
+
+mat4 Camera::get_view_projection_matrix() const {
+    return projection_matrix * view_matrix;
 }
 
 vec3 Camera::get_position() const {

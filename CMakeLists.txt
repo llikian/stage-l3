@@ -27,6 +27,10 @@ set(SOURCES
         src/Texture.cpp
         src/Window.cpp
 
+        # Culling Module
+        src/culling/Frustum.cpp
+        src/culling/Plane.cpp
+
         # Maths Module
         src/maths/functions.cpp
         src/maths/geometry.cpp

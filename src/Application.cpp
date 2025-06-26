@@ -22,14 +22,9 @@
 Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
-      camera(vec3(0.0f, 10.0f, 0.0f)), fov(M_PI_4),
-      projection(perspective(fov, window.get_size_ratio(), 0.1f, 4096.0f)),
+      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_4, window.get_size_ratio(), 0.1f, 4096.0f),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
-    event_handler.set_active_camera(&camera);
-    event_handler.set_window_size_event_action([this] {
-        projection(0, 0) = 1.0f / (window.get_size_ratio() * tanf(0.5f * fov));
-    });
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
 
     /* ---- ImGui ---- */
@@ -103,7 +98,7 @@ void Application::run() {
 
         vec3 camera_position = camera.get_position();
         vec3 camera_direction = camera.get_direction();
-        view_projection = projection * camera.get_view_matrix();
+        mat4 view_projection = camera.get_view_projection_matrix();
 
         root->update_transform_and_children();
 
@@ -179,12 +174,6 @@ EventHandler& Application::get_event_handler() {
 
 void Application::add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list) {
     shaders.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(paths_list, name));
-}
-
-void Application::update_mvp(const Shader& shader, const mat4& model_matrix) const {
-    shader.set_uniform("u_mvp", view_projection * model_matrix);
-    shader.set_uniform("u_model", model_matrix);
-    shader.set_uniform("u_normals_model_matrix", transpose_inverse(model_matrix));
 }
 
 void Application::draw_background() {

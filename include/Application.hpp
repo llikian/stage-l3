@@ -51,13 +51,6 @@ private:
     void add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
 
     /**
-     * @brief Updates the uniforms 'mvp' and 'normals_model_matrix' in the shader.
-     * @param shader The shader whose uniforms need to be updated.
-     * @param model_matrix The model matrix used in the next draw call.
-     */
-    void update_mvp(const Shader& shader, const mat4& model_matrix) const;
-
-    /**
      * @brief Draws the background.
      */
     void draw_background();
@@ -69,12 +62,6 @@ private:
     Camera camera;          ///< The active camera.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
-
-    float fov;       ///< The field of view angle.
-    mat4 projection; ///< The projection matrix. Used every frame in the mvp matrix calculation.
-
-    /// Holds the projection matrix multiplied by the view matrix in order to only do the calculation once per frame.
-    mat4 view_projection;
 
     TriangleMesh screen; ///< Mesh used to render a quad as the background.
     LineMesh axes;       ///< Mesh used to render axes in order to determine the view direction.

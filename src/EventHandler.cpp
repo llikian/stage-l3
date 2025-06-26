@@ -98,15 +98,9 @@ void EventHandler::set_active_camera(Camera* camera) {
     }
 }
 
-void EventHandler::set_window_size_event_action(const Action& action) {
-    window_size_event_action = action;
-}
-
 void EventHandler::handle_window_size_event(int width, int height) {
     window.update_size(width, height);
-    if(window_size_event_action) {
-        window_size_event_action();
-    }
+    active_camera->update_projection_matrix(window.get_size_ratio());
 }
 
 void EventHandler::handle_framebuffer_size_event(int width, int height) {

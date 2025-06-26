@@ -47,13 +47,6 @@ public:
     void set_active_camera(Camera* camera);
 
     /**
-     * @brief Sets or changes the action performed when the window is resized. The action will be
-     * called along with the base behavior of handle_window_size_event.
-     * @param action The action.
-     */
-    void set_window_size_event_action(const Action& action);
-
-    /**
      * @brief Handles what happens when the window is resized.
      * @param width The window's new width.
      * @param height The window's new height.
@@ -105,8 +98,6 @@ private:
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
     std::unordered_map<int, bool> repeatable_keys; ///< Stores repeatable keys and whether they are active.
-
-    Action window_size_event_action; ///< Additional action performed when the window is resized.
 
     vec2 mouse_position; ///< The position of the cursor of the mouse on the window.
 
