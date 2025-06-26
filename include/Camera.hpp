@@ -23,6 +23,8 @@ enum class MovementDirection : unsigned char {
  */
 class Camera {
 public:
+    friend struct Frustum;
+
     /**
      * @brief Creates a camera at a specific position looking towards the -z axis.
      * @param position The position of the camera.
