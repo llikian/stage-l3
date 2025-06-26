@@ -34,42 +34,6 @@ public:
     Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance);
 
     /**
-     * @brief Updates the camera's direction depending on how the mouse moved since the last frame.
-     * @param pitch_offset The offset to the camera's tilt angle (in degrees).
-     * @param yaw_offset The offset to the camera's orientation around the y axis (in degrees).
-     */
-    void look_around(float pitch_offset, float yaw_offset);
-
-    /**
-     * @brief Moves the camera in a certain direction.
-     * @param movement_direction The direction to move towards.
-     * @param delta How much time passed since the last frame.
-     */
-    void move_around(MovementDirection movement_direction, float delta);
-
-    /**
-     * @brief Updates the projection matrix with according to the window's new aspect ratio.
-     * @param aspect_ratio The window's new aspect ratio.
-     */
-    void update_projection_matrix(float aspect_ratio);
-
-    /**
-     * @return A reference to the camera's view matrix.
-     */
-    const mat4& get_view_matrix() const;
-
-    /**
-     * @return A reference to the projection matrix.
-     */
-    const mat4& get_projection_matrix() const;
-
-    /**
-     * @brief Calculates the view projection matrix.
-     * @return The projection matrix multiplied by the view matrix.
-     */
-    mat4 get_view_projection_matrix() const;
-
-    /**
      * @return The camera's position.
      */
     vec3 get_position() const;
@@ -88,6 +52,57 @@ public:
      * @return The direction pointing up of where the camera is looking.
      */
     vec3 get_up_vector() const;
+
+    /**
+     * @return The camera's fov.
+     */
+    float get_fov() const;
+
+    /**
+     * @return Distance of the near plane.
+     */
+    float get_near_distance() const;
+
+    /**
+     * @return Distance of the far plane.
+     */
+    float get_far_distance() const;
+
+    /**
+     * @return A reference to the camera's view matrix.
+     */
+    const mat4& get_view_matrix() const;
+
+    /**
+     * @return A reference to the projection matrix.
+     */
+    const mat4& get_projection_matrix() const;
+
+    /**
+     * @brief Calculates the view projection matrix.
+     * @return The projection matrix multiplied by the view matrix.
+     */
+    mat4 get_view_projection_matrix() const;
+
+    /**
+     * @brief Updates the camera's direction depending on how the mouse moved since the last frame.
+     * @param pitch_offset The offset to the camera's tilt angle (in degrees).
+     * @param yaw_offset The offset to the camera's orientation around the y axis (in degrees).
+     */
+    void look_around(float pitch_offset, float yaw_offset);
+
+    /**
+     * @brief Moves the camera in a certain direction.
+     * @param movement_direction The direction to move towards.
+     * @param delta How much time passed since the last frame.
+     */
+    void move_around(MovementDirection movement_direction, float delta);
+
+    /**
+     * @brief Updates the projection matrix with according to the window's new aspect ratio.
+     * @param aspect_ratio The window's new aspect ratio.
+     */
+    void update_projection_matrix(float aspect_ratio);
 
     float sensitivity;    ///< The sensivity when looking around.
     float movement_speed; ///< The sensitivity of the movement.

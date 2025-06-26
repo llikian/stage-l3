@@ -22,6 +22,42 @@ Camera::Camera(const vec3& position, float fov, float aspect, float near_distanc
     update_vectors_and_view_matrix();
 }
 
+vec3 Camera::get_position() const {
+    return position;
+}
+
+vec3 Camera::get_direction() const {
+    return direction;
+}
+
+vec3 Camera::get_right_vector() const {
+    return right;
+}
+
+vec3 Camera::get_up_vector() const {
+    return up;
+}
+
+float Camera::get_fov() const {
+    return fov;
+}
+
+float Camera::get_near_distance() const {
+    return near_distance;
+}
+
+float Camera::get_far_distance() const {
+    return near_distance;
+}
+
+const mat4& Camera::get_view_matrix() const {
+    return view_matrix;
+}
+
+const mat4& Camera::get_projection_matrix() const {
+    return projection_matrix;
+}
+
 void Camera::look_around(float pitch_offset, float yaw_offset) {
     static const float MAX_TILT_ANGLE = degrees_to_radians(80.0f);
 
@@ -64,32 +100,8 @@ void Camera::update_projection_matrix(float aspect_ratio) {
     projection_matrix(0, 0) = 1.0f / (aspect_ratio * std::tan(0.5f * fov));
 }
 
-const mat4& Camera::get_view_matrix() const {
-    return view_matrix;
-}
-
-const mat4& Camera::get_projection_matrix() const {
-    return projection_matrix;
-}
-
 mat4 Camera::get_view_projection_matrix() const {
     return projection_matrix * view_matrix;
-}
-
-vec3 Camera::get_position() const {
-    return position;
-}
-
-vec3 Camera::get_direction() const {
-    return direction;
-}
-
-vec3 Camera::get_right_vector() const {
-    return right;
-}
-
-vec3 Camera::get_up_vector() const {
-    return up;
 }
 
 void Camera::update_vectors_and_view_matrix() {
