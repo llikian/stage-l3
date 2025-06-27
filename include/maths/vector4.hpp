@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "vector3.hpp"
+
 /**
  * @class vector4
  * @brief Holds 4 values of the same type.
@@ -27,6 +29,31 @@ struct vector4 {
      * @param w The value of the w component.
      */
     vector4(Type x, Type y, Type z, Type w) : x(x), y(y), z(z), w(w) { }
+
+    /**
+     * @brief Constructs a vector4 with its first 2 components specified by a vector2 and its last 2
+     * by explicit values.
+     * @param xy The value of the x and y components.
+     * @param z The value of the z component.
+     * @param w The value of the w component.
+     */
+    vector4(const vector2<Type>& xy, float z, float w) : x(xy.x), y(xy.y), z(z), w(w) { }
+
+    /**
+     * @brief Constructs a vector4 with its first 2 components specified by a vector2 and its last 2
+     * by another vector2.
+     * @param xy The value of the x and y components.
+     * @param zw The value of the z and w components.
+     */
+    vector4(const vector2<Type>& xy, const vector2<Type> zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
+
+    /**
+     * @brief Constructs a vector4 with its first 3 components specified by a vector3 and its last
+     * one by an explicit value.
+     * @param xyz The value of the x, y and z components
+     * @param w The value of the w component.
+     */
+    vector4(const vector3<Type>& xyz, float w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 
     /**
      * @brief Constructs a vector4 with the same value for each component.

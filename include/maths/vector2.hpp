@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+template <typename Type> struct vector3; // Forward Declaration of vector3 to avoid circular inclusion.
+template <typename Type> struct vector4; // Forward Declaration of vector4 to avoid circular inclusion.
+
 /**
  * @class vector2
  * @brief Holds 2 values of the same type.
@@ -25,6 +28,18 @@ struct vector2 {
      * @param y The value of the y component.
      */
     vector2(Type x, Type y) : x(x), y(y) { }
+
+    /**
+     * @brief Constructs a vector2 with its components specified by a vector3's first 2 components.
+     * @param xyz The value of the xy (and the ignored z) components.
+     */
+    vector2(const vector3<Type>& xyz) : x(xyz.x), y(xyz.y) { }
+
+    /**
+     * @brief Constructs a vector2 with its components specified by a vector4's first 2 components.
+     * @param xyzw The value of the xy (and the ignored z and w) components.
+     */
+    vector2(const vector4<Type>& xyzw) : x(xyzw.x), y(xyzw.y) { }
 
     /**
      * @brief Constructs a vector2 with the same value for each component.

@@ -6,6 +6,7 @@
 #pragma once
 
 #include <iostream>
+#include "vector2.hpp"
 
 /**
  * @class vector3
@@ -15,7 +16,8 @@
 template <typename Type>
 struct vector3 {
     /**
-     * @brief Constructs a vector3 with all components set to 0 (or default initialized in the case of a class).
+     * @brief Constructs a vector3 with all components set to 0 (or default initialized in the case
+     * of a class).
      */
     vector3() : x(), y(), z() { }
 
@@ -26,6 +28,20 @@ struct vector3 {
      * @param z The value of the z component.
      */
     vector3(Type x, Type y, Type z) : x(x), y(y), z(z) { }
+
+    /**
+     * @brief Constructs a vector3 with its first 2 components specified by a vector2 and its last
+     * one by an explicit value.
+     * @param xy The value of the x and y components
+     * @param z The value of the z component.
+     */
+    vector3(const vector2<Type>& xy, float z) : x(xy.x), y(xy.y), z(z) { }
+
+    /**
+     * @brief Constructs a vector3 with its components specified by a vector4's first 3 components.
+     * @param xyzw The value of the xyz (and the ignored w) components.
+     */
+    vector3(const vector4<Type>& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z) { }
 
     /**
      * @brief Constructs a vector3 with the same value for each component.
