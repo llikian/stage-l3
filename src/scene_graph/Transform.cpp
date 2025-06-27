@@ -5,6 +5,8 @@
 
 #include "scene_graph/Transform.hpp"
 
+#include "maths/geometry.hpp"
+
 Transform::Transform()
     : local_position(0.0f),
       local_orientation(0.0f),
@@ -91,6 +93,26 @@ mat4 Transform::get_global_model() const {
 
 mat4& Transform::get_global_model_reference() {
     return global_model;
+}
+
+vec3 Transform::get_global_position() const {
+    return vec3(global_model(0, 3), global_model(1, 3), global_model(2, 3));
+}
+
+vec3 Transform::get_global_scale() const {
+    return vec3(length(get_right_vector()), length(get_up_vector()), length(get_front_vector()));
+}
+
+vec3 Transform::get_front_vector() const {
+    return vec3(-global_model(0, 2), -global_model(1, 2), -global_model(2, 2));
+}
+
+vec3 Transform::get_right_vector() const {
+    return vec3(global_model(0, 0), global_model(1, 0), global_model(2, 0));
+}
+
+vec3 Transform::get_up_vector() const {
+    return vec3(global_model(0, 1), global_model(1, 1), global_model(2, 1));
 }
 
 bool Transform::is_local_model_dirty() const {

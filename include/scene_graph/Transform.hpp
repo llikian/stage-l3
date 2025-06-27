@@ -115,11 +115,36 @@ public:
     mat4 get_global_model() const;
 
     /**
-     *
      * @return A reference to the transform's global model, the product of the local model matrices
      * of all its parents and itself.
      */
     mat4& get_global_model_reference();
+
+    /**
+     * @return The transform's global position.
+     */
+    vec3 get_global_position() const;
+
+    /**
+     * @return The transform's global scale.
+     */
+    vec3 get_global_scale() const;
+
+    /**
+     * @return The transform's global matrix's front vector: the first 3 components of its third row
+     * multiplied by -1.
+     */
+    vec3 get_front_vector() const;
+
+    /**
+     * @return The transform's global matrix's right vector: the first 3 components of its first row.
+     */
+    vec3 get_right_vector() const;
+
+    /**
+     * @return The transform's global matrix's up vector: the first 3 components of its second row.
+     */
+    vec3 get_up_vector() const;
 
     /**
      * @return Whether the local model was modified and needs to be recomputed.
@@ -146,9 +171,9 @@ public:
     void update_global_model(const mat4& parent_global_model);
 
 private:
-    vec3 local_position; ///< The transform's local position.
+    vec3 local_position;    ///< The transform's local position.
     vec3 local_orientation; ///< The transform's local orientation.
-    vec3 local_scale; ///< The transform's local scale.
+    vec3 local_scale;       ///< The transform's local scale.
 
     bool is_dirty; ///< Whether the local model was modified.
 
