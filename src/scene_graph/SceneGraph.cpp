@@ -9,14 +9,6 @@
 
 SceneGraph::SceneGraph() : root("Scene Graph"), selected_entity(nullptr) { }
 
-void SceneGraph::draw_imgui_node_tree(const std::string& imgui_window_name) {
-    ImGui::Begin(imgui_window_name.c_str());
-
-    add_entity_to_imgui_node_tree(&root);
-
-    ImGui::End();
-}
-
 void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
     if(entity->children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }

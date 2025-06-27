@@ -13,7 +13,6 @@
 #include "imgui_impl_opengl3.h"
 #include "culling/BoundingVolume.hpp"
 #include "maths/geometry.hpp"
-#include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
 #include "utility/Random.hpp"
@@ -207,51 +206,8 @@ void Application::run() {
 
         if(is_spying_enabled) { draw_spy_window(); }
 
-        /* ImGui Debug Window */
-        {
-            static ImVec2 win_pos(0.0f, 0.0f);
-            static ImVec2 win_size(0.0f, 0.0f);
-
-            ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-
-            win_size.x = 0.2f * window.get_width();
-            ImGui::SetWindowPos(win_pos);
-            ImGui::SetWindowSize(win_size);
-
-            ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
-            ImGui::Text("delta: %fs", event_handler.get_delta());
-
-            ImGui::Text("Camera:");
-            ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
-            ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
-
-            ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
-            if(is_spying_enabled) {
-                if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
-                    spy_camera.look_at_point(spy_camera_target);
-                }
-            }
-
-            ImGui::End();
-
-            scene_graph.draw_imgui_node_tree("Debug");
-        }
-
-        /* ImGui Object Editor Window */ {
-            static ImVec2 win_pos(0.0f, 0.0f);
-            static ImVec2 win_size(0.0f, 0.0f);
-
-            ImGui::Begin("Object Editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-
-            win_pos.x = 0.7f * window.get_width();
-            ImGui::SetWindowPos(win_pos);
-            win_size.x = window.get_width() - win_pos.x;
-            ImGui::SetWindowSize(win_size);
-
-            scene_graph.add_selected_entity_editor_to_imgui_window();
-
-            ImGui::End();
-        }
+        draw_imgui_debug_window();
+        draw_imgui_object_ediot_window();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -306,6 +262,7 @@ void Application::draw_spy_window() {
         win_pos.x = 0.7f * window.get_width();
         win_pos.y = window.get_height() / 2.0f;
         ImGui::SetWindowPos(win_pos);
+
         win_size.x = window.get_width() - win_pos.x;
         win_size.y = window.get_height() - win_pos.y;
         ImGui::SetWindowSize(win_size);
@@ -326,4 +283,49 @@ void Application::draw_spy_window() {
 
         ImGui::End();
     }
+}
+
+void Application::draw_imgui_debug_window() {
+    static ImVec2 win_pos(0.0f, 0.0f);
+    static ImVec2 win_size(0.0f, 0.0f);
+
+    ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+    win_size.x = 0.2f * window.get_width();
+    ImGui::SetWindowPos(win_pos);
+    ImGui::SetWindowSize(win_size);
+
+    ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
+    ImGui::Text("delta: %fs", event_handler.get_delta());
+
+    ImGui::Text("Camera:");
+    ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
+    ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
+
+    ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
+    if(is_spying_enabled) {
+        if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
+            spy_camera.look_at_point(spy_camera_target);
+        }
+    }
+
+    scene_graph.add_entity_to_imgui_node_tree(&scene_graph.root);
+
+    ImGui::End();
+}
+
+void Application::draw_imgui_object_ediot_window() const {
+    static ImVec2 win_pos(0.0f, 0.0f);
+    static ImVec2 win_size(0.0f, 0.0f);
+
+    ImGui::Begin("Object Editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+    win_pos.x = 0.7f * window.get_width();
+    ImGui::SetWindowPos(win_pos);
+    win_size.x = window.get_width() - win_pos.x;
+    ImGui::SetWindowSize(win_size);
+
+    scene_graph.add_selected_entity_editor_to_imgui_window();
+
+    ImGui::End();
 }

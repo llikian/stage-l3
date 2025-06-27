@@ -10,7 +10,6 @@
 #include "EventHandler.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
-#include "maths/mat4.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
@@ -59,6 +58,16 @@ private:
      * @brief Renders the scene from the spy window.
      */
     void draw_spy_window();
+
+    /**
+     * @brief Draws the imgui debug window.
+     */
+    void draw_imgui_debug_window();
+
+    /**
+     * @brief Draw the imgui object editor window.
+     */
+    void draw_imgui_object_ediot_window() const;
 
     Window window;              ///< Contains the GLFW window. Needs to be initialized first.
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.

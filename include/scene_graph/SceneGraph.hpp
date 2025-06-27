@@ -21,12 +21,6 @@ public:
     SceneGraph();
 
     /**
-     * @brief Draws the scene graph as an ImGui node tree.
-     * @param imgui_window_name The name of the ImGui window to create the tree in.
-     */
-    void draw_imgui_node_tree(const std::string& imgui_window_name);
-
-    /**
      * @brief Add an entity to the ImGui node tree.
      * @param entity The entity to add to the tree.
      */
