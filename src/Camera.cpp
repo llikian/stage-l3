@@ -13,12 +13,12 @@
 
 #define PIf (std::numbers::pi_v<float>)
 
-Camera::Camera(const vec3& position, float fov, float aspect, float near_distance, float far_distance)
+Camera::Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance)
     : sensitivity(0.1f), movement_speed(100.0f),
       position(position),
       pitch(0.0f), yaw(-PIf / 2.0f),
       fov(fov), near_distance(near_distance), far_distance(far_distance),
-      view_matrix(1.0f), projection_matrix(perspective(fov, aspect, near_distance, far_distance)) {
+      view_matrix(1.0f), projection_matrix(perspective(fov, aspect_ratio, near_distance, far_distance)) {
     update_vectors_and_view_matrix();
 }
 
