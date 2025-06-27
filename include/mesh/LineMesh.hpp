@@ -85,6 +85,11 @@ public:
      */
     size_t get_indices_amount() const;
 
+    /**
+     * @brief
+     */
+    void clear();
+
 private:
     /**
      * @brief Binds the OpenGL buffers.

@@ -61,6 +61,15 @@ size_t LineMesh::get_indices_amount() const {
     return indices.size();
 }
 
+void LineMesh::clear() {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
+    vertices.clear();
+    indices.clear();
+    bound = false;
+}
+
 void LineMesh::bind_buffers() {
     /* VAO */
     glGenVertexArrays(1, &VAO);
