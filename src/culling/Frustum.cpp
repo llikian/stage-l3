@@ -36,9 +36,12 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool 
     // Dimensions of the near/far quads divided by 2
     float near_height = camera.near_distance * tan_half_fov;
     float near_width = near_height * aspect_ratio;
+    vec3 near_center = camera.near_distance * camera.direction;
+    vec3 near_up = near_height * camera.up;
+    vec3 near_right = near_width * camera.right;
+
     float far_height = camera.far_distance * tan_half_fov;
     float far_width = far_height * aspect_ratio;
-
     vec3 far_center = camera.far_distance * camera.direction;
     vec3 far_up = far_height * camera.up;
     vec3 far_right = far_width * camera.right;
@@ -55,17 +58,17 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool 
     right_plane.normal = normalize(cross(camera.up, far_center + far_right));
 
     /* Mesh */
-    mesh.add_vertex(vec3(0.0f)); // 0
+    mesh.add_vertex(camera.position); // 0
 
-    mesh.add_vertex(vec3(-near_width, near_height, -camera.near_distance));  // 1
-    mesh.add_vertex(vec3(-near_width, -near_height, -camera.near_distance)); // 2
-    mesh.add_vertex(vec3(near_width, -near_height, -camera.near_distance));  // 3
-    mesh.add_vertex(vec3(near_width, near_height, -camera.near_distance));   // 4
+    mesh.add_vertex(camera.position + near_center - near_right + near_up); // 1
+    mesh.add_vertex(camera.position + near_center - near_right - near_up); // 2
+    mesh.add_vertex(camera.position + near_center + near_right - near_up); // 3
+    mesh.add_vertex(camera.position + near_center + near_right + near_up); // 4
 
-    mesh.add_vertex(vec3(-far_width, far_height, -camera.far_distance));  // 5
-    mesh.add_vertex(vec3(-far_width, -far_height, -camera.far_distance)); // 6
-    mesh.add_vertex(vec3(far_width, -far_height, -camera.far_distance));  // 7
-    mesh.add_vertex(vec3(far_width, far_height, -camera.far_distance));   // 8
+    mesh.add_vertex(camera.position + far_center - far_right + far_up); // 5
+    mesh.add_vertex(camera.position + far_center - far_right - far_up); // 6
+    mesh.add_vertex(camera.position + far_center + far_right - far_up); // 7
+    mesh.add_vertex(camera.position + far_center + far_right + far_up); // 8
 
     mesh.add_line(0, 5);
     mesh.add_line(0, 6);
