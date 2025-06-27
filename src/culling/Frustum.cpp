@@ -30,7 +30,7 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio) {
     right_plane.normal = normalize(cross(camera.up, far_center + far_right));
 }
 
-Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh) {
+Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals) {
     float tan_half_fov = std::tan(camera.fov / 2.0f);
 
     // Dimensions of the near/far quads divided by 2
@@ -55,8 +55,6 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh) {
     right_plane.normal = normalize(cross(camera.up, far_center + far_right));
 
     /* Mesh */
-    const float normal_length = (camera.far_distance - camera.near_distance) / 3.0f;
-
     mesh.add_vertex(vec3(0.0f)); // 0
 
     mesh.add_vertex(vec3(-near_width, near_height, -camera.near_distance));  // 1
@@ -84,45 +82,49 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh) {
     mesh.add_line(7, 8);
     mesh.add_line(8, 5);
 
-    // Near
-    vec3 pos = camera.near_distance * camera.direction;
-    vec3 color(0.5f, 0.5f, 1.0f);
-    mesh.add_vertex(pos, color);                                    // 9
-    mesh.add_vertex(pos + normal_length * camera.direction, color); // 10
-    mesh.add_line(9, 10);
+    if(draw_normals) {
+        const float normal_length = (camera.far_distance - camera.near_distance) / 3.0f;
 
-    // Far
-    pos = far_center;
-    color = vec3(0.5f, 0.5f, 0.0f);
-    mesh.add_vertex(pos, color);                                    // 11
-    mesh.add_vertex(pos - normal_length * camera.direction, color); // 12
-    mesh.add_line(11, 12);
+        // Near
+        vec3 pos = camera.near_distance * camera.direction;
+        vec3 color(0.5f, 0.5f, 1.0f);
+        mesh.add_vertex(pos, color);                                    // 9
+        mesh.add_vertex(pos + normal_length * camera.direction, color); // 10
+        mesh.add_line(9, 10);
 
-    // Top
-    pos = (far_center + far_up) / 2.0f;
-    color = vec3(0.5f, 1.0f, 0.5f);
-    mesh.add_vertex(pos, color);                                                                       // 13
-    mesh.add_vertex(pos + normal_length * normalize(cross(far_center + far_up, camera.right)), color); // 14
-    mesh.add_line(13, 14);
+        // Far
+        pos = far_center;
+        color = vec3(0.5f, 0.5f, 0.0f);
+        mesh.add_vertex(pos, color);                                    // 11
+        mesh.add_vertex(pos - normal_length * camera.direction, color); // 12
+        mesh.add_line(11, 12);
 
-    // Bottom
-    pos = (far_center - far_up) / 2.0f;
-    color = vec3(0.5f, 0.0f, 0.5f);
-    mesh.add_vertex(pos, color);                                                                       // 15
-    mesh.add_vertex(pos + normal_length * normalize(cross(camera.right, far_center - far_up)), color); // 16
-    mesh.add_line(15, 16);
+        // Top
+        pos = (far_center + far_up) / 2.0f;
+        color = vec3(0.5f, 1.0f, 0.5f);
+        mesh.add_vertex(pos, color);                                                                       // 13
+        mesh.add_vertex(pos + normal_length * normalize(cross(far_center + far_up, camera.right)), color); // 14
+        mesh.add_line(13, 14);
 
-    // Left
-    pos = (far_center - far_right) / 2.0f;
-    color = vec3(0.0f, 0.5f, 0.5f);
-    mesh.add_vertex(pos, color);                                                                       // 17
-    mesh.add_vertex(pos + normal_length * normalize(cross(far_center - far_right, camera.up)), color); // 18
-    mesh.add_line(17, 18);
+        // Bottom
+        pos = (far_center - far_up) / 2.0f;
+        color = vec3(0.5f, 0.0f, 0.5f);
+        mesh.add_vertex(pos, color);                                                                       // 15
+        mesh.add_vertex(pos + normal_length * normalize(cross(camera.right, far_center - far_up)), color); // 16
+        mesh.add_line(15, 16);
 
-    // Right
-    pos = (far_center + far_right) / 2.0f;
-    color = vec3(1.0f, 0.5f, 0.5f);
-    mesh.add_vertex(pos, color);                                                                       // 19
-    mesh.add_vertex(pos + normal_length * normalize(cross(camera.up, far_center + far_right)), color); // 20
-    mesh.add_line(19, 20);
+        // Left
+        pos = (far_center - far_right) / 2.0f;
+        color = vec3(0.0f, 0.5f, 0.5f);
+        mesh.add_vertex(pos, color);                                                                       // 17
+        mesh.add_vertex(pos + normal_length * normalize(cross(far_center - far_right, camera.up)), color); // 18
+        mesh.add_line(17, 18);
+
+        // Right
+        pos = (far_center + far_right) / 2.0f;
+        color = vec3(1.0f, 0.5f, 0.5f);
+        mesh.add_vertex(pos, color);                                                                       // 19
+        mesh.add_vertex(pos + normal_length * normalize(cross(camera.up, far_center + far_right)), color); // 20
+        mesh.add_line(19, 20);
+    }
 }

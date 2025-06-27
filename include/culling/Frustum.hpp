@@ -15,7 +15,7 @@
  */
 struct Frustum {
     Frustum(const Camera& camera, float aspect_ratio);
-    Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh);
+    Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals = false);
 
     Plane near_plane;
     Plane far_plane;
