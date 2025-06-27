@@ -33,6 +33,9 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
         case ENTITY_TYPE_TRIANGLE_MESH:
             label += "TM";
             break;
+        case ENTITY_TYPE_LINE_MESH:
+            label += " L";
+            break;
         case ENTITY_TYPE_FLAT_SHADED_MESH:
             label += " F";
             break;

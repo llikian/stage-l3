@@ -153,6 +153,21 @@ void TriangleMeshEntity::add_to_object_editor() {
     }
 }
 
+LineMeshEntity::LineMeshEntity(const std::string& name, const Shader* shader)
+    : DrawableEntity(name, shader) { }
+
+void LineMeshEntity::draw(const mat4& view_projection_matrix) {
+    if(is_hidden) { return; }
+
+    if(shader != nullptr) {
+        shader->use();
+        update_uniforms(view_projection_matrix);
+        mesh.draw(*shader);
+    } else {
+        std::cout << "[WARNING] LineMeshEntity '" << name << "' with nullptr shader.\n";
+    }
+}
+
 FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec3& color)
     : TriangleMeshEntity(name, shader), color(color) { }
 
