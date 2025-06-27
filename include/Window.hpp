@@ -47,10 +47,10 @@ public:
     int get_height() const;
 
     /**
-     * @brief Returns the window's size ratio.
+     * @brief Returns the window's aspect ratio.
      * @return The window's width divided by its height.
      */
-    float get_size_ratio() const;
+    float get_aspect_ratio() const;
 
     /**
      * @brief Updates the size of the window.

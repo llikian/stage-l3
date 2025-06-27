@@ -100,7 +100,7 @@ void EventHandler::set_active_camera(Camera* camera) {
 
 void EventHandler::handle_window_size_event(int width, int height) {
     window.update_size(width, height);
-    active_camera->update_projection_matrix(window.get_size_ratio());
+    active_camera->update_projection_matrix(window.get_aspect_ratio());
 }
 
 void EventHandler::handle_framebuffer_size_event(int width, int height) {

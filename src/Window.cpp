@@ -176,7 +176,7 @@ int Window::get_height() const {
     return height;
 }
 
-float Window::get_size_ratio() const {
+float Window::get_aspect_ratio() const {
     return static_cast<float>(width) / static_cast<float>(height);
 }
 

@@ -20,8 +20,8 @@
 Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
-      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 1024.0f),
-      is_spying_enabled(true), spy_camera(vec3(30.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 2048.0f),
+      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 1024.0f),
+      is_spying_enabled(true), spy_camera(vec3(30.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 2048.0f),
       spy_camera_target(0.0f),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
@@ -194,7 +194,7 @@ void Application::run() {
 
         /* Frustum Tests */
         frustum_mesh.clear();
-        Frustum frustum(camera, window.get_size_ratio(), frustum_mesh);
+        Frustum frustum(camera, window.get_aspect_ratio(), frustum_mesh);
         for(unsigned int i = 0 ; i < objects_amount ; ++i) {
             test_spheres[i]->color = test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)
                                          ? normal_color
