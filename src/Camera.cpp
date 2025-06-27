@@ -100,6 +100,12 @@ void Camera::update_projection_matrix(float aspect_ratio) {
     projection_matrix(0, 0) = 1.0f / (aspect_ratio * std::tan(0.5f * fov));
 }
 
+void Camera::look_at_point(const vec3& target) {
+    vec3 dir = normalize(target - position);
+    pitch = asinf(dir.y);
+    yaw = atan2f(dir.z, dir.x);
+}
+
 mat4 Camera::get_view_projection_matrix() const {
     return projection_matrix * view_matrix;
 }

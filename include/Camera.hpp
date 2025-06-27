@@ -106,6 +106,12 @@ public:
      */
     void update_projection_matrix(float aspect_ratio);
 
+    /**
+     * @brief Rotates the camera to make it look towards a certain point.
+     * @param target The point the camera should look towards.
+     */
+    void look_at_point(const vec3& target);
+
     float sensitivity;    ///< The sensivity when looking around.
     float movement_speed; ///< The sensitivity of the movement.
 
