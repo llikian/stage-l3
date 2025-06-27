@@ -39,18 +39,14 @@ AABB::AABB(const vec3& center, float extent_x, float extent_y, float extent_z)
       extents(extent_x, extent_y, extent_z) { }
 
 bool AABB::is_in_frustum(const Frustum& frustum, const Transform& transform) {
-    static const vec3 X_AXIS(1.0f, 0.0f, 0.0f);
-    static const vec3 Y_AXIS(0.0f, 1.0f, 0.0f);
-    static const vec3 Z_AXIS(0.0f, 0.0f, 1.0f);
-
     const vec3 front = extents.z * transform.get_front_vector();
     const vec3 right = extents.x * transform.get_right_vector();
     const vec3 up = extents.y * transform.get_up_vector();
 
     const AABB global_AABB(transform.get_global_model() * vec4(center, 1.0f),
-                           std::abs(dot(X_AXIS, front) + std::abs(dot(X_AXIS, right)) + std::abs(dot(X_AXIS, up))),
-                           std::abs(dot(Y_AXIS, front) + std::abs(dot(Y_AXIS, right)) + std::abs(dot(Y_AXIS, up))),
-                           std::abs(dot(Z_AXIS, front) + std::abs(dot(Z_AXIS, right)) + std::abs(dot(Z_AXIS, up))));
+                           std::abs(front.x) + std::abs(right.x) + std::abs(up.x),
+                           std::abs(front.y) + std::abs(right.y) + std::abs(up.y),
+                           std::abs(front.z) + std::abs(right.z) + std::abs(up.z));
 
     return global_AABB.is_in_or_above_plane(frustum.left_plane) &&
            global_AABB.is_in_or_above_plane(frustum.right_plane) &&
@@ -64,5 +60,5 @@ bool AABB::is_in_or_above_plane(const Plane& plane) const {
     float r = extents.x * std::abs(plane.normal.x)
               + extents.y * std::abs(plane.normal.y)
               + extents.z * std::abs(plane.normal.z);
-    return plane.get_signed_distance(center) > -r;
+    return plane.get_signed_distance(center) >= -r;
 }
