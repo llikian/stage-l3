@@ -55,11 +55,24 @@ private:
      */
     void draw_background();
 
+    /**
+     * @brief Renders the scene from the spy window.
+     */
+    void draw_spy_window();
+
     Window window;              ///< Contains the GLFW window. Needs to be initialized first.
     EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 
     SceneGraph scene_graph; ///< Scene graph.
-    Camera camera;          ///< The active camera.
+    Camera camera;          ///< The camera.
+
+    bool is_spying_enabled;          ///< Whether the spying window is drawn.
+    Camera spy_camera;               ///< The camera used to test frustum culling.
+    vec3 spy_camera_target;          ///< Where the spy camera is looking at.
+    unsigned int FBO;                ///< Frame Buffer Object.
+    unsigned int RBO;                ///< Rendering Buffer Object.
+    unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
+    LineMesh frustum_mesh;           ///< Mesh used to render the view frustum.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
 

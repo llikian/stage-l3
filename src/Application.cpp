@@ -21,7 +21,9 @@
 Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
-      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 4096.0f),
+      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 1024.0f),
+      is_spying_enabled(true), spy_camera(vec3(30.0f), M_PI_2f, window.get_size_ratio(), 0.1f, 2048.0f),
+      spy_camera_target(0.0f),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -51,12 +53,43 @@ Application::Application()
     create_quad_mesh(screen, vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     create_axes_mesh(axes, 0.5f);
 
+    /* ---- Framebuffer ---- */
+    spy_camera.look_at_point(spy_camera_target);
+
+    glGenFramebuffers(1, &FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    glGenTextures(1, &spy_window_texture);
+    glBindTexture(GL_TEXTURE_2D, spy_window_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window.get_width(), window.get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, spy_window_texture, 0);
+
+    glGenRenderbuffers(1, &RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.get_width(), window.get_height());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        throw std::runtime_error("Couldn't create framebuffer");
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
     /* ---- Other ---- */
     // glfwSwapInterval(0); // disable vsync
 }
 
 Application::~Application() {
     for(Shader& shader : shaders | std::views::values) { shader.free(); }
+
+    glDeleteRenderbuffers(1, &RBO);
+    glDeleteTextures(1, &spy_window_texture);
+    glDeleteFramebuffers(1, &FBO);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -86,46 +119,41 @@ void Application::run() {
     root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
         ->set_visibility(true);
 
-    /* SphereVolume Test */
-    Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
-    unsigned int spheres_amount = 100;
-    std::vector<FlatShadedMeshEntity*> test_spheres;
-    std::vector<SphereVolume> test_sphere_volumes(spheres_amount, SphereVolume(vec3(0.0f), 1.0f));
-    test_spheres.reserve(spheres_amount);
+    /* Frustum Culling Tests */
+    unsigned int objects_amount = 100;
 
-    for(unsigned int i = 0 ; i < spheres_amount ; ++i) {
+    Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
+    std::vector<FlatShadedMeshEntity*> test_spheres;
+    std::vector<SphereVolume> test_sphere_volumes(objects_amount, SphereVolume(vec3(0.0f), 1.0f));
+    test_spheres.reserve(objects_amount);
+
+    Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
+    std::vector<FlatShadedMeshEntity*> test_boxes;
+    std::vector<AABB> test_AABBs(objects_amount, AABB(vec3(0.0f), vec3(0.0f)));
+    test_boxes.reserve(objects_amount);
+
+    for(unsigned int i = 0 ; i < objects_amount ; ++i) {
+        // Sphere Volume
         test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
             "Frustum Test Sphere " + std::to_string(i),
             &shaders.at("flat")));
 
         create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
-        test_spheres.back()->transform.set_local_position(
-            Random::get_vec3(vec3(-200.0f, -50.0f, -300.0f), vec3(200.0f, 50.0f, 0.0f)));
-        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 5.0f));
-    }
+        test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
+        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
 
-    /* AABB Test */
-    Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
-    unsigned int boxes_amount = 100;
-    std::vector<FlatShadedMeshEntity*> test_boxes;
-    std::vector<AABB> test_AABBs(boxes_amount, AABB(vec3(0.0f), vec3(0.0f)));
-    test_boxes.reserve(boxes_amount);
-
-    for(unsigned int i = 0 ; i < boxes_amount ; ++i) {
+        // AABB
         test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
             "Frustum Test AABB " + std::to_string(i),
             &shaders.at("flat")));
 
         create_cube_mesh(test_boxes.back()->mesh);
-        test_boxes.back()->transform.set_local_position(
-            Random::get_vec3(vec3(-200.0f, -50.0f, -300.0f), vec3(200.0f, 50.0f, 0.0f)));
-        test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 5.0f));
+        test_boxes.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
+        test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
     }
 
-    /* Frustum */
-    // LineMesh frustum_mesh;
-    // Frustum frustum(Camera(vec3(0.0f), M_PI_4f, window.get_size_ratio(), 10.0f, 200.0f),
-    //                 window.get_size_ratio(), frustum_mesh);
+    vec3 normal_color(0.0f, 1.0f, 0.0f);
+    vec3 culled_color(1.0f, 0.0f, 0.0f);
 
     /* Main Loop */
     while(!window.should_close()) {
@@ -153,9 +181,6 @@ void Application::run() {
             shader.set_uniform("u_light_position", light_position);
         }
 
-        LineMesh frustum_mesh;
-        Frustum frustum(camera, window.get_size_ratio(), frustum_mesh, true);
-
         /* Line Mesh Shader */ {
             const Shader& shader = shaders.at("line mesh");
             shader.use();
@@ -164,31 +189,26 @@ void Application::run() {
                 shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
                 axes.draw(shader);
             }
-
-            shader.set_uniform("u_mvp", view_projection);
-            frustum_mesh.draw(shader);
         }
 
         scene_graph.draw(view_projection);
 
         /* Frustum Tests */
-        // for(unsigned int i = 0 ; i < spheres_amount ; ++i) {
-        //     if(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)) {
-        //         test_spheres[i]->color = vec3(0.0f, 1.0f, 0.0f);
-        //     } else {
-        //         test_spheres[i]->color = vec3(1.0f, 0.0f, 0.0f);
-        //     }
-        // }
-
-        for(unsigned int i = 0 ; i < boxes_amount ; ++i) {
-            if(test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)) {
-                test_boxes[i]->color = vec3(0.0f, 1.0f, 0.0f);
-            } else {
-                test_boxes[i]->color = vec3(1.0f, 0.0f, 0.0f);
-            }
+        frustum_mesh.clear();
+        Frustum frustum(camera, window.get_size_ratio(), frustum_mesh);
+        for(unsigned int i = 0 ; i < objects_amount ; ++i) {
+            test_spheres[i]->color = test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)
+                                         ? normal_color
+                                         : culled_color;
+            test_boxes[i]->color = test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)
+                                       ? normal_color
+                                       : culled_color;
         }
 
-        /* ImGui Debug Window */ {
+        if(is_spying_enabled) { draw_spy_window(); }
+
+        /* ImGui Debug Window */
+        {
             static ImVec2 win_pos(0.0f, 0.0f);
             static ImVec2 win_size(0.0f, 0.0f);
 
@@ -204,6 +224,13 @@ void Application::run() {
             ImGui::Text("Camera:");
             ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
             ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
+
+            ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
+            if(is_spying_enabled) {
+                if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
+                    spy_camera.look_at_point(spy_camera_target);
+                }
+            }
 
             ImGui::End();
 
@@ -252,4 +279,51 @@ void Application::draw_background() {
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
     screen.draw(shader);
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+}
+
+void Application::draw_spy_window() {
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mat4 spy_view_projection = spy_camera.get_view_projection_matrix();
+    scene_graph.draw(spy_view_projection);
+
+    const Shader& shader = shaders.at("line mesh");
+    shader.use();
+    shader.set_uniform("u_mvp", spy_view_projection);
+    frustum_mesh.draw(shader);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    /* ImGui Spy Window */ {
+        static ImVec2 win_pos(0.0f, 0.0f);
+        static ImVec2 win_size(0.0f, 0.0f);
+
+        ImGui::Begin("Spy", nullptr, ImGuiWindowFlags_NoResize
+                                     | ImGuiWindowFlags_NoMove
+                                     | ImGuiWindowFlags_NoTitleBar);
+
+        win_pos.x = 0.7f * window.get_width();
+        win_pos.y = window.get_height() / 2.0f;
+        ImGui::SetWindowPos(win_pos);
+        win_size.x = window.get_width() - win_pos.x;
+        win_size.y = window.get_height() - win_pos.y;
+        ImGui::SetWindowSize(win_size);
+
+        ImVec2 available_size = ImGui::GetContentRegionAvail();
+        ImVec2 cursor_position = ImGui::GetCursorScreenPos();
+        glViewport(0, 0, available_size.x, available_size.y);
+
+        ImGui::GetWindowDrawList()->AddImage(
+            spy_window_texture,
+            cursor_position,
+            ImVec2(cursor_position.x + available_size.x, cursor_position.y + available_size.y),
+            ImVec2(0.0f, 1.0f),
+            ImVec2(1.0f, 0.0f)
+        );
+
+        glViewport(0, 0, window.get_width(), window.get_height());
+
+        ImGui::End();
+    }
 }
