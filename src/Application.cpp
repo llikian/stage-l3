@@ -11,10 +11,12 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "culling/BoundingVolume.hpp"
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
+#include "utility/Random.hpp"
 
 Application::Application()
     : window("Projet Stage L3", this),
@@ -84,8 +86,46 @@ void Application::run() {
     root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
         ->set_visibility(true);
 
-    LineMesh frustum;
-    create_frustum_mesh(frustum, M_PI_4f, window.get_size_ratio(), 10.0f, 200.0f);
+    /* SphereVolume Test */
+    Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
+    unsigned int spheres_amount = 100;
+    std::vector<FlatShadedMeshEntity*> test_spheres;
+    std::vector<SphereVolume> test_sphere_volumes(spheres_amount, SphereVolume(vec3(0.0f), 1.0f));
+    test_spheres.reserve(spheres_amount);
+
+    for(unsigned int i = 0 ; i < spheres_amount ; ++i) {
+        test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
+            "Frustum Test Sphere " + std::to_string(i),
+            &shaders.at("flat")));
+
+        create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
+        test_spheres.back()->transform.set_local_position(
+            Random::get_vec3(vec3(-200.0f, -50.0f, -300.0f), vec3(200.0f, 50.0f, 0.0f)));
+        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 5.0f));
+    }
+
+    /* AABB Test */
+    Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
+    unsigned int boxes_amount = 100;
+    std::vector<FlatShadedMeshEntity*> test_boxes;
+    std::vector<AABB> test_AABBs(boxes_amount, AABB(vec3(0.0f), vec3(0.0f)));
+    test_boxes.reserve(boxes_amount);
+
+    for(unsigned int i = 0 ; i < boxes_amount ; ++i) {
+        test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
+            "Frustum Test AABB " + std::to_string(i),
+            &shaders.at("flat")));
+
+        create_cube_mesh(test_boxes.back()->mesh);
+        test_boxes.back()->transform.set_local_position(
+            Random::get_vec3(vec3(-200.0f, -50.0f, -300.0f), vec3(200.0f, 50.0f, 0.0f)));
+        test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 5.0f));
+    }
+
+    /* Frustum */
+    // LineMesh frustum_mesh;
+    // Frustum frustum(Camera(vec3(0.0f), M_PI_4f, window.get_size_ratio(), 10.0f, 200.0f),
+    //                 window.get_size_ratio(), frustum_mesh);
 
     /* Main Loop */
     while(!window.should_close()) {
@@ -113,6 +153,9 @@ void Application::run() {
             shader.set_uniform("u_light_position", light_position);
         }
 
+        LineMesh frustum_mesh;
+        Frustum frustum(camera, window.get_size_ratio(), frustum_mesh, true);
+
         /* Line Mesh Shader */ {
             const Shader& shader = shaders.at("line mesh");
             shader.use();
@@ -123,10 +166,27 @@ void Application::run() {
             }
 
             shader.set_uniform("u_mvp", view_projection);
-            frustum.draw(shader);
+            frustum_mesh.draw(shader);
         }
 
         scene_graph.draw(view_projection);
+
+        /* Frustum Tests */
+        // for(unsigned int i = 0 ; i < spheres_amount ; ++i) {
+        //     if(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)) {
+        //         test_spheres[i]->color = vec3(0.0f, 1.0f, 0.0f);
+        //     } else {
+        //         test_spheres[i]->color = vec3(1.0f, 0.0f, 0.0f);
+        //     }
+        // }
+
+        for(unsigned int i = 0 ; i < boxes_amount ; ++i) {
+            if(test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)) {
+                test_boxes[i]->color = vec3(0.0f, 1.0f, 0.0f);
+            } else {
+                test_boxes[i]->color = vec3(1.0f, 0.0f, 0.0f);
+            }
+        }
 
         /* ImGui Debug Window */ {
             static ImVec2 win_pos(0.0f, 0.0f);
