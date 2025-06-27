@@ -28,6 +28,7 @@ set(SOURCES
         src/Window.cpp
 
         # Culling Module
+        src/culling/BoundingVolume.cpp
         src/culling/Frustum.cpp
         src/culling/Plane.cpp
 
@@ -57,6 +58,7 @@ set(SOURCES
         # Utility Module
         src/utility/hash.cpp
         src/utility/LifetimeLogger.cpp
+        src/utility/Random.cpp
 
         # Libraries
         lib/glad/src/glad.c
