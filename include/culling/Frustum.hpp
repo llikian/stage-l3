@@ -7,13 +7,15 @@
 
 #include "Camera.hpp"
 #include "Plane.hpp"
+#include "mesh/LineMesh.hpp"
 
 /**
  * @struct Frustum
  * @brief
  */
 struct Frustum {
-    explicit Frustum(const Camera& camera, float aspect_ratio);
+    Frustum(const Camera& camera, float aspect_ratio);
+    Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh);
 
     Plane near_plane;
     Plane far_plane;
