@@ -7,7 +7,6 @@
 
 #include "LineMesh.hpp"
 #include "TriangleMesh.hpp"
-#include "culling/Frustum.hpp"
 
 /**
  * @brief Creates a mesh representing a sphere of radius 1.
@@ -16,6 +15,12 @@
  * @param vertical_slices The amount of vertical slices.
  */
 void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices);
+
+/**
+ * @brief Creates a mesh representing a mesh of side 1.
+ * @param mesh The mesh to create the cube in.
+ */
+void create_cube_mesh(TriangleMesh& mesh);
 
 /**
  * @brief Creates a mesh representing a quad as follow:
@@ -43,5 +48,3 @@ void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const ve
  * @param length The length of the axes.
  */
 void create_axes_mesh(LineMesh& mesh, float length);
-
-void create_frustum_mesh(LineMesh& mesh, float fov, float aspect_ratio, float near, float far);
