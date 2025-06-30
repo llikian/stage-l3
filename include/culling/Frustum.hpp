@@ -17,6 +17,8 @@ struct Frustum {
     Frustum(const Camera& camera, float aspect_ratio);
     Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals = false);
 
+    void update(const Camera& camera, float aspect_ratio);
+
     Plane near_plane;
     Plane far_plane;
     Plane top_plane;

@@ -6,31 +6,10 @@
 #include "culling/Frustum.hpp"
 
 #include <cmath>
-
 #include "maths/geometry.hpp"
 
 Frustum::Frustum(const Camera& camera, float aspect_ratio) {
-    // Dimensions of the far quad divided by 2
-    float far_height = camera.far_distance * std::tan(camera.fov / 2.0f);
-    float far_width = far_height * aspect_ratio;
-
-    vec3 far_center = camera.far_distance * camera.direction;
-    vec3 far_up = far_height * camera.up;
-    vec3 far_right = far_width * camera.right;
-
-    near_plane.normal = camera.direction;
-    far_plane.normal = -camera.direction;
-    top_plane.normal = normalize(cross(far_center + far_up, camera.right));
-    bottom_plane.normal = normalize(cross(camera.right, far_center - far_up));
-    left_plane.normal = normalize(cross(far_center - far_right, camera.up));
-    right_plane.normal = normalize(cross(camera.up, far_center + far_right));
-
-    near_plane.distance = dot(camera.position + camera.near_distance * camera.direction, near_plane.normal);
-    far_plane.distance = dot(camera.position + far_center, far_plane.normal);
-    top_plane.distance = dot(camera.position, top_plane.normal);
-    bottom_plane.distance = dot(camera.position, bottom_plane.normal);
-    left_plane.distance = dot(camera.position, left_plane.normal);
-    right_plane.distance = dot(camera.position, right_plane.normal);
+    update(camera, aspect_ratio);
 }
 
 Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals) {
@@ -136,4 +115,25 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool 
         mesh.add_vertex(pos + normal_length * normalize(cross(camera.up, far_center + far_right)), color); // 20
         mesh.add_line(19, 20);
     }
+}
+
+void Frustum::update(const Camera& camera, float aspect_ratio) {
+    float far_height = camera.far_distance * std::tan(camera.fov / 2.0f);
+    vec3 far_center = camera.far_distance * camera.direction;
+    vec3 far_up = far_height * camera.up;
+    vec3 far_right = far_height * aspect_ratio * camera.right;
+
+    near_plane.normal = camera.direction;
+    far_plane.normal = -camera.direction;
+    top_plane.normal = normalize(cross(far_center + far_up, camera.right));
+    bottom_plane.normal = normalize(cross(camera.right, far_center - far_up));
+    left_plane.normal = normalize(cross(far_center - far_right, camera.up));
+    right_plane.normal = normalize(cross(camera.up, far_center + far_right));
+
+    near_plane.distance = dot(camera.position + camera.near_distance * camera.direction, near_plane.normal);
+    far_plane.distance = dot(camera.position + far_center, far_plane.normal);
+    top_plane.distance = dot(camera.position, top_plane.normal);
+    bottom_plane.distance = dot(camera.position, bottom_plane.normal);
+    left_plane.distance = dot(camera.position, left_plane.normal);
+    right_plane.distance = dot(camera.position, right_plane.normal);
 }
