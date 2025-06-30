@@ -8,6 +8,7 @@
 #include "Camera.hpp"
 #include "Plane.hpp"
 #include "mesh/LineMesh.hpp"
+#include "mesh/TriangleMesh.hpp"
 
 /**
  * @struct Frustum
@@ -15,7 +16,7 @@
  */
 struct Frustum {
     Frustum(const Camera& camera, float aspect_ratio);
-    Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals = false);
+    Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, TriangleMesh& faces);
 
     void update(const Camera& camera, float aspect_ratio);
 

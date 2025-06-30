@@ -12,7 +12,7 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio) {
     update(camera, aspect_ratio);
 }
 
-Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool draw_normals) {
+Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, TriangleMesh& faces) {
     float tan_half_fov = std::tan(camera.fov / 2.0f);
 
     // Dimensions of the near/far quads divided by 2
@@ -42,79 +42,52 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& mesh, bool 
     left_plane.distance = dot(camera.position, left_plane.normal);
     right_plane.distance = dot(camera.position, right_plane.normal);
 
-    /* Mesh */
-    mesh.add_vertex(camera.position); // 0
+    /* Meshes */
+    const vec3 far_plane_corners[4] {
+        camera.position + far_center - far_right + far_up,
+        camera.position + far_center - far_right - far_up,
+        camera.position + far_center + far_right - far_up,
+        camera.position + far_center + far_right + far_up
+    };
 
-    mesh.add_vertex(camera.position + near_center - near_right + near_up); // 1
-    mesh.add_vertex(camera.position + near_center - near_right - near_up); // 2
-    mesh.add_vertex(camera.position + near_center + near_right - near_up); // 3
-    mesh.add_vertex(camera.position + near_center + near_right + near_up); // 4
+    lines.add_vertex(camera.position); // 0
 
-    mesh.add_vertex(camera.position + far_center - far_right + far_up); // 5
-    mesh.add_vertex(camera.position + far_center - far_right - far_up); // 6
-    mesh.add_vertex(camera.position + far_center + far_right - far_up); // 7
-    mesh.add_vertex(camera.position + far_center + far_right + far_up); // 8
+    lines.add_vertex(camera.position + near_center - near_right + near_up); // 1
+    lines.add_vertex(camera.position + near_center - near_right - near_up); // 2
+    lines.add_vertex(camera.position + near_center + near_right - near_up); // 3
+    lines.add_vertex(camera.position + near_center + near_right + near_up); // 4
 
-    mesh.add_line(0, 5);
-    mesh.add_line(0, 6);
-    mesh.add_line(0, 7);
-    mesh.add_line(0, 8);
+    lines.add_vertex(far_plane_corners[0]); // 5
+    lines.add_vertex(far_plane_corners[1]); // 6
+    lines.add_vertex(far_plane_corners[2]); // 7
+    lines.add_vertex(far_plane_corners[3]); // 8
 
-    mesh.add_line(1, 2);
-    mesh.add_line(2, 3);
-    mesh.add_line(3, 4);
-    mesh.add_line(4, 1);
+    lines.add_line(0, 5);
+    lines.add_line(0, 6);
+    lines.add_line(0, 7);
+    lines.add_line(0, 8);
 
-    mesh.add_line(5, 6);
-    mesh.add_line(6, 7);
-    mesh.add_line(7, 8);
-    mesh.add_line(8, 5);
+    lines.add_line(1, 2);
+    lines.add_line(2, 3);
+    lines.add_line(3, 4);
+    lines.add_line(4, 1);
 
-    if(draw_normals) {
-        const float normal_length = (camera.far_distance - camera.near_distance) / 3.0f;
+    lines.add_line(5, 6);
+    lines.add_line(6, 7);
+    lines.add_line(7, 8);
+    lines.add_line(8, 5);
 
-        // Near
-        vec3 pos = camera.near_distance * camera.direction;
-        vec3 color(0.5f, 0.5f, 1.0f);
-        mesh.add_vertex(pos, color);                                    // 9
-        mesh.add_vertex(pos + normal_length * camera.direction, color); // 10
-        mesh.add_line(9, 10);
+    faces.add_vertex(camera.position, vec3(), vec2()); // 0
+    faces.add_vertex(far_plane_corners[0], vec3(), vec2()); // 1
+    faces.add_vertex(far_plane_corners[1], vec3(), vec2()); // 2
+    faces.add_vertex(far_plane_corners[2], vec3(), vec2()); // 3
+    faces.add_vertex(far_plane_corners[3], vec3(), vec2()); // 4
 
-        // Far
-        pos = far_center;
-        color = vec3(0.5f, 0.5f, 0.0f);
-        mesh.add_vertex(pos, color);                                    // 11
-        mesh.add_vertex(pos - normal_length * camera.direction, color); // 12
-        mesh.add_line(11, 12);
-
-        // Top
-        pos = (far_center + far_up) / 2.0f;
-        color = vec3(0.5f, 1.0f, 0.5f);
-        mesh.add_vertex(pos, color);                                                                       // 13
-        mesh.add_vertex(pos + normal_length * normalize(cross(far_center + far_up, camera.right)), color); // 14
-        mesh.add_line(13, 14);
-
-        // Bottom
-        pos = (far_center - far_up) / 2.0f;
-        color = vec3(0.5f, 0.0f, 0.5f);
-        mesh.add_vertex(pos, color);                                                                       // 15
-        mesh.add_vertex(pos + normal_length * normalize(cross(camera.right, far_center - far_up)), color); // 16
-        mesh.add_line(15, 16);
-
-        // Left
-        pos = (far_center - far_right) / 2.0f;
-        color = vec3(0.0f, 0.5f, 0.5f);
-        mesh.add_vertex(pos, color);                                                                       // 17
-        mesh.add_vertex(pos + normal_length * normalize(cross(far_center - far_right, camera.up)), color); // 18
-        mesh.add_line(17, 18);
-
-        // Right
-        pos = (far_center + far_right) / 2.0f;
-        color = vec3(1.0f, 0.5f, 0.5f);
-        mesh.add_vertex(pos, color);                                                                       // 19
-        mesh.add_vertex(pos + normal_length * normalize(cross(camera.up, far_center + far_right)), color); // 20
-        mesh.add_line(19, 20);
-    }
+    faces.add_face(4, 3, 2, 1); // FAR
+    faces.add_triangle(1, 0, 4); // TOP
+    faces.add_triangle(0, 2, 3); // BOTTOM
+    faces.add_triangle(1, 2, 0); // LEFT
+    faces.add_triangle(4, 0, 3); // RIGHT
 }
 
 void Frustum::update(const Camera& camera, float aspect_ratio) {

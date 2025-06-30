@@ -10,6 +10,7 @@
 #include "EventHandler.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
+#include "culling/Frustum.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
@@ -81,7 +82,9 @@ private:
     unsigned int FBO;                ///< Frame Buffer Object.
     unsigned int RBO;                ///< Rendering Buffer Object.
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
-    LineMesh frustum_mesh;           ///< Mesh used to render the view frustum.
+    LineMesh frustum_lines;          ///< Mesh used to render the lines of the view frustum.
+    TriangleMesh frustum_faces;      ///< Mesh used to render the faces of the view frustum.
+    Frustum frustum;                 ///< The frustum used for culling.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
 

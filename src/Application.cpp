@@ -22,7 +22,7 @@ Application::Application()
       event_handler(window, &camera),
       camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 1024.0f),
       is_spying_enabled(true), spy_camera(vec3(30.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 2048.0f),
-      spy_camera_target(0.0f),
+      spy_camera_target(0.0f), frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -122,10 +122,10 @@ void Application::run() {
     /* Frustum Culling Tests */
     unsigned int objects_amount = 10'000;
 
-    Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
-    std::vector<FlatShadedMeshEntity*> test_spheres;
-    std::vector<SphereVolume> test_sphere_volumes(objects_amount, SphereVolume(vec3(0.0f), 1.0f));
-    test_spheres.reserve(objects_amount);
+    // Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
+    // std::vector<FlatShadedMeshEntity*> test_spheres;
+    // std::vector<SphereVolume> test_sphere_volumes(objects_amount, SphereVolume(vec3(0.0f), 1.0f));
+    // test_spheres.reserve(objects_amount);
 
     Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
     std::vector<FlatShadedMeshEntity*> test_boxes;
@@ -134,13 +134,13 @@ void Application::run() {
 
     for(unsigned int i = 0 ; i < objects_amount ; ++i) {
         // Sphere Volume
-        test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
-            "Frustum Test Sphere " + std::to_string(i),
-            &shaders.at("flat")));
-
-        create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
-        test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
-        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
+        // test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
+        //     "Frustum Test Sphere " + std::to_string(i),
+        //     &shaders.at("flat")));
+        //
+        // create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
+        // test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
+        // test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
 
         // AABB
         test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
@@ -194,17 +194,16 @@ void Application::run() {
         scene_graph.draw(view_projection);
 
         /* Frustum Tests */
-        frustum_mesh.clear();
-        Frustum frustum(camera, window.get_aspect_ratio(), frustum_mesh);
+        frustum.update(camera, window.get_aspect_ratio());
         for(unsigned int i = 0 ; i < objects_amount ; ++i) {
-            test_spheres[i]->color = test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)
-                                         ? normal_color
-                                         : culled_color;
+            // test_spheres[i]->color = test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)
+            //                              ? normal_color
+            //                              : culled_color;
             test_boxes[i]->color = test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)
                                        ? normal_color
                                        : culled_color;
 
-            test_spheres[i]->set_visibility(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform));
+            // test_spheres[i]->set_visibility(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform));
             test_boxes[i]->set_visibility(test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform));
         }
 
@@ -244,14 +243,29 @@ void Application::draw_background() {
 void Application::draw_spy_window() {
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     mat4 spy_view_projection = spy_camera.get_view_projection_matrix();
+    mat4 mvp = spy_view_projection * camera.get_model_matrix();
     scene_graph.draw(spy_view_projection);
 
-    const Shader& shader = shaders.at("line mesh");
-    shader.use();
-    shader.set_uniform("u_mvp", spy_view_projection);
-    frustum_mesh.draw(shader);
+    /* Lines */ {
+        const Shader& shader = shaders.at("line mesh");
+        shader.use();
+
+        glLineWidth(5);
+        shader.set_uniform("u_mvp", mvp);
+        frustum_lines.draw(shader);
+        glLineWidth(1);
+    }
+
+    /* Faces */ {
+        static const vec4 faces_color(0.0f, 0.0f, 1.0f, 0.2f);
+        const Shader& shader = shaders.at("flat");
+        shader.use();
+
+        shader.set_uniform("u_mvp", mvp);
+        shader.set_uniform("u_color", faces_color);
+        frustum_faces.draw(shader);
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
