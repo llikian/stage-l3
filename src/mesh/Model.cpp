@@ -240,3 +240,9 @@ void Model::draw(const Shader& shader) {
 void Model::apply_model_matrix(const mat4& model) {
     for(TriangleMesh& mesh : meshes) { mesh.apply_model_matrix(model); }
 }
+
+void Model::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
+    for(unsigned int i = 0 ; i < meshes.size() ; ++i) {
+        meshes[i].get_min_max_axis_aligned_coordinates(minimum, maximum);
+    }
+}

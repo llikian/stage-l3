@@ -65,6 +65,8 @@ public:
      */
     size_t get_vertices_amount() const override;
 
+    void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const override;
+
 private:
     /**
      * @brief Binds the OpenGL buffers.

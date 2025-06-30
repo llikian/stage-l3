@@ -39,6 +39,8 @@ public:
      */
     virtual size_t get_vertices_amount() const = 0;
 
+    virtual void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const = 0;
+
 protected:
     /**
      * @brief Binds the OpenGL buffers.

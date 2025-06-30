@@ -85,6 +85,8 @@ public:
      */
     size_t get_indices_amount() const;
 
+    void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const override;
+
     /**
      * @brief
      */

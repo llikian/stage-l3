@@ -45,6 +45,8 @@ public:
      */
     void apply_model_matrix(const mat4& model);
 
+    void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const;
+
 private:
     /**
      * @brief Parse a .obj file and reads all of its data into the model's buffers.

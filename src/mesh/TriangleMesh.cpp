@@ -75,6 +75,19 @@ size_t TriangleMesh::get_vertices_amount() const {
     return vertices.size();
 }
 
+void TriangleMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
+    for(unsigned int i = 0 ; i < vertices.size() ; ++i) {
+        const vec3& pos = vertices[i].position;
+        minimum.x = std::min(minimum.x, pos.x);
+        minimum.y = std::min(minimum.y, pos.y);
+        minimum.z = std::min(minimum.z, pos.z);
+
+        maximum.x = std::max(maximum.x, pos.x);
+        maximum.y = std::max(maximum.y, pos.y);
+        maximum.z = std::max(maximum.z, pos.z);
+    }
+}
+
 size_t TriangleMesh::get_indices_amount() const {
     return indices.size();
 }

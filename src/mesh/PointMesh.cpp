@@ -38,6 +38,19 @@ size_t PointMesh::get_vertices_amount() const {
     return vertices.size();
 }
 
+void PointMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
+    for(unsigned int i = 0 ; i < vertices.size() ; ++i) {
+        const vec3& pos = vertices[i].position;
+        minimum.x = std::min(minimum.x, pos.x);
+        minimum.y = std::min(minimum.y, pos.y);
+        minimum.z = std::min(minimum.z, pos.z);
+
+        maximum.x = std::max(maximum.x, pos.x);
+        maximum.y = std::max(maximum.y, pos.y);
+        maximum.z = std::max(maximum.z, pos.z);
+    }
+}
+
 void PointMesh::bind_buffers() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
