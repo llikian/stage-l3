@@ -168,7 +168,7 @@ void LineMeshEntity::draw(const mat4& view_projection_matrix) {
     }
 }
 
-FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec3& color)
+FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec4& color)
     : TriangleMeshEntity(name, shader), color(color) { }
 
 void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
@@ -178,7 +178,7 @@ void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
 
 void FlatShadedMeshEntity::add_to_object_editor() {
     TriangleMeshEntity::add_to_object_editor();
-    ImGui::ColorEdit3("Object color", &color.x);
+    ImGui::ColorEdit4("Object color", &color.x);
 }
 
 TerrainEntity::TerrainEntity(const std::string& name,

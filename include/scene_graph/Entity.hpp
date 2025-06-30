@@ -279,7 +279,7 @@ public:
      * @param shader A pointer to the shader used when rendering.
      * @param color The color the mesh should be rendered in.
      */
-    FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec3& color = vec3(1.0f));
+    FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec4& color = vec4(1.0f));
 
     /**
      * @brief Updates these uniforms if they exist in the shader:\n
@@ -306,7 +306,7 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_FLAT_SHADED_MESH; }
 
-    vec3 color; ///< The color the mesh should be rendered in.
+    vec4 color; ///< The color the mesh should be rendered in.
 };
 
 /**

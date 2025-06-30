@@ -103,6 +103,7 @@ void Application::run() {
     create_sphere_mesh(light->mesh, 8, 16);
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
+    const vec3& light_color = light->color;
 
     /* Models */
     // root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
@@ -116,10 +117,10 @@ void Application::run() {
 
     /* Other Entities */
     root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
-        ->set_visibility(true);
+        ->set_visibility(false);
 
     /* Frustum Culling Tests */
-    unsigned int objects_amount = 100;
+    unsigned int objects_amount = 10'000;
 
     Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
     std::vector<FlatShadedMeshEntity*> test_spheres;
@@ -151,8 +152,8 @@ void Application::run() {
         test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
     }
 
-    vec3 normal_color(0.0f, 1.0f, 0.0f);
-    vec3 culled_color(1.0f, 0.0f, 0.0f);
+    vec4 normal_color(0.0f, 1.0f, 0.0f, 1.0f);
+    vec4 culled_color(1.0f, 0.0f, 0.0f, 1.0f);
 
     /* Main Loop */
     while(!window.should_close()) {
@@ -176,7 +177,7 @@ void Application::run() {
             shader.use();
 
             shader.set_uniform("u_camera_position", camera_position);
-            shader.set_uniform("u_light_color", light->color);
+            shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
             shader.set_uniform("u_light_position", light_position);
         }
 
@@ -202,6 +203,9 @@ void Application::run() {
             test_boxes[i]->color = test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)
                                        ? normal_color
                                        : culled_color;
+
+            test_spheres[i]->set_visibility(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform));
+            test_boxes[i]->set_visibility(test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform));
         }
 
         if(is_spying_enabled) { draw_spy_window(); }
