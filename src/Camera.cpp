@@ -111,6 +111,23 @@ mat4 Camera::get_view_projection_matrix() const {
     return projection_matrix * view_matrix;
 }
 
+mat4 Camera::get_rotation_matrix() const {
+    return mat4(
+        right.x, up.x, -direction.x,
+        right.y, up.y, -direction.y,
+        right.z, up.z, -direction.z
+    );
+}
+
+mat4 Camera::get_model_matrix() const {
+    return mat4(
+        right.x, up.x, -direction.x, position.x,
+        right.y, up.y, -direction.y, position.y,
+        right.z, up.z, -direction.z, position.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+}
+
 void Camera::update_vectors_and_view_matrix() {
     direction.x = std::cos(pitch) * std::cos(yaw);
     direction.y = std::sin(pitch);
