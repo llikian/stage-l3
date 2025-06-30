@@ -25,7 +25,7 @@ bool SphereVolume::is_in_frustum(const Frustum& frustum, const Transform& transf
 }
 
 bool SphereVolume::is_in_or_above_plane(const Plane& plane) const {
-    return plane.get_signed_distance(center) > -radius;
+    return plane.get_signed_distance(center) >= -radius * 2.0f;
 }
 
 AABB::AABB() : center(0.0f, 0.0f, 0.0f), extents(0.0f, 0.0f, 0.0f) { }
@@ -57,8 +57,9 @@ bool AABB::is_in_frustum(const Frustum& frustum, const Transform& transform) {
 }
 
 bool AABB::is_in_or_above_plane(const Plane& plane) const {
-    float r = extents.x * std::abs(plane.normal.x)
-              + extents.y * std::abs(plane.normal.y)
-              + extents.z * std::abs(plane.normal.z);
-    return plane.get_signed_distance(center) >= -r;
+    return plane.get_signed_distance(center) >= -std::max({
+               extents.x * std::abs(plane.normal.x),
+               extents.y * std::abs(plane.normal.y),
+               extents.z * std::abs(plane.normal.z)
+           }) * 2.0f;
 }
