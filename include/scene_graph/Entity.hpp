@@ -7,6 +7,7 @@
 
 #include <list>
 #include "Transform.hpp"
+#include "culling/BoundingVolume.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/Terrain.hpp"
@@ -80,9 +81,10 @@ public:
 
     /**
      * @brief Check if the entity is drawable, draws it if it is and do the same thing for all children.
-     * @param view_projection_matrix 
+     * @param view_projection_matrix
+     * @param frustum
      */
-    void draw_drawables(const mat4& view_projection_matrix);
+    void draw_drawables(const mat4& view_projection_matrix, const Frustum& frustum);
 
     /**
      * @brief Returns whether this entity is drawable.
@@ -128,6 +130,8 @@ public:
      */
     DrawableEntity(const std::string& name, const Shader* shader);
 
+    ~DrawableEntity() override;
+
     /**
      * @brief Updates uniforms then draws the entity.
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
@@ -143,6 +147,8 @@ public:
      */
     virtual void update_uniforms(const mat4& view_projection_matrix);
 
+    virtual void create_aabb() = 0;
+
     /**
      * @brief Returns whether this entity is drawable.
      * @return true.
@@ -156,6 +162,11 @@ public:
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
     const Shader* shader; ///< A pointer to the shader used when rendering.
+    BoundingVolume* bounding_volume;
+
+    static inline unsigned int total_drawable_entities = 0;
+    static inline unsigned int total_not_hidden_entities = 0;
+    static inline unsigned int total_drawn_entities = 0;
 };
 
 /**
@@ -188,6 +199,8 @@ public:
      * - The model's materials: ambient, diffuse and specular colors, specular exponent
      */
     void add_to_object_editor() override;
+
+    void create_aabb() override;
 
     /**
      * @brief Returns the type of the entity.
@@ -227,6 +240,8 @@ public:
      * - The mesh's material: ambient, diffuse and specular colors, specular exponent
      */
     void add_to_object_editor() override;
+
+    void create_aabb() override;
 
     /**
      * @brief Returns the type of the entity.
@@ -337,6 +352,8 @@ public:
      * - The terrain's // TODO : update method and doc
      */
     void add_to_object_editor() override;
+
+    void create_aabb() override;
 
     /**
      * @brief Returns the type of the entity.

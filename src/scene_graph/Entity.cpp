@@ -5,6 +5,7 @@
 
 #include "scene_graph/Entity.hpp"
 
+#include <limits>
 #include "imgui.h"
 
 Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_hidden(false) { }
@@ -41,9 +42,27 @@ void Entity::force_update_transform_and_children() {
     for(Entity* child : children) { child->force_update_transform_and_children(); }
 }
 
-void Entity::draw_drawables(const mat4& view_projection_matrix) {
-    if(is_drawable()) { static_cast<DrawableEntity*>(this)->draw(view_projection_matrix); }
-    for(Entity* child : children) { child->draw_drawables(view_projection_matrix); }
+void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& frustum) {
+    if(is_drawable()) {
+        DrawableEntity::total_drawable_entities++;
+
+        if(!is_hidden) {
+            DrawableEntity::total_not_hidden_entities++;
+
+            DrawableEntity* entity = static_cast<DrawableEntity*>(this);
+            if(entity->bounding_volume != nullptr) {
+                if(entity->bounding_volume->is_in_frustum(frustum, transform)) {
+                    DrawableEntity::total_drawn_entities++;
+                    entity->draw(view_projection_matrix);
+                }
+            } else {
+                DrawableEntity::total_drawn_entities++;
+                entity->draw(view_projection_matrix);
+            }
+        }
+    }
+
+    for(Entity* child : children) { child->draw_drawables(view_projection_matrix, frustum); }
 }
 
 bool Entity::is_drawable() const {
@@ -66,7 +85,11 @@ void Entity::add_to_object_editor() {
 }
 
 DrawableEntity::DrawableEntity(const std::string& name, const Shader* shader)
-    : Entity(name), shader(shader) { }
+    : Entity(name), shader(shader), bounding_volume(nullptr) { }
+
+DrawableEntity::~DrawableEntity() {
+    delete bounding_volume;
+}
 
 void DrawableEntity::update_uniforms(const mat4& view_projection_matrix) {
     int u_mvp_location = shader->get_uniform_location("u_mvp");
@@ -91,8 +114,6 @@ ModelEntity::ModelEntity(const std::string& name, const Shader* shader, const st
     : DrawableEntity(name, shader), model(path) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) {
-    if(is_hidden) { return; }
-
     if(shader != nullptr) {
         shader->use();
         update_uniforms(view_projection_matrix);
@@ -125,12 +146,17 @@ void ModelEntity::add_to_object_editor() {
     }
 }
 
+void ModelEntity::create_aabb() {
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::min());
+    model.get_min_max_axis_aligned_coordinates(min, max);
+    bounding_volume = new AABB(min, max);
+}
+
 TriangleMeshEntity::TriangleMeshEntity(const std::string& name, const Shader* shader)
     : DrawableEntity(name, shader) { }
 
 void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
-    if(is_hidden) { return; }
-
     if(shader != nullptr) {
         shader->use();
         update_uniforms(view_projection_matrix);
@@ -153,12 +179,17 @@ void TriangleMeshEntity::add_to_object_editor() {
     }
 }
 
+void TriangleMeshEntity::create_aabb() {
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::min());
+    mesh.get_min_max_axis_aligned_coordinates(min, max);
+    bounding_volume = new AABB(min, max);
+}
+
 LineMeshEntity::LineMeshEntity(const std::string& name, const Shader* shader)
     : DrawableEntity(name, shader) { }
 
 void LineMeshEntity::draw(const mat4& view_projection_matrix) {
-    if(is_hidden) { return; }
-
     if(shader != nullptr) {
         shader->use();
         update_uniforms(view_projection_matrix);
@@ -188,8 +219,6 @@ TerrainEntity::TerrainEntity(const std::string& name,
     : DrawableEntity(name, &shader), terrain(shader, chunk_size, chunks_on_line) { }
 
 void TerrainEntity::draw(const mat4& view_projection_matrix) {
-    if(is_hidden) { return; }
-
     terrain.draw(view_projection_matrix);
 }
 
@@ -199,4 +228,8 @@ void TerrainEntity::add_to_object_editor() {
     if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
         for(Entity* child : children) { child->set_visibility(is_hidden); }
     }
+}
+
+void TerrainEntity::create_aabb() {
+    // TODO: aabb for terrain
 }

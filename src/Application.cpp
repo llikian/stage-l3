@@ -8,6 +8,7 @@
 #include <cmath>
 #include <ranges>
 #include <glad/glad.h>
+#include "debug.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -105,42 +106,47 @@ void Application::run() {
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec3& light_color = light->color;
 
-    /* Models */
-    // root->add_child<ModelEntity>("sponza", &shaders.at("blinn-phong"), "data/sponza/sponza.obj")
-    //     ->model.apply_model_matrix(scale(0.05f));
+    /* Models */ {
+        const Shader* shader = &shaders.at("blinn-phong");
 
-    // root->add_child<ModelEntity>("vokselia", &shaders.at("blinn-phong"), "data/vokselia_spawn/vokselia_spawn.obj")
-    //     ->model.apply_model_matrix(scale(100.0f));
+        // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
+        // sponza->model.apply_model_matrix(scale(0.05f));
+        // sponza->create_aabb();
 
-    // root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj")
-    //     ->model.apply_model_matrix(scale(0.05f));
+        ModelEntity* vokselia = root->add_child<ModelEntity>("vokselia", shader, "data/vokselia/vokselia_spawn.obj");
+        vokselia->model.apply_model_matrix(scale(100.0f));
+        vokselia->create_aabb();
 
+        // ModelEntity* bmw = root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj");
+        // bmw->model.apply_model_matrix(scale(0.05f));
+        // bmw->create_aabb();
+    }
     /* Other Entities */
     root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
         ->set_visibility(false);
 
     /* Frustum Culling Tests */
-    unsigned int objects_amount = 10'000;
+#ifdef DEBUG_ENABLE_FRUSTUM_TESTS
+    unsigned int objects_amount = 1'000;
 
     Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
     std::vector<FlatShadedMeshEntity*> test_spheres;
-    std::vector<SphereVolume> test_sphere_volumes(objects_amount, SphereVolume(vec3(0.0f), 1.0f));
     test_spheres.reserve(objects_amount);
 
     Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
     std::vector<FlatShadedMeshEntity*> test_boxes;
-    std::vector<AABB> test_AABBs(objects_amount, AABB(vec3(-1.0f), vec3(1.0f)));
     test_boxes.reserve(objects_amount);
 
     for(unsigned int i = 0 ; i < objects_amount ; ++i) {
         // Sphere Volume
-        test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
-            "Frustum Test Sphere " + std::to_string(i),
-            &shaders.at("flat")));
-
-        create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
-        test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
-        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
+        // test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
+        //     "Frustum Test Sphere " + std::to_string(i),
+        //     &shaders.at("flat")));
+        //
+        // create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
+        // test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
+        // test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
+        // test_spheres.back()->bounding_volume = new SphereVolume(vec3(0.0f), 1.0f);
 
         // AABB
         test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
@@ -150,14 +156,14 @@ void Application::run() {
         create_cube_mesh(test_boxes.back()->mesh);
         test_boxes.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
         test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
+        test_boxes.back()->create_aabb();
     }
-
-    vec4 normal_color(0.0f, 1.0f, 0.0f, 1.0f);
-    vec4 culled_color(1.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
     /* Main Loop */
     while(!window.should_close()) {
         event_handler.poll_and_handle_events();
+        frustum.update(camera, window.get_aspect_ratio());
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -191,21 +197,7 @@ void Application::run() {
             }
         }
 
-        scene_graph.draw(view_projection);
-
-        /* Frustum Tests */
-        frustum.update(camera, window.get_aspect_ratio());
-        for(unsigned int i = 0 ; i < objects_amount ; ++i) {
-            test_spheres[i]->color = test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform)
-                                         ? normal_color
-                                         : culled_color;
-            test_boxes[i]->color = test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform)
-                                       ? normal_color
-                                       : culled_color;
-
-            test_spheres[i]->set_visibility(test_sphere_volumes[i].is_in_frustum(frustum, test_spheres[i]->transform));
-            test_boxes[i]->set_visibility(test_AABBs[i].is_in_frustum(frustum, test_boxes[i]->transform));
-        }
+        scene_graph.draw(view_projection, frustum);
 
         if(is_spying_enabled) { draw_spy_window(); }
 
@@ -215,6 +207,11 @@ void Application::run() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         window.swap_buffers();
+
+        std::cout << "total_drawable_entities: " << DrawableEntity::total_drawable_entities << '\n';
+        std::cout << "total_not_hidden_entities: " << DrawableEntity::total_not_hidden_entities << '\n';
+        std::cout << "total_drawn_entities: " << DrawableEntity::total_drawn_entities << '\n';
+        std::cout << std::endl;
     }
 }
 
@@ -245,7 +242,8 @@ void Application::draw_spy_window() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mat4 spy_view_projection = spy_camera.get_view_projection_matrix();
     mat4 mvp = spy_view_projection * camera.get_model_matrix();
-    scene_graph.draw(spy_view_projection);
+
+    scene_graph.draw(spy_view_projection, frustum);
 
     /* Lines */ {
         const Shader& shader = shaders.at("line mesh");

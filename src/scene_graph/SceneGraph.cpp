@@ -56,6 +56,10 @@ void SceneGraph::add_selected_entity_editor_to_imgui_window() const {
     }
 }
 
-void SceneGraph::draw(const mat4& view_projection_matrix) {
-    root.draw_drawables(view_projection_matrix);
+void SceneGraph::draw(const mat4& view_projection_matrix, const Frustum& frustum) {
+    DrawableEntity::total_drawable_entities = 0;
+    DrawableEntity::total_not_hidden_entities = 0;
+    DrawableEntity::total_drawn_entities = 0;
+
+    root.draw_drawables(view_projection_matrix, frustum);
 }
