@@ -13,8 +13,8 @@ Entity::~Entity() {
     for(const Entity* child : children) { delete child; }
 }
 
-void Entity::set_visibility(bool is_hidden) {
-    this->is_hidden = is_hidden;
+void Entity::set_visibility(bool is_visible) {
+    is_hidden = !is_visible;
     for(Entity* child : children) { child->set_visibility(is_hidden); }
 }
 

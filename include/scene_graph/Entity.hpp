@@ -57,9 +57,9 @@ public:
 
     /**
      * @brief Changes the visibility for this entity and all its children.
-     * @param is_hidden Whether this entity and its children are hidden.
+     * @param is_visible Whether this entity and its children are visible.
      */
-    void set_visibility(bool is_hidden);
+    void set_visibility(bool is_visible);
 
     /**
      * @brief Toggles the visibility for this entity and sets all of its children's visibility to
