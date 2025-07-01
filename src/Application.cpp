@@ -23,8 +23,10 @@ Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
       camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 1024.0f),
-      is_spying_enabled(true), spy_camera(vec3(30.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 2048.0f),
-      spy_camera_target(0.0f), frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
+      is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
+      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), window.get_aspect_ratio(),
+                 camera.get_near_distance(), 2.0f * camera.get_far_distance()),
+      frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -55,7 +57,6 @@ Application::Application()
     create_axes_mesh(axes, 0.5f);
 
     /* ---- Framebuffer ---- */
-    spy_camera.look_at_point(spy_camera_target);
 
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
@@ -344,6 +345,11 @@ void Application::draw_imgui_debug_window() {
     ImGui::NewLine();
     ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
     if(is_spying_enabled) {
+        if(ImGui::DragFloat3("Spy Camera Position", &spy_camera_position.x)) {
+            spy_camera.set_position(spy_camera_position);
+            spy_camera.look_at_point(spy_camera_target);
+        }
+
         if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
             spy_camera.look_at_point(spy_camera_target);
         }

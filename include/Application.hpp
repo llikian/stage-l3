@@ -8,13 +8,13 @@
 #include <unordered_map>
 #include "Camera.hpp"
 #include "EventHandler.hpp"
+#include "SceneGraph.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "culling/Frustum.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
-#include "SceneGraph.hpp"
 
 /**
  * @class Application
@@ -77,8 +77,9 @@ private:
     Camera camera;          ///< The camera.
 
     bool is_spying_enabled;          ///< Whether the spying window is drawn.
-    Camera spy_camera;               ///< The camera used to test frustum culling.
+    vec3 spy_camera_position;        ///< The spy camera's position.
     vec3 spy_camera_target;          ///< Where the spy camera is looking at.
+    Camera spy_camera;               ///< The camera used to test frustum culling.
     unsigned int FBO;                ///< Frame Buffer Object.
     unsigned int RBO;                ///< Rendering Buffer Object.
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.

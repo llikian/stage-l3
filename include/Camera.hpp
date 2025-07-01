@@ -36,6 +36,22 @@ public:
     Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance);
 
     /**
+     * @brief Creates a camera at a specific position looking towards a specific point.
+     * @param position The position of the camera.
+     * @param target The point the camera is looking at.
+     * @param fov The camera's fov.
+     * @param aspect_ratio The window's aspect ratio.
+     * @param near_distance Distance of the near plane.
+     * @param far_distance Distance of the far plane.
+     */
+    Camera(const vec3& position,
+           const vec3& target,
+           float fov,
+           float aspect_ratio,
+           float near_distance,
+           float far_distance);
+
+    /**
      * @return The camera's position.
      */
     vec3 get_position() const;
@@ -98,6 +114,12 @@ public:
      * it to the camera's position
      */
     mat4 get_model_matrix() const;
+
+    /**
+     * @brief Sets the camera's position to a certain point.
+     * @param position The camera's new position.
+     */
+    void set_position(const vec3& position);
 
     /**
      * @brief Updates the camera's direction depending on how the mouse moved since the last frame.

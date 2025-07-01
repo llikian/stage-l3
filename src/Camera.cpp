@@ -22,6 +22,19 @@ Camera::Camera(const vec3& position, float fov, float aspect_ratio, float near_d
     update_vectors_and_view_matrix();
 }
 
+Camera::Camera(const vec3& position,
+               const vec3& target,
+               float fov,
+               float aspect_ratio,
+               float near_distance,
+               float far_distance)
+    : sensitivity(0.1f), movement_speed(100.0f),
+      position(position),
+      fov(fov), near_distance(near_distance), far_distance(far_distance),
+      view_matrix(1.0f), projection_matrix(perspective(fov, aspect_ratio, near_distance, far_distance)) {
+    look_at_point(target);
+}
+
 vec3 Camera::get_position() const {
     return position;
 }
@@ -126,6 +139,14 @@ mat4 Camera::get_model_matrix() const {
         right.z, up.z, -direction.z, position.z,
         0.0f, 0.0f, 0.0f, 1.0f
     );
+}
+
+void Camera::set_position(const vec3& position) {
+    this->position = position;
+
+    view_matrix(0, 3) = -dot(position, right);
+    view_matrix(1, 3) = -dot(position, up);
+    view_matrix(2, 3) = dot(position, direction);
 }
 
 void Camera::update_vectors_and_view_matrix() {
