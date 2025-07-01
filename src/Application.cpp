@@ -82,6 +82,7 @@ Application::Application()
 
     /* ---- Other ---- */
     // glfwSwapInterval(0); // disable vsync
+    glLineWidth(5);
 }
 
 Application::~Application() {
@@ -109,13 +110,13 @@ void Application::run() {
     /* Models */ {
         const Shader* shader = &shaders.at("blinn-phong");
 
-        // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
-        // sponza->model.apply_model_matrix(scale(0.05f));
-        // sponza->create_aabb();
+        ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
+        sponza->model.apply_model_matrix(scale(0.05f));
+        sponza->create_aabb();
 
-        ModelEntity* vokselia = root->add_child<ModelEntity>("vokselia", shader, "data/vokselia/vokselia_spawn.obj");
-        vokselia->model.apply_model_matrix(scale(100.0f));
-        vokselia->create_aabb();
+        // ModelEntity* vokselia = root->add_child<ModelEntity>("vokselia", shader, "data/vokselia/vokselia_spawn.obj");
+        // vokselia->model.apply_model_matrix(scale(100.0f));
+        // vokselia->create_aabb();
 
         // ModelEntity* bmw = root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj");
         // bmw->model.apply_model_matrix(scale(0.05f));
@@ -139,14 +140,14 @@ void Application::run() {
 
     for(unsigned int i = 0 ; i < objects_amount ; ++i) {
         // Sphere Volume
-        // test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
-        //     "Frustum Test Sphere " + std::to_string(i),
-        //     &shaders.at("flat")));
-        //
-        // create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
-        // test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
-        // test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
-        // test_spheres.back()->bounding_volume = new SphereVolume(vec3(0.0f), 1.0f);
+        test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
+            "Frustum Test Sphere " + std::to_string(i),
+            &shaders.at("flat")));
+
+        create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
+        test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
+        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
+        test_spheres.back()->bounding_volume = new SphereVolume(vec3(0.0f), 1.0f);
 
         // AABB
         test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
@@ -207,11 +208,6 @@ void Application::run() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         window.swap_buffers();
-
-        std::cout << "total_drawable_entities: " << DrawableEntity::total_drawable_entities << '\n';
-        std::cout << "total_not_hidden_entities: " << DrawableEntity::total_not_hidden_entities << '\n';
-        std::cout << "total_drawn_entities: " << DrawableEntity::total_drawn_entities << '\n';
-        std::cout << std::endl;
     }
 }
 
@@ -249,10 +245,8 @@ void Application::draw_spy_window() {
         const Shader& shader = shaders.at("line mesh");
         shader.use();
 
-        glLineWidth(5);
         shader.set_uniform("u_mvp", mvp);
         frustum_lines.draw(shader);
-        glLineWidth(1);
     }
 
     /* Faces */ {
@@ -316,10 +310,17 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
     ImGui::Text("delta: %fs", event_handler.get_delta());
 
+    ImGui::NewLine();
+    ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
+    ImGui::Text("Total Not Hidden Entities: %d", DrawableEntity::total_not_hidden_entities);
+    ImGui::Text("Total Drawn Entities: %d", DrawableEntity::total_drawn_entities);
+
+    ImGui::NewLine();
     ImGui::Text("Camera:");
     ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
     ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
 
+    ImGui::NewLine();
     ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
     if(is_spying_enabled) {
         if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
@@ -327,6 +328,7 @@ void Application::draw_imgui_debug_window() {
         }
     }
 
+    ImGui::NewLine();
     scene_graph.add_entity_to_imgui_node_tree(&scene_graph.root);
 
     ImGui::End();
