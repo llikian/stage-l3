@@ -23,6 +23,12 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
 void create_cube_mesh(TriangleMesh& mesh);
 
 /**
+ * @brief Creates a mesh representing a cube of side 1 using lines.
+ * @param mesh The mesh to create the wireframe cube in.
+ */
+void create_wireframe_cube_mesh(LineMesh& mesh);
+
+/**
  * @brief Creates a mesh representing a quad as follow:
  * \verbatim
  * A---D

@@ -97,6 +97,44 @@ void create_cube_mesh(TriangleMesh& mesh) {
     }
 }
 
+void create_wireframe_cube_mesh(LineMesh& mesh) {
+    mesh.add_vertex(vec3(1.0f, 1.0f, 1.0f));    // 0: TOP - RIGHT - FRONT
+    mesh.add_vertex(vec3(1.0f, 1.0f, -1.0f));   // 1: TOP - RIGHT - BACK
+    mesh.add_vertex(vec3(1.0f, -1.0f, 1.0f));   // 2: BOTTOM - RIGHT - FRONT
+    mesh.add_vertex(vec3(1.0f, -1.0f, -1.0f));  // 3: BOTTOM - RIGHT - BACK
+    mesh.add_vertex(vec3(-1.0f, 1.0f, 1.0f));   // 4: TOP - LEFT - FRONT
+    mesh.add_vertex(vec3(-1.0f, 1.0f, -1.0f));  // 5: TOP - LEFT - BACK
+    mesh.add_vertex(vec3(-1.0f, -1.0f, 1.0f));  // 6: BOTTOM - LEFT - FRONT
+    mesh.add_vertex(vec3(-1.0f, -1.0f, -1.0f)); // 7: BOTTOM - LEFT - BACK
+
+    // RIGHT  : (0, 2, 3, 1)
+    // LEFT   : (5, 7, 6, 4)
+    // TOP    : (5, 4, 0, 1)
+    // BOTTOM : (6, 7, 3, 2)
+    // FRONT  : (4, 6, 2, 0)
+    // BACK   : (1, 3, 7, 5)
+
+    // RIGHT
+    mesh.add_line(0, 2);
+    mesh.add_line(2, 3);
+    mesh.add_line(3, 1);
+    mesh.add_line(1, 0);
+
+    // LEFT
+    mesh.add_line(5, 7);
+    mesh.add_line(7, 6);
+    mesh.add_line(6, 4);
+    mesh.add_line(4, 5);
+
+    // FRONT
+    mesh.add_line(6, 2);
+    mesh.add_line(0, 4);
+
+    // BACK
+    mesh.add_line(3, 7);
+    mesh.add_line(5, 1);
+}
+
 void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
     const vec3 BA(A - B);
     const vec3 BC(C - B);
