@@ -8,20 +8,20 @@
 #include <limits>
 #include "imgui.h"
 
-Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_hidden(false) { }
+Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_visible(true) { }
 
 Entity::~Entity() {
     for(const Entity* child : children) { delete child; }
 }
 
 void Entity::set_visibility(bool is_visible) {
-    is_hidden = !is_visible;
-    for(Entity* child : children) { child->set_visibility(is_hidden); }
+    this->is_visible = is_visible;
+    for(Entity* child : children) { child->set_visibility(is_visible); }
 }
 
 void Entity::toggle_visibility() {
-    is_hidden = !is_hidden;
-    for(Entity* child : children) { child->set_visibility(is_hidden); }
+    is_visible = !is_visible;
+    for(Entity* child : children) { child->set_visibility(is_visible); }
 }
 
 void Entity::update_transform_and_children() {
@@ -46,7 +46,7 @@ void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& f
     if(is_drawable()) {
         DrawableEntity::total_drawable_entities++;
 
-        if(!is_hidden) {
+        if(is_visible) {
             DrawableEntity::total_not_hidden_entities++;
 
             DrawableEntity* entity = static_cast<DrawableEntity*>(this);
@@ -72,8 +72,8 @@ bool Entity::is_drawable() const {
 void Entity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
-    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
-        for(Entity* child : children) { child->set_visibility(is_hidden); }
+    if(ImGui::Checkbox("Is Object Visible", &is_visible)) {
+        for(Entity* child : children) { child->set_visibility(is_visible); }
     }
 
     bool is_dirty = ImGui::DragFloat3("Local Position", &transform.get_local_position_reference().x);
@@ -148,7 +148,7 @@ void ModelEntity::add_to_object_editor() {
 
 void ModelEntity::create_aabb() {
     vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::min());
+    vec3 max(std::numeric_limits<float>::lowest());
     model.get_min_max_axis_aligned_coordinates(min, max);
     bounding_volume = new AABB(min, max);
 }
@@ -181,7 +181,7 @@ void TriangleMeshEntity::add_to_object_editor() {
 
 void TriangleMeshEntity::create_aabb() {
     vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::min());
+    vec3 max(std::numeric_limits<float>::lowest());
     mesh.get_min_max_axis_aligned_coordinates(min, max);
     bounding_volume = new AABB(min, max);
 }
@@ -197,6 +197,13 @@ void LineMeshEntity::draw(const mat4& view_projection_matrix) {
     } else {
         std::cout << "[WARNING] LineMeshEntity '" << name << "' with nullptr shader.\n";
     }
+}
+
+void LineMeshEntity::create_aabb() {
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    mesh.get_min_max_axis_aligned_coordinates(min, max);
+    bounding_volume = new AABB(min, max);
 }
 
 FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec4& color)
@@ -225,8 +232,8 @@ void TerrainEntity::draw(const mat4& view_projection_matrix) {
 void TerrainEntity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
-    if(ImGui::Checkbox("Is Object Hidden", &is_hidden)) {
-        for(Entity* child : children) { child->set_visibility(is_hidden); }
+    if(ImGui::Checkbox("Is Object Visible", &is_visible)) {
+        for(Entity* child : children) { child->set_visibility(is_visible); }
     }
 }
 

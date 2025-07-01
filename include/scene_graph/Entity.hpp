@@ -113,7 +113,7 @@ public:
     Transform transform;         ///< The entity's transform.
 
 protected:
-    bool is_hidden; ///< Whether the mesh is hidden: it should not be drawn.
+    bool is_visible; ///< Whether the mesh is hidden: it should not be drawn.
 };
 
 /**
@@ -271,6 +271,8 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
     void draw(const mat4& view_projection_matrix) override;
+
+    void create_aabb() override;
 
     /**
      * @brief Returns the type of the entity.
