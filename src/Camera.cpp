@@ -47,7 +47,7 @@ float Camera::get_near_distance() const {
 }
 
 float Camera::get_far_distance() const {
-    return near_distance;
+    return far_distance;
 }
 
 const mat4& Camera::get_view_matrix() const {
