@@ -13,7 +13,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "culling/BoundingVolume.hpp"
-#include "entities/entities.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
@@ -23,10 +22,10 @@ Application::Application()
     : window("Projet Stage L3", this),
       event_handler(window, &camera),
       camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 1024.0f),
+      frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
       is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
       spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), window.get_aspect_ratio(),
                  camera.get_near_distance(), 2.0f * camera.get_far_distance()),
-      frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -53,11 +52,15 @@ Application::Application()
                });
 
     /* ---- Meshes ---- */
+    create_pyramid_mesh(spy_camera_mesh,
+                        vec3(1.0f, 1.0f, -1.0f),
+                        vec3(1.0f, -1.0f, -1.0f),
+                        vec3(-1.0f, -1.0f, -1.0f),
+                        1.0f);
     create_quad_mesh(screen, vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     create_axes_mesh(axes, 0.5f);
 
     /* ---- Framebuffer ---- */
-
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
@@ -199,6 +202,20 @@ void Application::run() {
             }
         }
 
+        /* Flat Shader */ {
+            const Shader& shader = shaders.at("flat");
+            shader.use();
+
+            if(is_spying_enabled) {
+                shader.set_uniform("u_mvp", view_projection * spy_camera.get_model_matrix().scale(1024.0f));
+                // shader.set_uniform("u_mvp", view_projection );
+                shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
+                glLineWidth(3.0f);
+                spy_camera_mesh.draw(shader);
+                glLineWidth(1.0f);
+            }
+        }
+
         /* Terrain Shader */
         if(terrain->get_visibility()) {
             const Shader& shader = shaders.at("terrain");
@@ -265,10 +282,10 @@ void Application::draw_spy_window() {
         const Shader& shader = shaders.at("line mesh");
         shader.use();
 
-        glLineWidth(5);
+        glLineWidth(5.0f);
         shader.set_uniform("u_mvp", mvp);
         frustum_lines.draw(shader);
-        glLineWidth(1);
+        glLineWidth(1.0f);
     }
 
     /* Faces */ {

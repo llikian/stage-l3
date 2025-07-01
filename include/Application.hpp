@@ -12,6 +12,7 @@
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "culling/Frustum.hpp"
+#include "entities/entities.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
@@ -76,16 +77,18 @@ private:
     SceneGraph scene_graph; ///< Scene graph.
     Camera camera;          ///< The camera.
 
+    /* Frustum Culling */
+    LineMesh frustum_lines;          ///< Mesh used to render the lines of the view frustum.
+    TriangleMesh frustum_faces;      ///< Mesh used to render the faces of the view frustum.
+    Frustum frustum;                 ///< The frustum used for culling.
     bool is_spying_enabled;          ///< Whether the spying window is drawn.
     vec3 spy_camera_position;        ///< The spy camera's position.
     vec3 spy_camera_target;          ///< Where the spy camera is looking at.
     Camera spy_camera;               ///< The camera used to test frustum culling.
+    LineMesh spy_camera_mesh;        ///< Mesh used to show where the spy camera is.
     unsigned int FBO;                ///< Frame Buffer Object.
     unsigned int RBO;                ///< Rendering Buffer Object.
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
-    LineMesh frustum_lines;          ///< Mesh used to render the lines of the view frustum.
-    TriangleMesh frustum_faces;      ///< Mesh used to render the faces of the view frustum.
-    Frustum frustum;                 ///< The frustum used for culling.
 
     std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
 
