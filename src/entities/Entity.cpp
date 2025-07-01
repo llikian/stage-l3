@@ -19,6 +19,10 @@ void Entity::set_visibility(bool is_visible) {
     for(Entity* child : children) { child->set_visibility(is_visible); }
 }
 
+bool Entity::get_visibility() const {
+    return is_visible;
+}
+
 void Entity::toggle_visibility() {
     is_visible = !is_visible;
     for(Entity* child : children) { child->set_visibility(is_visible); }

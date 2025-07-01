@@ -60,6 +60,11 @@ public:
     void set_visibility(bool is_visible);
 
     /**
+     * @return Whether the entity is visible.
+     */
+    bool get_visibility() const;
+
+    /**
      * @brief Toggles the visibility for this entity and sets all of its children's visibility to
      * the same value.
      */
@@ -110,5 +115,5 @@ public:
     Transform transform;         ///< The entity's transform.
 
 protected:
-    bool is_visible; ///< Whether the mesh is hidden: it should not be drawn.
+    bool is_visible; ///< Whether the entity is visible.
 };
