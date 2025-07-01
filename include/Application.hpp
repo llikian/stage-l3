@@ -14,7 +14,7 @@
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
-#include "scene_graph/SceneGraph.hpp"
+#include "SceneGraph.hpp"
 
 /**
  * @class Application

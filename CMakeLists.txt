@@ -23,6 +23,7 @@ set(SOURCES
         src/Camera.cpp
         src/EventHandler.cpp
         src/Image.cpp
+        src/SceneGraph.cpp
         src/Shader.cpp
         src/Texture.cpp
         src/Window.cpp
@@ -32,11 +33,21 @@ set(SOURCES
         src/culling/Frustum.cpp
         src/culling/Plane.cpp
 
+        # Entities Module
+        src/entities/DrawableEntity.cpp
+        src/entities/Entity.cpp
+        src/entities/FlatShadedMeshEntity.cpp
+        src/entities/LineMeshEntity.cpp
+        src/entities/ModelEntity.cpp
+        src/entities/TerrainEntity.cpp
+        src/entities/TriangleMeshEntity.cpp
+
         # Maths Module
         src/maths/functions.cpp
         src/maths/geometry.cpp
         src/maths/mat3.cpp
         src/maths/mat4.cpp
+        src/maths/Transform.cpp
         src/maths/transforms.cpp
         src/maths/trigonometry.cpp
 
@@ -49,11 +60,6 @@ set(SOURCES
         src/mesh/primitives.cpp
         src/mesh/Terrain.cpp
         src/mesh/TriangleMesh.cpp
-
-        # Scene Graph Module
-        src/scene_graph/Entity.cpp
-        src/scene_graph/SceneGraph.cpp
-        src/scene_graph/Transform.cpp
 
         # Utility Module
         src/utility/hash.cpp

@@ -3,9 +3,9 @@
  * @brief Implementation of the SceneGraph class
  **************************************************************************************************/
 
-#include "scene_graph/SceneGraph.hpp"
-
+#include "SceneGraph.hpp"
 #include "imgui.h"
+#include "entities/DrawableEntity.hpp"
 
 SceneGraph::SceneGraph() : root("Scene Graph"), selected_entity(nullptr) { }
 

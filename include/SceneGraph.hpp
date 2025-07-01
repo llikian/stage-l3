@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "scene_graph/Entity.hpp"
+#include "entities/Entity.hpp"
 
 /**
  * @class SceneGraph

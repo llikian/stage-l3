@@ -13,6 +13,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "culling/BoundingVolume.hpp"
+#include "entities/entities.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
