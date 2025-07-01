@@ -7,21 +7,27 @@
 
 #include "maths/geometry.hpp"
 
+bool BoundingVolume::is_in_frustum(const Frustum& frustum) const {
+    return is_in_or_above_plane(frustum.left_plane) &&
+           is_in_or_above_plane(frustum.right_plane) &&
+           is_in_or_above_plane(frustum.top_plane) &&
+           is_in_or_above_plane(frustum.bottom_plane) &&
+           is_in_or_above_plane(frustum.near_plane) &&
+           is_in_or_above_plane(frustum.far_plane);
+}
+
 SphereVolume::SphereVolume() : center(0.0f, 0.0f, 0.0f), radius(1.0f) { }
 
 SphereVolume::SphereVolume(const vec3& center, float radius) : center(center), radius(radius) { }
 
-bool SphereVolume::is_in_frustum(const Frustum& frustum, const Transform& transform) {
+SphereVolume SphereVolume::get_global_volumue(const Transform& transform) const {
     const vec3 global_scale = transform.get_global_scale();
     const float max_scale = std::max({ global_scale.x, global_scale.y, global_scale.z });
-    const SphereVolume global_sphere(transform.get_global_model() * vec4(center, 1.0f), radius * max_scale * 0.5f);
+    return SphereVolume(transform.get_global_model() * vec4(center, 1.0f), radius * max_scale * 0.5f);
+}
 
-    return global_sphere.is_in_or_above_plane(frustum.left_plane) &&
-           global_sphere.is_in_or_above_plane(frustum.right_plane) &&
-           global_sphere.is_in_or_above_plane(frustum.top_plane) &&
-           global_sphere.is_in_or_above_plane(frustum.bottom_plane) &&
-           global_sphere.is_in_or_above_plane(frustum.near_plane) &&
-           global_sphere.is_in_or_above_plane(frustum.far_plane);
+bool SphereVolume::is_in_frustum(const Frustum& frustum, const Transform& transform) const {
+    return get_global_volumue(transform).BoundingVolume::is_in_frustum(frustum);
 }
 
 bool SphereVolume::is_in_or_above_plane(const Plane& plane) const {
@@ -38,22 +44,19 @@ AABB::AABB(const vec3& center, float extent_x, float extent_y, float extent_z)
     : center(center),
       extents(extent_x, extent_y, extent_z) { }
 
-bool AABB::is_in_frustum(const Frustum& frustum, const Transform& transform) {
+AABB AABB::get_global_volumue(const Transform& transform) const {
     const vec3 front = extents.z * transform.get_front_vector();
     const vec3 right = extents.x * transform.get_right_vector();
     const vec3 up = extents.y * transform.get_up_vector();
 
-    const AABB global_AABB(transform.get_global_model() * vec4(center, 1.0f),
-                           std::abs(front.x) + std::abs(right.x) + std::abs(up.x),
-                           std::abs(front.y) + std::abs(right.y) + std::abs(up.y),
-                           std::abs(front.z) + std::abs(right.z) + std::abs(up.z));
+    return AABB(transform.get_global_model() * vec4(center, 1.0f),
+                std::abs(front.x) + std::abs(right.x) + std::abs(up.x),
+                std::abs(front.y) + std::abs(right.y) + std::abs(up.y),
+                std::abs(front.z) + std::abs(right.z) + std::abs(up.z));
+}
 
-    return global_AABB.is_in_or_above_plane(frustum.left_plane) &&
-           global_AABB.is_in_or_above_plane(frustum.right_plane) &&
-           global_AABB.is_in_or_above_plane(frustum.top_plane) &&
-           global_AABB.is_in_or_above_plane(frustum.bottom_plane) &&
-           global_AABB.is_in_or_above_plane(frustum.near_plane) &&
-           global_AABB.is_in_or_above_plane(frustum.far_plane);
+bool AABB::is_in_frustum(const Frustum& frustum, const Transform& transform) const {
+    return get_global_volumue(transform).BoundingVolume::is_in_frustum(frustum);
 }
 
 bool AABB::is_in_or_above_plane(const Plane& plane) const {
