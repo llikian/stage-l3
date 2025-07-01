@@ -97,7 +97,7 @@ public:
     const mat4& get_projection_matrix() const;
 
     /**
-     * @brief Calculates the view projection matrix.
+     * @brief Calculates the view-projection matrix.
      * @return The projection matrix multiplied by the view matrix.
      */
     mat4 get_view_projection_matrix() const;
@@ -111,7 +111,7 @@ public:
     /**
      * @brief Calculates the camera's model matrix.
      * @return A transformation matrix that rotates towards where the camera is looking and translates
-     * it to the camera's position
+     * it to the camera's position.
      */
     mat4 get_model_matrix() const;
 

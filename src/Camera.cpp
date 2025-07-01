@@ -71,6 +71,55 @@ const mat4& Camera::get_projection_matrix() const {
     return projection_matrix;
 }
 
+mat4 Camera::get_view_projection_matrix() const {
+    return mat4(
+        projection_matrix(0, 0) * view_matrix(0, 0),
+        projection_matrix(0, 0) * view_matrix(0, 1),
+        projection_matrix(0, 0) * view_matrix(0, 2),
+        projection_matrix(0, 0) * view_matrix(0, 3),
+
+        projection_matrix(1, 1) * view_matrix(1, 0),
+        projection_matrix(1, 1) * view_matrix(1, 1),
+        projection_matrix(1, 1) * view_matrix(1, 2),
+        projection_matrix(1, 1) * view_matrix(1, 3),
+
+        projection_matrix(2, 2) * view_matrix(2, 0),
+        projection_matrix(2, 2) * view_matrix(2, 1),
+        projection_matrix(2, 2) * view_matrix(2, 2),
+        projection_matrix(2, 2) * view_matrix(2, 3) + projection_matrix(2, 3),
+
+        -view_matrix(2, 0),
+        -view_matrix(2, 1),
+        -view_matrix(2, 2),
+        -view_matrix(2, 3)
+    );
+}
+
+mat4 Camera::get_rotation_matrix() const {
+    return mat4(
+        right.x, up.x, -direction.x,
+        right.y, up.y, -direction.y,
+        right.z, up.z, -direction.z
+    );
+}
+
+mat4 Camera::get_model_matrix() const {
+    return mat4(
+        right.x, up.x, -direction.x, position.x,
+        right.y, up.y, -direction.y, position.y,
+        right.z, up.z, -direction.z, position.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+}
+
+void Camera::set_position(const vec3& position) {
+    this->position = position;
+
+    view_matrix(0, 3) = -dot(position, right);
+    view_matrix(1, 3) = -dot(position, up);
+    view_matrix(2, 3) = dot(position, direction);
+}
+
 void Camera::look_around(float pitch_offset, float yaw_offset) {
     static const float MAX_TILT_ANGLE = degrees_to_radians(80.0f);
 
@@ -118,35 +167,6 @@ void Camera::look_at_point(const vec3& target) {
     pitch = asinf(dir.y);
     yaw = atan2f(dir.z, dir.x);
     update_vectors_and_view_matrix();
-}
-
-mat4 Camera::get_view_projection_matrix() const {
-    return projection_matrix * view_matrix;
-}
-
-mat4 Camera::get_rotation_matrix() const {
-    return mat4(
-        right.x, up.x, -direction.x,
-        right.y, up.y, -direction.y,
-        right.z, up.z, -direction.z
-    );
-}
-
-mat4 Camera::get_model_matrix() const {
-    return mat4(
-        right.x, up.x, -direction.x, position.x,
-        right.y, up.y, -direction.y, position.y,
-        right.z, up.z, -direction.z, position.z,
-        0.0f, 0.0f, 0.0f, 1.0f
-    );
-}
-
-void Camera::set_position(const vec3& position) {
-    this->position = position;
-
-    view_matrix(0, 3) = -dot(position, right);
-    view_matrix(1, 3) = -dot(position, up);
-    view_matrix(2, 3) = dot(position, direction);
 }
 
 void Camera::update_vectors_and_view_matrix() {
