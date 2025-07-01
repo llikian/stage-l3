@@ -3,7 +3,7 @@
  * @brief Implementation of the Transform class
  **************************************************************************************************/
 
-#include "../../include/maths/Transform.hpp"
+#include "maths/Transform.hpp"
 
 #include "maths/geometry.hpp"
 

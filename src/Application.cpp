@@ -6,13 +6,13 @@
 #include "Application.hpp"
 
 #include <cmath>
-#include <ranges>
 #include <glad/glad.h>
+#include <ranges>
 #include "debug.hpp"
+#include "entities/entities.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "culling/BoundingVolume.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
@@ -134,26 +134,11 @@ void Application::run() {
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     unsigned int objects_amount = 1'000;
 
-    Entity* test_spheres_root = root->add_child<Entity>("Frustum Test Spheres");
-    std::vector<FlatShadedMeshEntity*> test_spheres;
-    test_spheres.reserve(objects_amount);
-
     Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
     std::vector<FlatShadedMeshEntity*> test_boxes;
     test_boxes.reserve(objects_amount);
 
     for(unsigned int i = 0 ; i < objects_amount ; ++i) {
-        // Sphere Volume
-        test_spheres.emplace_back(test_spheres_root->add_child<FlatShadedMeshEntity>(
-            "Frustum Test Sphere " + std::to_string(i),
-            &shaders.at("flat")));
-
-        create_sphere_mesh(test_spheres.back()->mesh, 16, 32);
-        test_spheres.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
-        test_spheres.back()->transform.set_local_scale(Random::get_float(1.0f, 10.0f));
-        test_spheres.back()->bounding_volume = new SphereVolume(vec3(0.0f), 1.0f);
-
-        // AABB
         test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
             "Frustum Test AABB " + std::to_string(i),
             &shaders.at("flat")));

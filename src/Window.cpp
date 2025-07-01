@@ -5,8 +5,8 @@
 
 #include "Window.hpp"
 
-#include <unordered_set>
 #include <glad/glad.h>
+#include <unordered_set>
 
 static void glfw_error_callback(int code, const char* message) {
     std::cerr << "GLFW Error '" << code << "' : " << message << '\n';

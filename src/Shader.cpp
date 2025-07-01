@@ -6,8 +6,8 @@
 #include "Shader.hpp"
 
 #include <fstream>
-#include <sstream>
 #include <glad/glad.h>
+#include <sstream>
 
 #ifdef DEBUG
 #include "debug.hpp"

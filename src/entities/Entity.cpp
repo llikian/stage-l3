@@ -5,8 +5,8 @@
 
 #include "entities/Entity.hpp"
 
-#include "imgui.h"
 #include "entities/DrawableEntity.hpp"
+#include "imgui.h"
 
 Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_visible(true) { }
 

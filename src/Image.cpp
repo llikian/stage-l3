@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "stb_image.h"
 #include "glad/glad.h"
+#include "stb_image.h"
 
 Image::Image(const std::string& path) {
     stbi_set_flip_vertically_on_load(true);

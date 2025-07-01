@@ -9,8 +9,8 @@
 #include <queue>
 #include <unordered_map>
 #include "Camera.hpp"
-#include "Window.hpp"
 #include "maths/vec2.hpp"
+#include "Window.hpp"
 
 using Action = std::function<void()>;
 

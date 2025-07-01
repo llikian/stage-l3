@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Frustum.hpp"
-#include "../maths/Transform.hpp"
+#include "maths/Transform.hpp"
 
 /**
  * @struct BoundingVolume

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "TriangleMesh.hpp"
 #include "culling/Frustum.hpp"
+#include "TriangleMesh.hpp"
 
 /**
  * @class Terrain

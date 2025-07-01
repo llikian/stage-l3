@@ -7,15 +7,14 @@
 
 #include <unordered_map>
 #include "Camera.hpp"
-#include "EventHandler.hpp"
-#include "SceneGraph.hpp"
-#include "Shader.hpp"
-#include "Window.hpp"
 #include "culling/Frustum.hpp"
-#include "entities/entities.hpp"
+#include "EventHandler.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/TriangleMesh.hpp"
+#include "SceneGraph.hpp"
+#include "Shader.hpp"
+#include "Window.hpp"
 
 /**
  * @class Application

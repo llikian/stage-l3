@@ -5,6 +5,7 @@
 
 #include "mesh/Model.hpp"
 
+#include <fstream>
 #include <ranges>
 #include "maths/geometry.hpp"
 #include "utility/hash.hpp"

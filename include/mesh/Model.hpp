@@ -6,13 +6,11 @@
 #pragma once
 
 #include <filesystem>
-#include <fstream>
-#include <list>
 #include <vector>
 #include "Material.hpp"
+#include "maths/vec3.hpp"
 #include "Shader.hpp"
 #include "TriangleMesh.hpp"
-#include "maths/vec3.hpp"
 
 /**
  * @class Model

@@ -4,8 +4,9 @@
  **************************************************************************************************/
 
 #include "SceneGraph.hpp"
-#include "imgui.h"
+
 #include "entities/DrawableEntity.hpp"
+#include "imgui.h"
 
 SceneGraph::SceneGraph() : root("Scene Graph"), selected_entity(nullptr) { }
 

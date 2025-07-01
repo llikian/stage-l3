@@ -6,9 +6,9 @@
 #pragma once
 
 #include "Camera.hpp"
-#include "Plane.hpp"
 #include "mesh/LineMesh.hpp"
 #include "mesh/TriangleMesh.hpp"
+#include "Plane.hpp"
 
 /**
  * @struct Frustum
