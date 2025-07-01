@@ -159,3 +159,24 @@ void create_axes_mesh(LineMesh& mesh, float length) {
         mesh.add_vertex(length * axis, axis);
     }
 }
+
+void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
+    const vec3 BA = A - B;
+    const vec3 BC = C - B;
+
+    mesh.add_vertex(0.5f * (A + C) + height * normalize(cross(BA, BC)));
+    mesh.add_vertex(A);
+    mesh.add_vertex(B);
+    mesh.add_vertex(C);
+    mesh.add_vertex(B + BA + BC);
+
+    mesh.add_line(0, 1);
+    mesh.add_line(0, 2);
+    mesh.add_line(0, 3);
+    mesh.add_line(0, 4);
+
+    mesh.add_line(1, 2);
+    mesh.add_line(2, 3);
+    mesh.add_line(3, 4);
+    mesh.add_line(4, 1);
+}

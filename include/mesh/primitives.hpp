@@ -54,3 +54,15 @@ void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const ve
  * @param length The length of the axes.
  */
 void create_axes_mesh(LineMesh& mesh, float length);
+
+/**
+ * @brief Creates a mesh representing a wireframe pyramid, the fourth point of the base is calculated
+ * to ensure that the all four points in the base are coplanar and the apex is also calculated using
+ * the base's normal.
+ * @param mesh The mesh to create the pyramid in.
+ * @param A The upper left point of the base.
+ * @param B The lower left point of the base.
+ * @param C The lower right point of the base.
+ * @param height How far the pyramid's apex should be from the base.
+ */
+void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height);
