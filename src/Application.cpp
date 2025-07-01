@@ -83,7 +83,6 @@ Application::Application()
 
     /* ---- Other ---- */
     // glfwSwapInterval(0); // disable vsync
-    glLineWidth(5);
 }
 
 Application::~Application() {
@@ -111,9 +110,9 @@ void Application::run() {
     /* Models */ {
         const Shader* shader = &shaders.at("blinn-phong");
 
-        ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
-        sponza->model.apply_model_matrix(scale(0.05f));
-        sponza->create_aabb();
+        // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
+        // sponza->model.apply_model_matrix(scale(0.05f));
+        // sponza->create_aabb();
 
         // ModelEntity* vokselia = root->add_child<ModelEntity>("vokselia", shader, "data/vokselia/vokselia_spawn.obj");
         // vokselia->model.apply_model_matrix(scale(100.0f));
@@ -123,9 +122,9 @@ void Application::run() {
         // bmw->model.apply_model_matrix(scale(0.05f));
         // bmw->create_aabb();
     }
+
     /* Other Entities */
-    root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128)
-        ->set_visibility(false);
+    TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128);
 
     /* Frustum Culling Tests */
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
@@ -178,7 +177,7 @@ void Application::run() {
 
         root->update_transform_and_children();
 
-        // draw_background();
+        draw_background();
 
         /* Blinn-Phong Shader */ {
             const Shader& shader = shaders.at("blinn-phong");
@@ -197,6 +196,25 @@ void Application::run() {
                 shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
                 axes.draw(shader);
             }
+        }
+
+        /* Terrain Shader */
+        if(terrain->get_visibility()) {
+            const Shader& shader = shaders.at("terrain");
+            shader.use();
+
+            shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
+            shader.set_uniform("u_frustum.near_plane.distance", frustum.near_plane.distance);
+            shader.set_uniform("u_frustum.far_plane.normal", frustum.far_plane.normal);
+            shader.set_uniform("u_frustum.far_plane.distance", frustum.far_plane.distance);
+            shader.set_uniform("u_frustum.top_plane.normal", frustum.top_plane.normal);
+            shader.set_uniform("u_frustum.top_plane.distance", frustum.top_plane.distance);
+            shader.set_uniform("u_frustum.bottom_plane.normal", frustum.bottom_plane.normal);
+            shader.set_uniform("u_frustum.bottom_plane.distance", frustum.bottom_plane.distance);
+            shader.set_uniform("u_frustum.left_plane.normal", frustum.left_plane.normal);
+            shader.set_uniform("u_frustum.left_plane.distance", frustum.left_plane.distance);
+            shader.set_uniform("u_frustum.right_plane.normal", frustum.right_plane.normal);
+            shader.set_uniform("u_frustum.right_plane.distance", frustum.right_plane.distance);
         }
 
         scene_graph.draw(view_projection, frustum);
@@ -246,8 +264,10 @@ void Application::draw_spy_window() {
         const Shader& shader = shaders.at("line mesh");
         shader.use();
 
+        glLineWidth(5);
         shader.set_uniform("u_mvp", mvp);
         frustum_lines.draw(shader);
+        glLineWidth(1);
     }
 
     /* Faces */ {

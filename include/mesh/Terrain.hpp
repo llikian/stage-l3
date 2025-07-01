@@ -6,6 +6,7 @@
 #pragma once
 
 #include "TriangleMesh.hpp"
+#include "culling/Frustum.hpp"
 
 /**
  * @class Terrain
@@ -17,6 +18,7 @@ public:
     ~Terrain();
 
     void draw(const mat4& view_projection) const;
+    void draw(const Frustum& frustum, const mat4& view_projection) const;
 
 private:
     unsigned int get_index(unsigned int x, unsigned int y) const;
