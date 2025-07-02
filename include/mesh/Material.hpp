@@ -22,11 +22,6 @@ struct Material {
     explicit Material(const std::string& name);
 
     /**
-     * @brief Frees all textures.
-     */
-    void free();
-
-    /**
      * @brief Updates a shader's values with the material's data.
      * @param shader The shader whose uniforms need to be updated.
      */

@@ -27,11 +27,6 @@ public:
     explicit Model(const std::filesystem::path& path);
 
     /**
-     * @brief Frees all materials.
-     */
-    ~Model();
-
-    /**
      * @brief Performs a draw call for each of the model's meshes with a certain shader.
      * @param shader The shader to perform the draw calls with.
      */
