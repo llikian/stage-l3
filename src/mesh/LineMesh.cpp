@@ -105,6 +105,8 @@ void LineMesh::apply_model_matrix(const mat4& model) {
         vertex.position.y = model(1, 0) * vec.x + model(1, 1) * vec.y + model(1, 2) * vec.z + model(1, 3);
         vertex.position.z = model(2, 0) * vec.x + model(2, 1) * vec.y + model(2, 2) * vec.z + model(2, 3);
     }
+
+    bind_buffers();
 }
 
 void LineMesh::add_vertex(const Vertex& vertex) {

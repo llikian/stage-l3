@@ -112,6 +112,8 @@ void TriangleMesh::apply_model_matrix(const mat4& model) {
 
         vertex.normal = normalize(normals_model * vertex.normal);
     }
+
+    bind_buffers();
 }
 
 size_t TriangleMesh::get_indices_amount() const {
