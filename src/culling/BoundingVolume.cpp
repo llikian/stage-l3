@@ -34,6 +34,16 @@ bool SphereVolume::is_in_or_above_plane(const Plane& plane) const {
     return plane.get_signed_distance(center) >= -radius * 2.0f;
 }
 
+mat4 SphereVolume::get_global_model_matrix(const Transform& transform) const {
+    SphereVolume global_volume = get_global_volumue(transform);
+    return mat4(
+        global_volume.radius, 0.0f, 0.0f, global_volume.center.x,
+        0.0f, global_volume.radius, 0.0f, global_volume.center.y,
+        0.0f, 0.0f, global_volume.radius, global_volume.center.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+}
+
 AABB::AABB() : center(0.0f, 0.0f, 0.0f), extents(0.0f, 0.0f, 0.0f) { }
 
 AABB::AABB(const vec3& min, const vec3& max)
@@ -65,4 +75,14 @@ bool AABB::is_in_or_above_plane(const Plane& plane) const {
                extents.y * std::abs(plane.normal.y),
                extents.z * std::abs(plane.normal.z)
            }) * 2.0f;
+}
+
+mat4 AABB::get_global_model_matrix(const Transform& transform) const {
+    AABB global_volume = get_global_volumue(transform);
+    return mat4(
+        global_volume.extents.x, 0.0f, 0.0f, global_volume.center.x,
+        0.0f, global_volume.extents.y, 0.0f, global_volume.center.y,
+        0.0f, 0.0f, global_volume.extents.z, global_volume.center.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
 }

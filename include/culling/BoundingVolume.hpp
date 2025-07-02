@@ -18,6 +18,7 @@ struct BoundingVolume {
     bool is_in_frustum(const Frustum& frustum) const;
     virtual bool is_in_frustum(const Frustum& frustum, const Transform& transform) const = 0;
     virtual bool is_in_or_above_plane(const Plane& plane) const = 0;
+    virtual mat4 get_global_model_matrix(const Transform& transform) const = 0;
 };
 
 struct SphereVolume final : BoundingVolume {
@@ -28,6 +29,7 @@ struct SphereVolume final : BoundingVolume {
     SphereVolume get_global_volumue(const Transform& transform) const;
     bool is_in_frustum(const Frustum& frustum, const Transform& transform) const override;
     bool is_in_or_above_plane(const Plane& plane) const override;
+    mat4 get_global_model_matrix(const Transform& transform) const override;
 
     vec3 center;
     float radius;
@@ -41,6 +43,7 @@ struct AABB final : BoundingVolume {
     AABB get_global_volumue(const Transform& transform) const;
     bool is_in_frustum(const Frustum& frustum, const Transform& transform) const override;
     bool is_in_or_above_plane(const Plane& plane) const override;
+    mat4 get_global_model_matrix(const Transform& transform) const override;
 
     vec3 center;
     vec3 extents;
