@@ -42,9 +42,32 @@ public:
     void draw(const Shader& shader) override;
 
     /**
+     * @brief Binds the OpenGL buffers.
+     */
+    void bind_buffers() override;
+
+    /**
      * @return The mesh's primitive: GL_POINTS.
      */
     unsigned int get_primitive() const override;
+
+    /**
+     * @return The amount of vertices in the mesh.
+     */
+    size_t get_vertices_amount() const override;
+
+    /**
+     * @brief Calculates the minimum and maximum value for each coordinate for every point in the
+     * mesh.
+     * @param minimum The lowest x, y and z values of the points in the mesh.
+     * @param maximum The highest x, y and z values of the points in the mesh.
+     */
+    void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const override;
+
+    /**
+     * @brief Delete OpenGL buffers and clears the vertices array.
+     */
+    void clear() override;
 
     /**
      * @brief Add a vertex to the mesh.
@@ -60,18 +83,6 @@ public:
      */
     void add_vertex(const vec3& position, const vec3& color = vec3(1.0f), float size = 1.0f);
 
-    /**
-     * @return The amount of vertices in the mesh.
-     */
-    size_t get_vertices_amount() const override;
-
-    void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const override;
-
 private:
-    /**
-     * @brief Binds the OpenGL buffers.
-     */
-    void bind_buffers() override;
-
     std::vector<Vertex> vertices; ///< The mesh's vertices.
 };

@@ -109,9 +109,6 @@ void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
     if(gl_InvocationID % 4 == 0) {
-        float extent = u_chunk_size / 2.0f;
-        vec2 center = gl_in[gl_InvocationID].gl_Position.xz + vec2(extent);
-
         float level = 0.0f;
         if(is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID].gl_Position.xz)) ||
            is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID + 1].gl_Position.xz)) ||

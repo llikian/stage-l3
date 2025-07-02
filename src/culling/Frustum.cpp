@@ -43,7 +43,7 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, Tria
     right_plane.distance = dot(camera.position, right_plane.normal);
 
     /* Meshes */
-    const vec3 far_plane_corners[4] {
+    const vec3 far_plane_corners[4]{
         camera.position + far_center - far_right + far_up,
         camera.position + far_center - far_right - far_up,
         camera.position + far_center + far_right - far_up,
@@ -77,17 +77,20 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, Tria
     lines.add_line(7, 8);
     lines.add_line(8, 5);
 
-    faces.add_vertex(camera.position, vec3(), vec2()); // 0
+    faces.add_vertex(camera.position, vec3(), vec2());      // 0
     faces.add_vertex(far_plane_corners[0], vec3(), vec2()); // 1
     faces.add_vertex(far_plane_corners[1], vec3(), vec2()); // 2
     faces.add_vertex(far_plane_corners[2], vec3(), vec2()); // 3
     faces.add_vertex(far_plane_corners[3], vec3(), vec2()); // 4
 
-    faces.add_face(4, 3, 2, 1); // FAR
+    faces.add_face(4, 3, 2, 1);  // FAR
     faces.add_triangle(1, 0, 4); // TOP
     faces.add_triangle(0, 2, 3); // BOTTOM
     faces.add_triangle(1, 2, 0); // LEFT
     faces.add_triangle(4, 0, 3); // RIGHT
+
+    lines.bind_buffers();
+    faces.bind_buffers();
 }
 
 void Frustum::update(const Camera& camera, float aspect_ratio) {

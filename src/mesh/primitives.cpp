@@ -49,6 +49,8 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
             );
         }
     }
+
+    mesh.bind_buffers();
 }
 
 void create_cube_mesh(TriangleMesh& mesh) {
@@ -95,6 +97,8 @@ void create_cube_mesh(TriangleMesh& mesh) {
         mesh.add_vertex(positions[faces[i].w], normals[i], tex_coords[3]);
         mesh.add_face(i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3);
     }
+
+    mesh.bind_buffers();
 }
 
 void create_wireframe_cube_mesh(LineMesh& mesh) {
@@ -133,6 +137,8 @@ void create_wireframe_cube_mesh(LineMesh& mesh) {
     // BACK
     mesh.add_line(3, 7);
     mesh.add_line(5, 1);
+
+    mesh.bind_buffers();
 }
 
 void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
@@ -144,6 +150,8 @@ void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const ve
     mesh.add_vertex(C, normal, vec2(1.0f, 0.0f));
     mesh.add_vertex(B + BA + BC, normal, vec2(1.0f, 1.0f));
     mesh.add_face(0, 1, 2, 3);
+
+    mesh.bind_buffers();
 }
 
 void create_axes_mesh(LineMesh& mesh, float length) {
@@ -158,6 +166,8 @@ void create_axes_mesh(LineMesh& mesh, float length) {
         mesh.add_vertex(origin, axis);
         mesh.add_vertex(length * axis, axis);
     }
+
+    mesh.bind_buffers();
 }
 
 void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
@@ -179,4 +189,6 @@ void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec
     mesh.add_line(2, 3);
     mesh.add_line(3, 4);
     mesh.add_line(4, 1);
+
+    mesh.bind_buffers();
 }

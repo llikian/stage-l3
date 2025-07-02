@@ -24,8 +24,6 @@ LineMesh::~LineMesh() {
 }
 
 void LineMesh::draw(const Shader& shader) {
-    if(!bound) { bind_buffers(); }
-
     shader.use();
     glBindVertexArray(VAO);
 
@@ -34,53 +32,6 @@ void LineMesh::draw(const Shader& shader) {
     } else {
         glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, nullptr);
     }
-}
-
-unsigned int LineMesh::get_primitive() const {
-    return GL_LINES;
-}
-
-void LineMesh::add_vertex(const Vertex& vertex) {
-    vertices.push_back(vertex);
-}
-
-void LineMesh::add_vertex(const vec3& position, const vec3& color) {
-    vertices.emplace_back(position, color);
-}
-
-void LineMesh::add_line(unsigned int start, unsigned int end) {
-    indices.push_back(start);
-    indices.push_back(end);
-}
-
-size_t LineMesh::get_vertices_amount() const {
-    return vertices.size();
-}
-
-size_t LineMesh::get_indices_amount() const {
-    return indices.size();
-}
-
-void LineMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
-    for(unsigned int i = 0 ; i < vertices.size() ; ++i) {
-        const vec3& pos = vertices[i].position;
-        minimum.x = std::min(minimum.x, pos.x);
-        minimum.y = std::min(minimum.y, pos.y);
-        minimum.z = std::min(minimum.z, pos.z);
-
-        maximum.x = std::max(maximum.x, pos.x);
-        maximum.y = std::max(maximum.y, pos.y);
-        maximum.z = std::max(maximum.z, pos.z);
-    }
-}
-
-void LineMesh::clear() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
-    vertices.clear();
-    indices.clear();
-    bound = false;
 }
 
 void LineMesh::bind_buffers() {
@@ -107,6 +58,55 @@ void LineMesh::bind_buffers() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint), indices.data(), GL_STATIC_DRAW);
     }
+}
 
-    bound = true;
+unsigned int LineMesh::get_primitive() const {
+    return GL_LINES;
+}
+
+size_t LineMesh::get_vertices_amount() const {
+    return vertices.size();
+}
+
+void LineMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
+    for(unsigned int i = 0 ; i < vertices.size() ; ++i) {
+        const vec3& pos = vertices[i].position;
+        minimum.x = std::min(minimum.x, pos.x);
+        minimum.y = std::min(minimum.y, pos.y);
+        minimum.z = std::min(minimum.z, pos.z);
+
+        maximum.x = std::max(maximum.x, pos.x);
+        maximum.y = std::max(maximum.y, pos.y);
+        maximum.z = std::max(maximum.z, pos.z);
+    }
+}
+
+size_t LineMesh::get_indices_amount() const {
+    return indices.size();
+}
+
+void LineMesh::clear() {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
+    vertices.clear();
+    indices.clear();
+}
+
+void LineMesh::delete_buffers() {
+    Mesh::delete_buffers();
+    if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
+}
+
+void LineMesh::add_vertex(const Vertex& vertex) {
+    vertices.push_back(vertex);
+}
+
+void LineMesh::add_vertex(const vec3& position, const vec3& color) {
+    vertices.emplace_back(position, color);
+}
+
+void LineMesh::add_line(unsigned int start, unsigned int end) {
+    indices.push_back(start);
+    indices.push_back(end);
 }

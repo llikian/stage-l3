@@ -130,23 +130,19 @@ void Application::run() {
     /* Other Entities */
     TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128);
 
-    /* Frustum Culling Tests */
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
-    unsigned int objects_amount = 1'000;
+    /* Frustum Culling Tests */ {
+        const Shader* shader = &shaders.at("flat");
+        Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
 
-    Entity* test_AABBs_root = root->add_child<Entity>("Frustum Test AABBs");
-    std::vector<FlatShadedMeshEntity*> test_boxes;
-    test_boxes.reserve(objects_amount);
+        for(unsigned int i = 0 ; i < 10'000 ; ++i) {
+            auto* entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader);
 
-    for(unsigned int i = 0 ; i < objects_amount ; ++i) {
-        test_boxes.emplace_back(test_AABBs_root->add_child<FlatShadedMeshEntity>(
-            "Frustum Test AABB " + std::to_string(i),
-            &shaders.at("flat")));
-
-        create_cube_mesh(test_boxes.back()->mesh);
-        test_boxes.back()->transform.set_local_position(Random::get_vec3(-400.0f, 400.0f));
-        test_boxes.back()->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
-        test_boxes.back()->create_aabb();
+            create_cube_mesh(entity->mesh);
+            entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
+            entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
+            entity->create_aabb();
+        }
     }
 #endif
 
@@ -193,7 +189,6 @@ void Application::run() {
 
             if(is_spying_enabled) {
                 shader.set_uniform("u_mvp", view_projection * spy_camera.get_model_matrix().scale(1024.0f));
-                // shader.set_uniform("u_mvp", view_projection );
                 shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
                 glLineWidth(3.0f);
                 spy_camera_mesh.draw(shader);
@@ -355,6 +350,9 @@ void Application::draw_imgui_debug_window() {
         if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
             spy_camera.look_at_point(spy_camera_target);
         }
+
+        if(ImGui::Button("Move Spy to Camera")) { spy_camera.set_position(camera.get_position()); }
+        if(ImGui::Button("Make Spy Look at Camera")) { spy_camera.look_at_point(camera.get_position()); }
     }
 
     ImGui::NewLine();
