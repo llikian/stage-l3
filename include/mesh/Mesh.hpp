@@ -63,6 +63,12 @@ public:
      */
     virtual void delete_buffers();
 
+    /**
+     * @brief Applies a model matrix to each vertex in the mesh.
+     * @param model The model matrix to apply.
+     */
+    virtual void apply_model_matrix(const mat4& model) = 0;
+
 protected:
     unsigned int VAO; ///< The mesh's Vertex Array Object.
     unsigned int VBO; ///< The mesh's Vertex Buffer Object.

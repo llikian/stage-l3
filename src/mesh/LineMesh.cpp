@@ -98,6 +98,15 @@ void LineMesh::delete_buffers() {
     if(!indices.empty()) { glDeleteBuffers(1, &EBO); }
 }
 
+void LineMesh::apply_model_matrix(const mat4& model) {
+    for(Vertex& vertex : vertices) {
+        vec3 vec = vertex.position;
+        vertex.position.x = model(0, 0) * vec.x + model(0, 1) * vec.y + model(0, 2) * vec.z + model(0, 3);
+        vertex.position.y = model(1, 0) * vec.x + model(1, 1) * vec.y + model(1, 2) * vec.z + model(1, 3);
+        vertex.position.z = model(2, 0) * vec.x + model(2, 1) * vec.y + model(2, 2) * vec.z + model(2, 3);
+    }
+}
+
 void LineMesh::add_vertex(const Vertex& vertex) {
     vertices.push_back(vertex);
 }

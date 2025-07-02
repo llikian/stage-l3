@@ -89,6 +89,12 @@ public:
     void delete_buffers() override;
 
     /**
+     * @brief Applies a model matrix to each vertex in the mesh.
+     * @param model The model matrix to apply.
+     */
+    void apply_model_matrix(const mat4& model) override;
+
+    /**
      * @brief Add a vertex to the mesh.
      * @param vertex The vertex.
      */

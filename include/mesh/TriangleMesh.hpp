@@ -89,6 +89,12 @@ public:
     void delete_buffers() override;
 
     /**
+     * @brief Applies a model matrix to each vertex in the mesh.
+     * @param model The model matrix to apply.
+     */
+    void apply_model_matrix(const mat4& model) override;
+
+    /**
      * @return The amount of indices in the mesh.
      */
     size_t get_indices_amount() const;
@@ -129,12 +135,6 @@ public:
      * @param material The material to use.
      */
     void set_material(Material* material);
-
-    /**
-     * @brief Applies a model matrix to each vertex in the mesh.
-     * @param model The model matrix to apply.
-     */
-    void apply_model_matrix(const mat4& model);
 
 private:
     unsigned int EBO; ///< The mesh's Element Buffer Object. Useful to avoid repeating vertices in memory.
