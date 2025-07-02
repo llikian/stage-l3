@@ -5,19 +5,24 @@
 
 #include "entities/ModelEntity.hpp"
 
+#include <glad/glad.h>
 #include "imgui.h"
 
-ModelEntity::ModelEntity(const std::string& name, const Shader* shader, const std::filesystem::path& path)
-    : DrawableEntity(name, shader), model(path) { }
+ModelEntity::ModelEntity(const std::string& name, const Shader& shader, Model& model)
+    : DrawableEntity(name, shader), model(model) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) {
-    if(shader != nullptr) {
-        shader->use();
+        shader.use();
         update_uniforms(view_projection_matrix);
-        model.draw(*shader);
-    } else {
-        std::cout << "[WARNING] ModelEntity '" << name << "' with nullptr shader.\n";
-    }
+        model.draw(shader);
+
+        // aabb_shader->use();
+        // aabb_shader->set_uniform("u_mvp", view_projection_matrix
+        //                                   * static_cast<AABB*>(bounding_volume)->get_global_model_matrix(transform));
+        // aabb_shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        // glLineWidth(3.0f);
+        // aabb_mesh->draw(*aabb_shader);
+        // glLineWidth(1.0f);
 }
 
 void ModelEntity::add_to_object_editor() {

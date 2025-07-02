@@ -46,8 +46,8 @@ public:
      * @return The new child's pointer.
      */
     template <typename EntityClass, typename... Args>
-    EntityClass* add_child(const std::string& child_name, const Args&... args) {
-        EntityClass* child = new EntityClass(child_name, args...);
+    EntityClass* add_child(const std::string& child_name, Args&&... args) {
+        EntityClass* child = new EntityClass(child_name, std::forward<Args>(args)...);
         children.push_back(child);
         child->parent = this;
         return child;

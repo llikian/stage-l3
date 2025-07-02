@@ -14,12 +14,13 @@
 class TriangleMeshEntity : public DrawableEntity {
 public:
     /**
-     * @brief Creates an entity with a certain name and a pointer to the shader that will be used
-     * when rendering.
+     * @brief Creates an entity with a certain name, the shader that will be used when rendering and
+     * the mesh to render.
      * @param name The name of the entity.
-     * @param shader A pointer to the shader used when rendering.
+     * @param shader The shader used when rendering.
+     * @param mesh The mesh to render.
      */
-    TriangleMeshEntity(const std::string& name, const Shader* shader);
+    TriangleMeshEntity(const std::string& name, const Shader& shader, TriangleMesh& mesh);
 
     /**
      * @brief Updates uniforms then draws the mesh.
@@ -45,5 +46,5 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_TRIANGLE_MESH; }
 
-    TriangleMesh mesh; ///< The mesh to render.
+    TriangleMesh& mesh; ///< The mesh to render.
 };

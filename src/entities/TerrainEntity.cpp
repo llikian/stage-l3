@@ -11,7 +11,7 @@ TerrainEntity::TerrainEntity(const std::string& name,
                              const Shader& shader,
                              float chunk_size,
                              unsigned int chunks_on_line)
-    : DrawableEntity(name, &shader), terrain(shader, chunk_size, chunks_on_line) { }
+    : DrawableEntity(name, shader), terrain(shader, chunk_size, chunks_on_line) { }
 
 void TerrainEntity::draw(const mat4& view_projection_matrix) {
     terrain.draw(view_projection_matrix);

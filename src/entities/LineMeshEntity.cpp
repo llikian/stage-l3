@@ -5,17 +5,13 @@
 
 #include "entities/LineMeshEntity.hpp"
 
-LineMeshEntity::LineMeshEntity(const std::string& name, const Shader* shader)
-    : DrawableEntity(name, shader) { }
+LineMeshEntity::LineMeshEntity(const std::string& name, const Shader& shader, LineMesh& mesh)
+    : DrawableEntity(name, shader), mesh(mesh) { }
 
 void LineMeshEntity::draw(const mat4& view_projection_matrix) {
-    if(shader != nullptr) {
-        shader->use();
-        update_uniforms(view_projection_matrix);
-        mesh.draw(*shader);
-    } else {
-        std::cout << "[WARNING] LineMeshEntity '" << name << "' with nullptr shader.\n";
-    }
+    shader.use();
+    update_uniforms(view_projection_matrix);
+    mesh.draw(shader);
 }
 
 void LineMeshEntity::create_aabb() {

@@ -14,13 +14,17 @@
 class FlatShadedMeshEntity : public TriangleMeshEntity {
 public:
     /**
-     * @brief Creates an entity with a certain name, a pointer to the shader that will be used
-     * when rendering and the color of the mesh.
+     * @brief Creates an entity with a certain name, the shader that will be used when rendering and
+     * the color of the mesh.
      * @param name The name of the entity.
-     * @param shader A pointer to the shader used when rendering.
+     * @param shader The shader used when rendering.
+     * @param mesh The mesh to render.
      * @param color The color the mesh should be rendered in.
      */
-    FlatShadedMeshEntity(const std::string& name, const Shader* shader, const vec4& color = vec4(1.0f));
+    FlatShadedMeshEntity(const std::string& name,
+                         const Shader& shader,
+                         TriangleMesh& mesh,
+                         const vec4& color = vec4(1.0f));
 
     /**
      * @brief Updates these uniforms if they exist in the shader:\n

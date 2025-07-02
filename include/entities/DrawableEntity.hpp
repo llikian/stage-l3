@@ -14,12 +14,11 @@
 class DrawableEntity : public Entity {
 public:
     /**
-     * @brief Creates an entity with a certain name and a pointer to the shader that will be used
-     * when rendering.
+     * @brief Creates an entity with a certain name and a the shader that will be used when rendering.
      * @param name The name of the entity.
-     * @param shader A pointer to the shader used when rendering.
+     * @param shader The shader used when rendering.
      */
-    DrawableEntity(const std::string& name, const Shader* shader);
+    DrawableEntity(const std::string& name, const Shader& shader);
 
     ~DrawableEntity() override;
 
@@ -52,7 +51,7 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
-    const Shader* shader; ///< A pointer to the shader used when rendering.
+    const Shader& shader; ///< A pointer to the shader used when rendering.
     BoundingVolume* bounding_volume;
 
     static inline unsigned int total_drawable_entities = 0;

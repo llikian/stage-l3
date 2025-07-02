@@ -15,13 +15,13 @@
 class ModelEntity : public DrawableEntity {
 public:
     /**
-     * @brief Creates an entity with a certain name, a pointer to the shader that will be used
-     * when rendering and the path to the model to render.
+     * @brief Creates an entity with a certain name, the shader that will be used when rendering and
+     * the model to render.
      * @param name The name of the entity.
-     * @param shader A pointer to the shader used when rendering.
-     * @param path The path to the model to render.
+     * @param shader The shader used when rendering.
+     * @param model The model to render.
      */
-    ModelEntity(const std::string& name, const Shader* shader, const std::filesystem::path& path);
+    ModelEntity(const std::string& name, const Shader& shader, Model& model);
 
     /**
      * @brief Updates uniforms then draws the model.
@@ -47,5 +47,5 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_MODEL; }
 
-    Model model; ///< The model to render.
+    Model& model; ///< The model to render.
 };

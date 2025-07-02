@@ -7,17 +7,13 @@
 
 #include "imgui.h"
 
-TriangleMeshEntity::TriangleMeshEntity(const std::string& name, const Shader* shader)
-    : DrawableEntity(name, shader) { }
+TriangleMeshEntity::TriangleMeshEntity(const std::string& name, const Shader& shader, TriangleMesh& mesh)
+    : DrawableEntity(name, shader), mesh(mesh) { }
 
 void TriangleMeshEntity::draw(const mat4& view_projection_matrix) {
-    if(shader != nullptr) {
-        shader->use();
-        update_uniforms(view_projection_matrix);
-        mesh.draw(*shader);
-    } else {
-        std::cout << "[WARNING] TriangleMeshEntity '" << name << "' with nullptr shader.\n";
-    }
+    shader.use();
+    update_uniforms(view_projection_matrix);
+    mesh.draw(shader);
 }
 
 void TriangleMeshEntity::add_to_object_editor() {
