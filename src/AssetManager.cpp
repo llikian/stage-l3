@@ -21,10 +21,12 @@ Shader& AssetManager::add_shader(const std::string& name,
 }
 
 Texture& AssetManager::add_texture(const std::filesystem::path& path) {
-    return get_instance().textures.emplace(std::piecewise_construct,
-                                           std::forward_as_tuple(path.string()),
-                                           std::forward_as_tuple(path))
-                         .first->second;
+    AssetManager& asset_manager = get_instance();
+    auto iterator = asset_manager.textures.find(path);
+
+    return iterator == asset_manager.textures.end()
+               ? asset_manager.textures.emplace(path.string(), Texture(path)).first->second
+               : iterator->second;
 }
 
 Model& AssetManager::add_model(const std::string& name, const std::filesystem::path& path) {
