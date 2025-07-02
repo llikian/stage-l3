@@ -8,6 +8,8 @@
 #include <cmath>
 #include <glad/glad.h>
 #include <ranges>
+
+#include "AssetManager.hpp"
 #include "debug.hpp"
 #include "entities/entities.hpp"
 #include "imgui.h"
@@ -38,27 +40,48 @@ Application::Application()
     ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
     ImGui_ImplOpenGL3_Init();
 
-    /* ---- Shaders ---- */
-    add_shader("point mesh", { "shaders/point_mesh/point_mesh.vert", "shaders/point_mesh/point_mesh.frag" });
-    add_shader("line mesh", { "shaders/line_mesh/line_mesh.vert", "shaders/line_mesh/line_mesh.frag" });
-    add_shader("background", { "shaders/vertex/position_only-no_mvp.vert", "shaders/fragment/background.frag" });
-    add_shader("flat", { "shaders/vertex/position_only.vert", "shaders/fragment/flat.frag" });
-    add_shader("blinn-phong", { "shaders/vertex/default.vert", "shaders/fragment/blinn_phong.frag" });
-    add_shader("terrain", {
-                   "shaders/terrain/terrain.vert",
-                   "shaders/terrain/terrain.tesc",
-                   "shaders/terrain/terrain.tese",
-                   "shaders/terrain/terrain.frag"
-               });
+    /* ---- Asset Manager ---- */
+    /* Shaders */
+    AssetManager::add_shader("point mesh", {
+                                 "shaders/point_mesh/point_mesh.vert",
+                                 "shaders/point_mesh/point_mesh.frag"
+                             });
+    AssetManager::add_shader("line mesh", {
+                                 "shaders/line_mesh/line_mesh.vert",
+                                 "shaders/line_mesh/line_mesh.frag"
+                             });
+    AssetManager::add_shader("background", {
+                                 "shaders/vertex/position_only-no_mvp.vert",
+                                 "shaders/fragment/background.frag"
+                             });
+    AssetManager::add_shader("flat", {
+                                 "shaders/vertex/position_only.vert",
+                                 "shaders/fragment/flat.frag"
+                             });
+    AssetManager::add_shader("blinn-phong", {
+                                 "shaders/vertex/default.vert",
+                                 "shaders/fragment/blinn_phong.frag"
+                             });
+    AssetManager::add_shader("terrain", {
+                                 "shaders/terrain/terrain.vert",
+                                 "shaders/terrain/terrain.tesc",
+                                 "shaders/terrain/terrain.tese",
+                                 "shaders/terrain/terrain.frag"
+                             });
 
-    /* ---- Meshes ---- */
-    create_pyramid_mesh(spy_camera_mesh,
-                        vec3(1.0f, 1.0f, -1.0f),
-                        vec3(1.0f, -1.0f, -1.0f),
-                        vec3(-1.0f, -1.0f, -1.0f),
-                        1.0f);
-    create_quad_mesh(screen, vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
-    create_axes_mesh(axes, 0.5f);
+    /* Meshes */
+    AssetManager::add_triangle_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
+    AssetManager::add_triangle_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
+    AssetManager::add_triangle_mesh("screen", create_quad_mesh,
+                                    vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
+    AssetManager::add_line_mesh("axes", create_axes_mesh, 0.5f);
+    AssetManager::add_line_mesh("camera pyramid", create_pyramid_mesh,
+                                vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
+
+    /* Models */
+    AssetManager::add_model("sponza", "data/sponza/sponza.obj").apply_model_matrix(scale(0.05f));
+    AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj").apply_model_matrix(scale(100.0f));
+    AssetManager::add_model("bmw", "data/bmw/bmw.obj").apply_model_matrix(scale(0.05f));
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -90,8 +113,6 @@ Application::Application()
 }
 
 Application::~Application() {
-    for(Shader& shader : shaders | std::views::values) { shader.free(); }
-
     glDeleteRenderbuffers(1, &RBO);
     glDeleteTextures(1, &spy_window_texture);
     glDeleteFramebuffers(1, &FBO);
@@ -104,35 +125,33 @@ Application::~Application() {
 void Application::run() {
     Entity* root = &scene_graph.root;
 
+    // LineMesh aabb_mesh;
+    // create_wireframe_cube_mesh(aabb_mesh);
+    // DrawableEntity::aabb_mesh = &aabb_mesh;
+    // DrawableEntity::aabb_shader = &AssetManager::get_shader("flat");
+
     /* Light */
-    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light", &shaders.at("flat"));
-    create_sphere_mesh(light->mesh, 8, 16);
+    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light",
+                                                                        AssetManager::get_shader("flat"),
+                                                                        AssetManager::get_triangle_mesh("sphere 8 16"));
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec3& light_color = light->color;
 
     /* Models */ {
-        const Shader* shader = &shaders.at("blinn-phong");
+        const Shader& shader = AssetManager::get_shader("blinn-phong");
 
-        // ModelEntity* sponza = root->add_child<ModelEntity>("sponza", shader, "data/sponza/sponza.obj");
-        // sponza->model.apply_model_matrix(scale(0.05f));
-        // sponza->create_aabb();
-
-        // ModelEntity* vokselia = root->add_child<ModelEntity>("vokselia", shader, "data/vokselia/vokselia_spawn.obj");
-        // vokselia->model.apply_model_matrix(scale(100.0f));
-        // vokselia->create_aabb();
-
-        // ModelEntity* bmw = root->add_child<ModelEntity>("BMW", &shaders.at("blinn-phong"), "data/bmw/bmw.obj");
-        // bmw->model.apply_model_matrix(scale(0.05f));
-        // bmw->create_aabb();
+        root->add_child<ModelEntity>("sponza", shader, AssetManager::get_model("sponza"))->create_aabb();
+        root->add_child<ModelEntity>("vokselia", shader, AssetManager::get_model("vokselia"))->create_aabb();
+        root->add_child<ModelEntity>("bmw", shader, AssetManager::get_model("bmw"))->create_aabb();
     }
 
     /* Other Entities */
-    TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", shaders.at("terrain"), 32.0f, 128);
+    TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     /* Frustum Culling Tests */ {
-        const Shader* shader = &shaders.at("flat");
+        const Shader* shader = &AssetManager::get_shader("flat");
         Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
@@ -165,7 +184,7 @@ void Application::run() {
         draw_background();
 
         /* Blinn-Phong Shader */ {
-            const Shader& shader = shaders.at("blinn-phong");
+            const Shader& shader = AssetManager::get_shader("blinn-phong");
             shader.use();
 
             shader.set_uniform("u_camera_position", camera_position);
@@ -174,31 +193,31 @@ void Application::run() {
         }
 
         /* Line Mesh Shader */ {
-            const Shader& shader = shaders.at("line mesh");
+            const Shader& shader = AssetManager::get_shader("line mesh");
             shader.use();
 
             if(are_axes_drawn) {
                 shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
-                axes.draw(shader);
+                AssetManager::get_line_mesh("axes").draw(shader);
             }
         }
 
         /* Flat Shader */ {
-            const Shader& shader = shaders.at("flat");
+            const Shader& shader = AssetManager::get_shader("flat");
             shader.use();
 
             if(is_spying_enabled) {
                 shader.set_uniform("u_mvp", view_projection * spy_camera.get_model_matrix().scale(1024.0f));
                 shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
                 glLineWidth(3.0f);
-                spy_camera_mesh.draw(shader);
+                AssetManager::get_line_mesh("camera pyramid").draw(shader);
                 glLineWidth(1.0f);
             }
         }
 
         /* Terrain Shader */
         if(terrain->get_visibility()) {
-            const Shader& shader = shaders.at("terrain");
+            const Shader& shader = AssetManager::get_shader("terrain");
             shader.use();
 
             shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
@@ -232,12 +251,8 @@ EventHandler& Application::get_event_handler() {
     return event_handler;
 }
 
-void Application::add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list) {
-    shaders.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(paths_list, name));
-}
-
 void Application::draw_background() {
-    const Shader& shader = shaders.at("background");
+    const Shader& shader = AssetManager::get_shader("background");
     shader.use();
 
     shader.set_uniform("u_resolution", window.get_resolution());
@@ -246,7 +261,7 @@ void Application::draw_background() {
     shader.set_uniform("u_camera_up", camera.get_up_vector());
 
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-    screen.draw(shader);
+    AssetManager::get_triangle_mesh("screen").draw(shader);
     if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
 }
 
@@ -259,7 +274,7 @@ void Application::draw_spy_window() {
     scene_graph.draw(spy_view_projection, frustum);
 
     /* Lines */ {
-        const Shader& shader = shaders.at("line mesh");
+        const Shader& shader = AssetManager::get_shader("line mesh");
         shader.use();
 
         glLineWidth(5.0f);
@@ -270,7 +285,7 @@ void Application::draw_spy_window() {
 
     /* Faces */ {
         static const vec4 faces_color(0.0f, 0.0f, 1.0f, 0.2f);
-        const Shader& shader = shaders.at("flat");
+        const Shader& shader = AssetManager::get_shader("flat");
         shader.use();
 
         glDisable(GL_CULL_FACE);

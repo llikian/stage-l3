@@ -44,13 +44,6 @@ public:
 
 private:
     /**
-     * @brief Add a shader to the unordered_map.
-     * @param name The name of the shader (key).
-     * @param paths_list The paths to each of the different shaders (parameter to the value's constructor).
-     */
-    void add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
-
-    /**
      * @brief Draws the background.
      */
     void draw_background();
@@ -84,14 +77,9 @@ private:
     vec3 spy_camera_position;        ///< The spy camera's position.
     vec3 spy_camera_target;          ///< Where the spy camera is looking at.
     Camera spy_camera;               ///< The camera used to test frustum culling.
-    LineMesh spy_camera_mesh;        ///< Mesh used to show where the spy camera is.
     unsigned int FBO;                ///< Frame Buffer Object.
     unsigned int RBO;                ///< Rendering Buffer Object.
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
 
-    std::unordered_map<std::string, Shader> shaders; ///< Array containing all the shaders used for rendering.
-
-    TriangleMesh screen; ///< Mesh used to render a quad as the background.
-    LineMesh axes;       ///< Mesh used to render axes in order to determine the view direction.
     bool are_axes_drawn; ///< Whether the axes are drawn.
 };
