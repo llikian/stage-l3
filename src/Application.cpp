@@ -72,16 +72,13 @@ Application::Application()
     /* Meshes */
     AssetManager::add_triangle_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
     AssetManager::add_triangle_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
+    AssetManager::add_triangle_mesh("cube", create_cube_mesh);
+    AssetManager::add_line_mesh("wireframe cube", create_wireframe_cube_mesh);
     AssetManager::add_triangle_mesh("screen", create_quad_mesh,
                                     vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     AssetManager::add_line_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_line_mesh("camera pyramid", create_pyramid_mesh,
                                 vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
-
-    /* Models */
-    AssetManager::add_model("sponza", "data/sponza/sponza.obj").apply_model_matrix(scale(0.05f));
-    AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj").apply_model_matrix(scale(100.0f));
-    AssetManager::add_model("bmw", "data/bmw/bmw.obj").apply_model_matrix(scale(0.05f));
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -141,9 +138,18 @@ void Application::run() {
     /* Models */ {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
 
-        root->add_child<ModelEntity>("sponza", shader, AssetManager::get_model("sponza"))->create_aabb();
-        root->add_child<ModelEntity>("vokselia", shader, AssetManager::get_model("vokselia"))->create_aabb();
-        root->add_child<ModelEntity>("bmw", shader, AssetManager::get_model("bmw"))->create_aabb();
+        /* Models */
+        Model& sponza = AssetManager::add_model("sponza", "data/sponza/sponza.obj");
+        sponza.apply_model_matrix(scale(0.05f));
+        root->add_child<ModelEntity>("sponza", shader, sponza)->create_aabb();
+
+        // Model& vokselia = AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj");
+        // vokselia.apply_model_matrix(scale(100.0f));
+        // root->add_child<ModelEntity>("vokselia", shader, vokselia)->create_aabb();
+
+        // Model& bmw = AssetManager::add_model("bmw", "data/bmw/bmw.obj");
+        // bmw.apply_model_matrix(scale(0.05f));
+        // root->add_child<ModelEntity>("bmw", shader, bmw)->create_aabb();
     }
 
     /* Other Entities */
@@ -151,13 +157,12 @@ void Application::run() {
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     /* Frustum Culling Tests */ {
-        const Shader* shader = &AssetManager::get_shader("flat");
+        const Shader& shader = AssetManager::get_shader("flat");
+        TriangleMesh& mesh = AssetManager::get_triangle_mesh("cube");
         Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
-            auto* entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader);
-
-            create_cube_mesh(entity->mesh);
+            auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);
             entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
             entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
             entity->create_aabb();

@@ -5,24 +5,25 @@
 
 #include "entities/ModelEntity.hpp"
 
-#include <glad/glad.h>
+#include "AssetManager.hpp"
 #include "imgui.h"
 
 ModelEntity::ModelEntity(const std::string& name, const Shader& shader, Model& model)
     : DrawableEntity(name, shader), model(model) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) {
-        shader.use();
-        update_uniforms(view_projection_matrix);
-        model.draw(shader);
+    shader.use();
+    update_uniforms(view_projection_matrix);
+    model.draw(shader);
 
-        // aabb_shader->use();
-        // aabb_shader->set_uniform("u_mvp", view_projection_matrix
-        //                                   * static_cast<AABB*>(bounding_volume)->get_global_model_matrix(transform));
-        // aabb_shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        // glLineWidth(3.0f);
-        // aabb_mesh->draw(*aabb_shader);
-        // glLineWidth(1.0f);
+    // const Shader& bounding_volume_shader = AssetManager::get_shader("flat");
+    // bounding_volume_shader.use();
+    // bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix
+    //                                             * bounding_volume->get_global_model_matrix(transform));
+    // bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    // glLineWidth(3.0f);
+    // AssetManager::get_line_mesh("wireframe cube").draw(bounding_volume_shader);
+    // glLineWidth(1.0f);
 }
 
 void ModelEntity::add_to_object_editor() {
