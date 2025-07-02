@@ -231,6 +231,8 @@ void Model::add_mesh(const std::vector<vec3>& positions,
 
         mesh.add_triangle(indices[0], indices[1], indices[2]);
     }
+
+    mesh.bind_buffers();
 }
 
 void Model::draw(const Shader& shader) {
