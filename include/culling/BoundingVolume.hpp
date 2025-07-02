@@ -25,7 +25,7 @@ struct SphereVolume final : BoundingVolume {
 
     SphereVolume(const vec3& center, float radius);
 
-    SphereVolume inline get_global_volumue(const Transform& transform) const;
+    SphereVolume get_global_volumue(const Transform& transform) const;
     bool is_in_frustum(const Frustum& frustum, const Transform& transform) const override;
     bool is_in_or_above_plane(const Plane& plane) const override;
 
@@ -38,7 +38,7 @@ struct AABB final : BoundingVolume {
     AABB(const vec3& min, const vec3& max);
     AABB(const vec3& center, float extent_x, float extent_y, float extent_z);
 
-    AABB inline get_global_volumue(const Transform& transform) const;
+    AABB get_global_volumue(const Transform& transform) const;
     bool is_in_frustum(const Frustum& frustum, const Transform& transform) const override;
     bool is_in_or_above_plane(const Plane& plane) const override;
 
