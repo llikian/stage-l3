@@ -19,62 +19,72 @@
  */
 class Window {
 public:
-    /**
-     * @brief Initializes GLFW, GLAD and OpenGL and creates the GLFW window.
-     * @param window_name The name of the GLFW window.
-     * @param user_pointer A pointer to an object that needs to be accessible in callbacks.
-     */
-    Window(const std::string& window_name, void* user_pointer);
+    Window(const Window&) = delete; ///< Delete copy constructor.
+    Window& operator=(const Window&) = delete; ///< Deleted copy operator.
 
     /**
-     * @brief Destroys the GLFW window and terminates GLFW.
+     * @brief Access the Window singleton.
+     * @return A reference to the Window singleton.
      */
-    ~Window();
+    static inline Window& get() {
+        static Window window;
+        return window;
+    }
 
     /**
      * @return The GLFW window pointer.
      */
-    GLFWwindow* get() const;
+    static GLFWwindow* get_glfw();
 
     /**
      * @return The width of the window.
      */
-    int get_width() const;
+    static int get_width();
 
     /**
      * @return The height of the window.
      */
-    int get_height() const;
+    static int get_height();
 
     /**
      * @brief Returns the window's aspect ratio.
      * @return The window's width divided by its height.
      */
-    float get_aspect_ratio() const;
+    static float get_aspect_ratio();
 
     /**
      * @brief Updates the size of the window.
      * @param width The window's current width.
      * @param height The window's current height.
      */
-    void update_size(int width, int height);
+    static void update_size(int width, int height);
 
     /**
      * @return A vec2 with the width of the window as the x component and its height as the y component.
      */
-    vec2 get_resolution() const;
+    static vec2 get_resolution();
 
     /**
      * @return Whether the window should close.
      */
-    bool should_close() const;
+    static bool should_close();
 
     /**
      * @brief Swaps the front and back buffers of the window.
      */
-    void swap_buffers() const;
+    static void swap_buffers();
 
 private:
+    /**
+     * @brief Initializes GLFW, GLAD and OpenGL and creates the GLFW window.
+     */
+    Window();
+
+    /**
+     * @brief Destroys the GLFW window and terminates GLFW.
+     */
+    ~Window();
+
     GLFWwindow* window; ///< The GLFW window pointer.
     int width;          ///< The width of the window.
     int height;         ///< The height of the window.

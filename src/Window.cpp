@@ -104,7 +104,7 @@ static void opengl_error_callback(unsigned int source,
     std::cerr << "\n\tMessage: " << message << '\n';
 }
 
-Window::Window(const std::string& window_name, void* user_pointer)
+Window::Window()
     : window(nullptr) {
     /* ---- GLFW ---- */
     glfwSetErrorCallback(glfw_error_callback);
@@ -117,13 +117,12 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1920, 1080, window_name.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(1920, 1080, "Projet Stage L3", nullptr, nullptr);
     if(window == nullptr) {
         throw std::runtime_error("Failed to create window.");
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetWindowUserPointer(window, user_pointer);
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwMaximizeWindow(window);
@@ -148,7 +147,7 @@ Window::Window(const std::string& window_name, void* user_pointer)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(opengl_error_callback, user_pointer);
+    glDebugMessageCallback(opengl_error_callback, nullptr);
 
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
@@ -164,35 +163,38 @@ Window::~Window() {
     glfwTerminate();
 }
 
-GLFWwindow* Window::get() const {
-    return window;
+GLFWwindow* Window::get_glfw() {
+    return get().window;
 }
 
-int Window::get_width() const {
-    return width;
+int Window::get_width() {
+    return get().width;
 }
 
-int Window::get_height() const {
-    return height;
+int Window::get_height() {
+    return get().height;
 }
 
-float Window::get_aspect_ratio() const {
-    return static_cast<float>(width) / static_cast<float>(height);
+float Window::get_aspect_ratio() {
+    const Window& window = get();
+    return static_cast<float>(window.width) / static_cast<float>(window.height);
 }
 
 void Window::update_size(int width, int height) {
-    this->width = width;
-    this->height = height;
+    Window& window = get();
+    window.width = width;
+    window.height = height;
 }
 
-vec2 Window::get_resolution() const {
-    return vec2(width, height);
+vec2 Window::get_resolution() {
+    Window& window = get();
+    return vec2(window.width, window.height);
 }
 
-bool Window::should_close() const {
-    return glfwWindowShouldClose(window);
+bool Window::should_close() {
+    return glfwWindowShouldClose(get_glfw());
 }
 
-void Window::swap_buffers() const {
-    glfwSwapBuffers(window);
+void Window::swap_buffers() {
+    glfwSwapBuffers(get_glfw());
 }
