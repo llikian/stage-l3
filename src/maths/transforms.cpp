@@ -147,9 +147,34 @@ mat4 rotate_z(float angle) {
 }
 
 mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale) {
-    vec3 radians(degrees_to_radians(rotation.x), degrees_to_radians(rotation.y), degrees_to_radians(rotation.z));
-    vec3 cosine(std::cos(radians.x), std::cos(radians.y), std::cos(radians.z));
-    vec3 sine(std::sin(radians.x), std::sin(radians.y), std::sin(radians.z));
+    vec3 cosine, sine;
+    
+    if(rotation.x == 0.0f) {
+        cosine.x = 1.0f;
+        sine.x = 0.0f;
+    } else {
+        float radians = degrees_to_radians(rotation.x);
+        cosine.x = std::cos(radians);
+        sine.x = std::sin(radians);
+    }
+    
+    if(rotation.y == 0.0f) {
+        cosine.y = 1.0f;
+        sine.y = 0.0f;
+    } else {
+        float radians = degrees_to_radians(rotation.y);
+        cosine.y = std::cos(radians);
+        sine.y = std::sin(radians);
+    }
+    
+    if(rotation.z == 0.0f) {
+        cosine.z = 1.0f;
+        sine.z = 0.0f;
+    } else {
+        float radians = degrees_to_radians(rotation.z);
+        cosine.z = std::cos(radians);
+        sine.z = std::sin(radians);
+    }
 
     return mat4(
         scale.x * (cosine.y * cosine.z + sine.x * sine.y * sine.z),
