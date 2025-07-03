@@ -6,9 +6,16 @@
 #include <iostream>
 #include <stdexcept>
 #include "Application.hpp"
+#include "AssetManager.hpp"
 
 int main() {
     try {
+        /* Making Sure Singletons are Initialized First */
+        Window::get();
+        EventHandler::get();
+        AssetManager::get();
+
+        /* Running Application */
         Application app;
         app.run();
     } catch(const std::exception& exception) {
