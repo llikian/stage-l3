@@ -18,7 +18,8 @@
  */
 class AssetManager {
 public:
-    ~AssetManager();
+    AssetManager(const AssetManager&) = delete;
+    AssetManager& operator=(const AssetManager&) = delete;
 
     static inline AssetManager& get_instance() {
         static AssetManager asset_manager;
@@ -58,6 +59,9 @@ public:
     static LineMesh& get_line_mesh(const std::string& mesh_name);
 
 private:
+    AssetManager();
+    ~AssetManager();
+
     std::unordered_map<std::string, Shader> shaders;
     std::unordered_map<std::string, Texture> textures;
     std::unordered_map<std::string, Model> models;

@@ -7,11 +7,6 @@
 
 #include <ranges>
 
-AssetManager::~AssetManager() {
-    for(Shader& shader : shaders | std::views::values) { shader.free(); }
-    for(Texture& texture : textures | std::views::values) { texture.free(); }
-}
-
 Shader& AssetManager::add_shader(const std::string& name,
                                  const std::initializer_list<std::filesystem::path>& paths_list) {
     return get_instance().shaders.emplace(std::piecewise_construct,
@@ -97,4 +92,11 @@ LineMesh& AssetManager::get_line_mesh(const std::string& mesh_name) {
     }
 
     return iterator->second;
+}
+
+AssetManager::AssetManager() { }
+
+AssetManager::~AssetManager() {
+    for(Shader& shader : shaders | std::views::values) { shader.free(); }
+    for(Texture& texture : textures | std::views::values) { texture.free(); }
 }
