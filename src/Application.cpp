@@ -21,23 +21,22 @@
 #include "utility/Random.hpp"
 
 Application::Application()
-    : window("Projet Stage L3", this),
-      event_handler(window, &camera),
-      camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, window.get_aspect_ratio(), 0.1f, 1024.0f),
-      frustum(camera, window.get_aspect_ratio(), frustum_lines, frustum_faces),
+    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, Window::get_aspect_ratio(), 0.1f, 1024.0f),
+      frustum(camera, Window::get_aspect_ratio(), frustum_lines, frustum_faces),
       is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
-      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), window.get_aspect_ratio(),
+      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), Window::get_aspect_ratio(),
                  camera.get_near_distance(), 2.0f * camera.get_far_distance()),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
-    event_handler.associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
+    EventHandler::set_active_camera(&camera);
+    EventHandler::get().associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
 
     /* ---- ImGui ---- */
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui::GetIO().IniFilename = "data/imgui.ini";
-    ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
+    ImGui_ImplGlfw_InitForOpenGL(Window::get_glfw(), true);
     ImGui_ImplOpenGL3_Init();
 
     /* ---- Asset Manager ---- */
@@ -86,7 +85,7 @@ Application::Application()
 
     glGenTextures(1, &spy_window_texture);
     glBindTexture(GL_TEXTURE_2D, spy_window_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window.get_width(), window.get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::get_width(), Window::get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE,
                  nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -94,7 +93,7 @@ Application::Application()
 
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.get_width(), window.get_height());
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::get_width(), Window::get_height());
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -171,9 +170,9 @@ void Application::run() {
 #endif
 
     /* Main Loop */
-    while(!window.should_close()) {
-        event_handler.poll_and_handle_events();
-        frustum.update(camera, window.get_aspect_ratio());
+    while(!Window::should_close()) {
+        EventHandler::poll_and_handle_events();
+        frustum.update(camera, Window::get_aspect_ratio());
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -248,26 +247,22 @@ void Application::run() {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        window.swap_buffers();
+        Window::swap_buffers();
     }
-}
-
-EventHandler& Application::get_event_handler() {
-    return event_handler;
 }
 
 void Application::draw_background() {
     const Shader& shader = AssetManager::get_shader("background");
     shader.use();
 
-    shader.set_uniform("u_resolution", window.get_resolution());
+    shader.set_uniform("u_resolution", Window::get_resolution());
     shader.set_uniform("u_camera_direction", camera.get_direction());
     shader.set_uniform("u_camera_right", camera.get_right_vector());
     shader.set_uniform("u_camera_up", camera.get_up_vector());
 
-    if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+    if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
     AssetManager::get_triangle_mesh("screen").draw(shader);
-    if(event_handler.is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+    if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
 }
 
 void Application::draw_spy_window() {
@@ -310,12 +305,12 @@ void Application::draw_spy_window() {
                                      | ImGuiWindowFlags_NoMove
                                      | ImGuiWindowFlags_NoTitleBar);
 
-        win_pos.x = 0.7f * window.get_width();
-        win_pos.y = window.get_height() / 2.0f;
+        win_pos.x = 0.7f * Window::get_width();
+        win_pos.y = Window::get_height() / 2.0f;
         ImGui::SetWindowPos(win_pos);
 
-        win_size.x = window.get_width() - win_pos.x;
-        win_size.y = window.get_height() - win_pos.y;
+        win_size.x = Window::get_width() - win_pos.x;
+        win_size.y = Window::get_height() - win_pos.y;
         ImGui::SetWindowSize(win_size);
 
         ImVec2 available_size = ImGui::GetContentRegionAvail();
@@ -330,7 +325,7 @@ void Application::draw_spy_window() {
             ImVec2(1.0f, 0.0f)
         );
 
-        glViewport(0, 0, window.get_width(), window.get_height());
+        glViewport(0, 0, Window::get_width(), Window::get_height());
 
         ImGui::End();
     }
@@ -342,12 +337,12 @@ void Application::draw_imgui_debug_window() {
 
     ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-    win_size.x = 0.2f * window.get_width();
+    win_size.x = 0.2f * Window::get_width();
     ImGui::SetWindowPos(win_pos);
     ImGui::SetWindowSize(win_size);
 
-    ImGui::Text("fps: %f f/s", 1.0f / event_handler.get_delta());
-    ImGui::Text("delta: %fs", event_handler.get_delta());
+    ImGui::Text("fps: %f f/s", 1.0f / EventHandler::get_delta());
+    ImGui::Text("delta: %fs", EventHandler::get_delta());
 
     ImGui::NewLine();
     ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
@@ -387,9 +382,9 @@ void Application::draw_imgui_object_ediot_window() const {
 
     ImGui::Begin("Object Editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-    win_pos.x = 0.7f * window.get_width();
+    win_pos.x = 0.7f * Window::get_width();
     ImGui::SetWindowPos(win_pos);
-    win_size.x = window.get_width() - win_pos.x;
+    win_size.x = Window::get_width() - win_pos.x;
     ImGui::SetWindowSize(win_size);
 
     scene_graph.add_selected_entity_editor_to_imgui_window();

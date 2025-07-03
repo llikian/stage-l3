@@ -37,11 +37,6 @@ public:
      */
     void run();
 
-    /**
-     * @return A reference to the Application's event handler.
-     */
-    EventHandler& get_event_handler();
-
 private:
     /**
      * @brief Draws the background.
@@ -62,9 +57,6 @@ private:
      * @brief Draw the imgui object editor window.
      */
     void draw_imgui_object_ediot_window() const;
-
-    Window window;              ///< Contains the GLFW window. Needs to be initialized first.
-    EventHandler event_handler; ///< Event handler. Handles key events. Should be initialized last.
 
     SceneGraph scene_graph; ///< Scene graph.
     Camera camera;          ///< The camera.
