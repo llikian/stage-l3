@@ -52,6 +52,14 @@ public:
         return mesh;
     }
 
+    template <typename MeshFunc, typename... Args>
+    static void add_triangle_and_line_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+        AssetManager& asset_manager = get();
+        TriangleMesh& triangle_mesh = asset_manager.triangle_meshes.emplace(name, TriangleMesh()).first->second;
+        LineMesh& line_mesh = asset_manager.line_meshes.emplace(name, LineMesh()).first->second;
+        std::invoke(std::forward<MeshFunc>(create_mesh), triangle_mesh, line_mesh, std::forward<Args>(args)...);
+    }
+
     static Shader& get_shader(const std::string& shader_name);
     static Texture& get_texture(const std::string& texture_path);
     static Model& get_model(const std::string& model_name);

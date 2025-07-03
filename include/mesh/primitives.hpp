@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "Camera.hpp"
 #include "LineMesh.hpp"
 #include "TriangleMesh.hpp"
 
@@ -66,3 +67,11 @@ void create_axes_mesh(LineMesh& mesh, float length);
  * @param height How far the pyramid's apex should be from the base.
  */
 void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height);
+
+/**
+ * @brief //TODO
+ * @param faces
+ * @param lines
+ * @param camera
+ */
+void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& camera);

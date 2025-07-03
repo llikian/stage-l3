@@ -8,6 +8,7 @@
 #include <cmath>
 #include "maths/constants.hpp"
 #include "maths/geometry.hpp"
+#include "Window.hpp"
 
 void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     const float theta_step = PI_F / horizontal_slices; // theta in [-PI/2 ; PI/2]
@@ -191,4 +192,86 @@ void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec
     mesh.add_line(4, 1);
 
     mesh.bind_buffers();
+}
+
+void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& camera) {
+    vec3 points[8];
+
+    float tan_half_fov = std::tan(camera.get_fov() / 2.0f);
+
+    // Dimensions of the near/far quads divided by 2
+    float far_height = camera.get_far_distance() * tan_half_fov;
+    float far_width = far_height * Window::get_aspect_ratio();
+
+    float near_height = camera.get_near_distance() * tan_half_fov;
+    float near_width = near_height * Window::get_aspect_ratio();
+
+    // Position of the center of the far/near quads and vectors
+    vec3 far_center = camera.get_position() + camera.get_far_distance() * camera.get_direction();
+    vec3 near_center = camera.get_position() + camera.get_near_distance() * camera.get_direction();
+
+    // Vector from the center of the far/near quad to the center of its top edge.
+    vec3 far_up = far_height * camera.get_up_vector();
+    vec3 near_up = near_height * camera.get_up_vector();
+
+    // Vector from the center of the far/near quad to the center of its top edge.
+    vec3 far_right = far_width * camera.get_right_vector();
+    vec3 near_right = near_width * camera.get_right_vector();
+
+    points[0] = far_center - far_right + far_up;
+    points[1] = far_center - far_right - far_up;
+    points[2] = far_center + far_right - far_up;
+    points[3] = far_center + far_right + far_up;
+    points[4] = near_center - near_right + near_up;
+    points[5] = near_center - near_right - near_up;
+    points[6] = near_center + near_right - near_up;
+    points[7] = near_center + near_right + near_up;
+
+    /* Line Mesh */
+    lines.add_vertex(points[0]);
+    lines.add_vertex(points[1]);
+    lines.add_vertex(points[2]);
+    lines.add_vertex(points[3]);
+    lines.add_vertex(points[4]);
+    lines.add_vertex(points[5]);
+    lines.add_vertex(points[6]);
+    lines.add_vertex(points[7]);
+
+    // Far to Near Lines
+    lines.add_line(0, 4);
+    lines.add_line(1, 5);
+    lines.add_line(2, 6);
+    lines.add_line(3, 7);
+
+    // Far Lines
+    lines.add_line(0, 1);
+    lines.add_line(1, 2);
+    lines.add_line(2, 3);
+    lines.add_line(3, 0);
+
+    // Near Lines
+    lines.add_line(4, 5);
+    lines.add_line(5, 6);
+    lines.add_line(6, 7);
+    lines.add_line(7, 4);
+
+    /* Face Mesh */
+    faces.add_vertex(points[0], vec3(), vec2());
+    faces.add_vertex(points[1], vec3(), vec2());
+    faces.add_vertex(points[2], vec3(), vec2());
+    faces.add_vertex(points[3], vec3(), vec2());
+    faces.add_vertex(points[4], vec3(), vec2());
+    faces.add_vertex(points[5], vec3(), vec2());
+    faces.add_vertex(points[6], vec3(), vec2());
+    faces.add_vertex(points[7], vec3(), vec2());
+
+    faces.add_face(0, 1, 2, 3); // FAR
+    faces.add_face(4, 5, 6, 7); // NEAR
+    faces.add_face(0, 4, 7, 3); // TOP
+    faces.add_face(5, 1, 2, 6); // BOTTOM
+    faces.add_face(0, 1, 5, 4); // LEFT
+    faces.add_face(7, 6, 2, 3); // RIGHT
+
+    lines.bind_buffers();
+    faces.bind_buffers();
 }
