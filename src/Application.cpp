@@ -121,11 +121,6 @@ Application::~Application() {
 void Application::run() {
     Entity* root = &scene_graph.root;
 
-    // LineMesh aabb_mesh;
-    // create_wireframe_cube_mesh(aabb_mesh);
-    // DrawableEntity::aabb_mesh = &aabb_mesh;
-    // DrawableEntity::aabb_shader = &AssetManager::get_shader("flat");
-
     /* Light */
     FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light",
                                                                         AssetManager::get_shader("flat"),
@@ -140,7 +135,9 @@ void Application::run() {
         /* Models */
         Model& sponza = AssetManager::add_model("sponza", "data/sponza/sponza.obj");
         sponza.apply_model_matrix(scale(0.05f));
-        root->add_child<ModelEntity>("sponza", shader, sponza)->create_aabb();
+        ModelEntity* sponza_entity = root->add_child<ModelEntity>("sponza", shader, sponza);
+        sponza_entity->create_aabb();
+        sponza_entity->transform.set_local_position(-200.0f, -40.0f, 0.0f);
 
         // Model& vokselia = AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj");
         // vokselia.apply_model_matrix(scale(100.0f));
@@ -153,6 +150,7 @@ void Application::run() {
 
     /* Other Entities */
     TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
+    // terrain->set_visibility(false);
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     /* Frustum Culling Tests */ {
@@ -371,7 +369,7 @@ void Application::draw_imgui_debug_window() {
     }
 
     ImGui::NewLine();
-    scene_graph.add_entity_to_imgui_node_tree(&scene_graph.root);
+    scene_graph.add_imgui_node_tree();
 
     ImGui::End();
 }

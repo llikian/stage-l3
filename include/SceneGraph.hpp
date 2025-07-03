@@ -20,11 +20,7 @@ public:
      */
     SceneGraph();
 
-    /**
-     * @brief Add an entity to the ImGui node tree.
-     * @param entity The entity to add to the tree.
-     */
-    void add_entity_to_imgui_node_tree(Entity* entity);
+    void add_imgui_node_tree();
 
     /**
      * @brief Add an object editor for the selected entity (if one is selected) to the current ImGui
@@ -44,5 +40,11 @@ public:
     Entity root; ///< The root of the scene graph.
 
 private:
+    /**
+     * @brief Add an entity to the ImGui node tree.
+     * @param entity The entity to add to the tree.
+     */
+    void add_entity_to_imgui_node_tree(Entity* entity);
+
     Entity* selected_entity; ///< The currently selected entity.
 };

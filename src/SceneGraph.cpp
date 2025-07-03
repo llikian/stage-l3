@@ -10,6 +10,35 @@
 
 SceneGraph::SceneGraph() : root("Scene Graph"), selected_entity(nullptr) { }
 
+void SceneGraph::add_imgui_node_tree() {
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+    if(root.children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }
+    if(selected_entity == &root) { flags |= ImGuiTreeNodeFlags_Selected; }
+
+    if(ImGui::TreeNodeEx(" o Scene Graph", flags)) {
+        if(ImGui::IsItemClicked()) { selected_entity = &root; }
+
+        for(Entity* child : root.children) { add_entity_to_imgui_node_tree(child); }
+        ImGui::TreePop();
+    }
+}
+
+void SceneGraph::add_selected_entity_editor_to_imgui_window() const {
+    if(selected_entity == nullptr) {
+        ImGui::Text("No Entity is Selected");
+    } else {
+        selected_entity->add_to_object_editor();
+    }
+}
+
+void SceneGraph::draw(const mat4& view_projection_matrix, const Frustum& frustum) {
+    DrawableEntity::total_drawable_entities = 0;
+    DrawableEntity::total_not_hidden_entities = 0;
+    DrawableEntity::total_drawn_entities = 0;
+
+    root.draw_drawables(view_projection_matrix, frustum);
+}
+
 void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
     if(entity->children.empty()) { flags |= ImGuiTreeNodeFlags_Leaf; }
@@ -47,20 +76,4 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
         for(Entity* child : entity->children) { add_entity_to_imgui_node_tree(child); }
         ImGui::TreePop();
     }
-}
-
-void SceneGraph::add_selected_entity_editor_to_imgui_window() const {
-    if(selected_entity == nullptr) {
-        ImGui::Text("No Entity is Selected");
-    } else {
-        selected_entity->add_to_object_editor();
-    }
-}
-
-void SceneGraph::draw(const mat4& view_projection_matrix, const Frustum& frustum) {
-    DrawableEntity::total_drawable_entities = 0;
-    DrawableEntity::total_not_hidden_entities = 0;
-    DrawableEntity::total_drawn_entities = 0;
-
-    root.draw_drawables(view_projection_matrix, frustum);
 }

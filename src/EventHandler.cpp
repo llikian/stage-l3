@@ -120,7 +120,7 @@ EventHandler::EventHandler()
         glfwSetInputMode(Window::get_glfw(), GLFW_CURSOR, mode);
         is_cursor_visible = !is_cursor_visible;
     });
-    associate_action_to_key(GLFW_KEY_C, false, [this] {
+    associate_action_to_key(GLFW_KEY_F, false, [this] {
         (is_face_culling_enabled ? glDisable : glEnable)(GL_CULL_FACE);
         is_face_culling_enabled = !is_face_culling_enabled;
     });
