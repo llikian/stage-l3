@@ -21,11 +21,11 @@
 #include "utility/Random.hpp"
 
 Application::Application()
-    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, Window::get_aspect_ratio(), 0.1f, 1024.0f),
-      frustum(camera, Window::get_aspect_ratio(), frustum_lines, frustum_faces),
+    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
+      frustum(camera, frustum_lines, frustum_faces),
       is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
-      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), Window::get_aspect_ratio(),
-                 camera.get_near_distance(), 2.0f * camera.get_far_distance()),
+      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
+                 2.0f * camera.get_far_distance()),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     EventHandler::set_active_camera(&camera);
@@ -172,7 +172,7 @@ void Application::run() {
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
-        frustum.update(camera, Window::get_aspect_ratio());
+        frustum.update(camera);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

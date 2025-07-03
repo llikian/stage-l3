@@ -7,31 +7,29 @@
 
 #include <cmath>
 #include <numbers>
+
+#include "EventHandler.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "maths/trigonometry.hpp"
+#include "Window.hpp"
 
 #define PIf (std::numbers::pi_v<float>)
 
-Camera::Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance)
+Camera::Camera(const vec3& position, float fov, float near_distance, float far_distance)
     : sensitivity(0.1f), movement_speed(100.0f),
       position(position),
       pitch(0.0f), yaw(-PIf / 2.0f),
       fov(fov), near_distance(near_distance), far_distance(far_distance),
-      view_matrix(1.0f), projection_matrix(perspective(fov, aspect_ratio, near_distance, far_distance)) {
+      view_matrix(1.0f), projection_matrix(perspective(fov, Window::get_aspect_ratio(), near_distance, far_distance)) {
     update_vectors_and_view_matrix();
 }
 
-Camera::Camera(const vec3& position,
-               const vec3& target,
-               float fov,
-               float aspect_ratio,
-               float near_distance,
-               float far_distance)
+Camera::Camera(const vec3& position, const vec3& target, float fov, float near_distance, float far_distance)
     : sensitivity(0.1f), movement_speed(100.0f),
       position(position),
       fov(fov), near_distance(near_distance), far_distance(far_distance),
-      view_matrix(1.0f), projection_matrix(perspective(fov, aspect_ratio, near_distance, far_distance)) {
+      view_matrix(1.0f), projection_matrix(perspective(fov, Window::get_aspect_ratio(), near_distance, far_distance)) {
     look_at_point(target);
 }
 
@@ -129,7 +127,9 @@ void Camera::look_around(float pitch_offset, float yaw_offset) {
     update_vectors_and_view_matrix();
 }
 
-void Camera::move_around(MovementDirection movement_direction, float delta) {
+void Camera::move_around(MovementDirection movement_direction) {
+    float delta = EventHandler::get_delta();
+
     switch(movement_direction) {
         case MovementDirection::FORWARD:
             position += movement_speed * delta * direction;
@@ -158,8 +158,8 @@ void Camera::move_around(MovementDirection movement_direction, float delta) {
     view_matrix(2, 3) = dot(position, direction);
 }
 
-void Camera::update_projection_matrix(float aspect_ratio) {
-    projection_matrix(0, 0) = 1.0f / (aspect_ratio * std::tan(0.5f * fov));
+void Camera::update_projection_matrix() {
+    projection_matrix(0, 0) = 1.0f / (Window::get_aspect_ratio() * std::tan(0.5f * fov));
 }
 
 void Camera::look_at_point(const vec3& target) {

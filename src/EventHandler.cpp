@@ -50,7 +50,7 @@ void EventHandler::set_active_camera(Camera* camera) {
 
 void EventHandler::handle_window_size_event(int width, int height) {
     Window::update_size(width, height);
-    get().active_camera->update_projection_matrix(Window::get_aspect_ratio());
+    get().active_camera->update_projection_matrix();
 }
 
 void EventHandler::handle_framebuffer_size_event(int width, int height) {
@@ -130,24 +130,12 @@ EventHandler::EventHandler()
     });
 
     /* Camera */
-    associate_action_to_key(GLFW_KEY_W, true, [this] {
-        active_camera->move_around(MovementDirection::FORWARD, delta);
-    });
-    associate_action_to_key(GLFW_KEY_A, true, [this] {
-        active_camera->move_around(MovementDirection::LEFT, delta);
-    });
-    associate_action_to_key(GLFW_KEY_S, true, [this] {
-        active_camera->move_around(MovementDirection::BACKWARD, delta);
-    });
-    associate_action_to_key(GLFW_KEY_D, true, [this] {
-        active_camera->move_around(MovementDirection::RIGHT, delta);
-    });
-    associate_action_to_key(GLFW_KEY_SPACE, true, [this] {
-        active_camera->move_around(MovementDirection::UPWARD, delta);
-    });
-    associate_action_to_key(GLFW_KEY_LEFT_SHIFT, true, [this] {
-        active_camera->move_around(MovementDirection::DOWNWARD, delta);
-    });
+    associate_action_to_key(GLFW_KEY_W, true, [this] { active_camera->move_around(MovementDirection::FORWARD); });
+    associate_action_to_key(GLFW_KEY_A, true, [this] { active_camera->move_around(MovementDirection::LEFT); });
+    associate_action_to_key(GLFW_KEY_S, true, [this] { active_camera->move_around(MovementDirection::BACKWARD); });
+    associate_action_to_key(GLFW_KEY_D, true, [this] { active_camera->move_around(MovementDirection::RIGHT); });
+    associate_action_to_key(GLFW_KEY_SPACE, true, [this] { active_camera->move_around(MovementDirection::UPWARD); });
+    associate_action_to_key(GLFW_KEY_C, true, [this] { active_camera->move_around(MovementDirection::DOWNWARD); });
 }
 
 EventHandler::~EventHandler() { }

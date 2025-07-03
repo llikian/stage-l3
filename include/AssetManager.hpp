@@ -21,7 +21,7 @@ public:
     AssetManager(const AssetManager&) = delete;
     AssetManager& operator=(const AssetManager&) = delete;
 
-    static inline AssetManager& get_instance() {
+    static inline AssetManager& get() {
         static AssetManager asset_manager;
         return asset_manager;
     }
@@ -38,7 +38,7 @@ public:
 
     template <typename MeshFunc, typename... Args>
     static TriangleMesh& add_triangle_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
-        TriangleMesh& mesh = get_instance().triangle_meshes.emplace(name, TriangleMesh()).first->second;
+        TriangleMesh& mesh = get().triangle_meshes.emplace(name, TriangleMesh()).first->second;
         std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
         return mesh;
     }
@@ -47,7 +47,7 @@ public:
 
     template <typename MeshFunc, typename... Args>
     static LineMesh& add_line_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
-        LineMesh& mesh = get_instance().line_meshes.emplace(name, LineMesh()).first->second;
+        LineMesh& mesh = get().line_meshes.emplace(name, LineMesh()).first->second;
         std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
         return mesh;
     }

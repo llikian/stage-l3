@@ -29,27 +29,20 @@ public:
      * @brief Creates a camera at a specific position looking towards the -z axis.
      * @param position The position of the camera.
      * @param fov The camera's fov.
-     * @param aspect_ratio The window's aspect ratio.
      * @param near_distance Distance of the near plane.
      * @param far_distance Distance of the far plane.
      */
-    Camera(const vec3& position, float fov, float aspect_ratio, float near_distance, float far_distance);
+    Camera(const vec3& position, float fov, float near_distance, float far_distance);
 
     /**
      * @brief Creates a camera at a specific position looking towards a specific point.
      * @param position The position of the camera.
      * @param target The point the camera is looking at.
      * @param fov The camera's fov.
-     * @param aspect_ratio The window's aspect ratio.
      * @param near_distance Distance of the near plane.
      * @param far_distance Distance of the far plane.
      */
-    Camera(const vec3& position,
-           const vec3& target,
-           float fov,
-           float aspect_ratio,
-           float near_distance,
-           float far_distance);
+    Camera(const vec3& position, const vec3& target, float fov, float near_distance, float far_distance);
 
     /**
      * @return The camera's position.
@@ -131,15 +124,13 @@ public:
     /**
      * @brief Moves the camera in a certain direction.
      * @param movement_direction The direction to move towards.
-     * @param delta How much time passed since the last frame.
      */
-    void move_around(MovementDirection movement_direction, float delta);
+    void move_around(MovementDirection movement_direction);
 
     /**
      * @brief Updates the projection matrix with according to the window's new aspect ratio.
-     * @param aspect_ratio The window's new aspect ratio.
      */
-    void update_projection_matrix(float aspect_ratio);
+    void update_projection_matrix();
 
     /**
      * @brief Rotates the camera to make it look towards a certain point.

@@ -9,14 +9,14 @@
 
 Shader& AssetManager::add_shader(const std::string& name,
                                  const std::initializer_list<std::filesystem::path>& paths_list) {
-    return get_instance().shaders.emplace(std::piecewise_construct,
+    return get().shaders.emplace(std::piecewise_construct,
                                           std::forward_as_tuple(name),
                                           std::forward_as_tuple(paths_list, name))
                          .first->second;
 }
 
 Texture& AssetManager::add_texture(const std::filesystem::path& path) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
     auto iterator = asset_manager.textures.find(path);
 
     return iterator == asset_manager.textures.end()
@@ -25,22 +25,22 @@ Texture& AssetManager::add_texture(const std::filesystem::path& path) {
 }
 
 Model& AssetManager::add_model(const std::string& name, const std::filesystem::path& path) {
-    return get_instance().models.emplace(std::piecewise_construct,
+    return get().models.emplace(std::piecewise_construct,
                                          std::forward_as_tuple(name),
                                          std::forward_as_tuple(path))
                          .first->second;
 }
 
 TriangleMesh& AssetManager::add_triangle_mesh(const std::string& name) {
-    return get_instance().triangle_meshes.emplace(name, TriangleMesh()).first->second;
+    return get().triangle_meshes.emplace(name, TriangleMesh()).first->second;
 }
 
 LineMesh& AssetManager::add_line_mesh(const std::string& name) {
-    return get_instance().line_meshes.emplace(name, LineMesh()).first->second;
+    return get().line_meshes.emplace(name, LineMesh()).first->second;
 }
 
 Shader& AssetManager::get_shader(const std::string& shader_name) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.shaders.find(shader_name);
     if(iterator == asset_manager.shaders.end()) {
@@ -51,7 +51,7 @@ Shader& AssetManager::get_shader(const std::string& shader_name) {
 }
 
 Texture& AssetManager::get_texture(const std::string& texture_path) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.textures.find(texture_path);
     if(iterator == asset_manager.textures.end()) {
@@ -62,7 +62,7 @@ Texture& AssetManager::get_texture(const std::string& texture_path) {
 }
 
 Model& AssetManager::get_model(const std::string& model_name) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.models.find(model_name);
     if(iterator == asset_manager.models.end()) {
@@ -73,7 +73,7 @@ Model& AssetManager::get_model(const std::string& model_name) {
 }
 
 TriangleMesh& AssetManager::get_triangle_mesh(const std::string& mesh_name) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.triangle_meshes.find(mesh_name);
     if(iterator == asset_manager.triangle_meshes.end()) {
@@ -84,7 +84,7 @@ TriangleMesh& AssetManager::get_triangle_mesh(const std::string& mesh_name) {
 }
 
 LineMesh& AssetManager::get_line_mesh(const std::string& mesh_name) {
-    AssetManager& asset_manager = get_instance();
+    AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.line_meshes.find(mesh_name);
     if(iterator == asset_manager.line_meshes.end()) {

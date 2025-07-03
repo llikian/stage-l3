@@ -7,23 +7,24 @@
 
 #include <cmath>
 #include "maths/geometry.hpp"
+#include "Window.hpp"
 
-Frustum::Frustum(const Camera& camera, float aspect_ratio) {
-    update(camera, aspect_ratio);
+Frustum::Frustum(const Camera& camera) {
+    update(camera);
 }
 
-Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, TriangleMesh& faces) {
+Frustum::Frustum(const Camera& camera, LineMesh& lines, TriangleMesh& faces) {
     float tan_half_fov = std::tan(camera.fov / 2.0f);
 
     // Dimensions of the near/far quads divided by 2
     float near_height = camera.near_distance * tan_half_fov;
-    float near_width = near_height * aspect_ratio;
+    float near_width = near_height * Window::get_aspect_ratio();
     vec3 near_center = camera.near_distance * camera.direction;
     vec3 near_up = near_height * camera.up;
     vec3 near_right = near_width * camera.right;
 
     float far_height = camera.far_distance * tan_half_fov;
-    float far_width = far_height * aspect_ratio;
+    float far_width = far_height * Window::get_aspect_ratio();
     vec3 far_center = camera.far_distance * camera.direction;
     vec3 far_up = far_height * camera.up;
     vec3 far_right = far_width * camera.right;
@@ -93,11 +94,11 @@ Frustum::Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, Tria
     faces.bind_buffers();
 }
 
-void Frustum::update(const Camera& camera, float aspect_ratio) {
+void Frustum::update(const Camera& camera) {
     float far_height = camera.far_distance * std::tan(camera.fov / 2.0f);
     vec3 far_center = camera.far_distance * camera.direction;
     vec3 far_up = far_height * camera.up;
-    vec3 far_right = far_height * aspect_ratio * camera.right;
+    vec3 far_right = far_height * Window::get_aspect_ratio() * camera.right;
 
     near_plane.normal = camera.direction;
     far_plane.normal = -camera.direction;

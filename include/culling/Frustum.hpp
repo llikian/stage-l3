@@ -15,10 +15,10 @@
  * @brief
  */
 struct Frustum {
-    Frustum(const Camera& camera, float aspect_ratio);
-    Frustum(const Camera& camera, float aspect_ratio, LineMesh& lines, TriangleMesh& faces);
+    explicit Frustum(const Camera& camera);
+    Frustum(const Camera& camera, LineMesh& lines, TriangleMesh& faces);
 
-    void update(const Camera& camera, float aspect_ratio);
+    void update(const Camera& camera);
 
     Plane near_plane;
     Plane far_plane;
