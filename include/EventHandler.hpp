@@ -20,17 +20,13 @@ using Action = std::function<void()>;
  */
 class EventHandler {
 public:
-    /**
-     * @brief Creates an event handler.
-     * @param window The window.
-     * @param camera The active camera.
-     */
-    EventHandler(Window& window, Camera* camera);
+    EventHandler(const EventHandler&) = delete; ///< Delete copy constructor.
+    EventHandler& operator=(const EventHandler&) = delete; ///< Deleted copy operator.
 
-    /**
-     * @brief Polls GLFW events, handles all of them and updates all event related variables.
-     */
-    void poll_and_handle_events();
+    static inline EventHandler& get() {
+        static EventHandler event_handler;
+        return event_handler;
+    }
 
     /**
      * @brief Associates an action to the press of a key.
@@ -41,60 +37,72 @@ public:
     void associate_action_to_key(int key, bool repeatable, Action action);
 
     /**
+     * @brief Polls GLFW events, handles all of them and updates all event related variables.
+     */
+    static void poll_and_handle_events();
+
+    /**
      * @brief Changes the active camera.
      * @param camera The new active camera.
      */
-    void set_active_camera(Camera* camera);
+    static void set_active_camera(Camera* camera);
 
     /**
      * @brief Handles what happens when the window is resized.
      * @param width The window's new width.
      * @param height The window's new height.
      */
-    void handle_window_size_event(int width, int height);
+    static void handle_window_size_event(int width, int height);
 
     /**
      * @brief Handles what happens when the frambuffer is resized.
      * @param width The framebuffer's new width.
      * @param height The framebuffer's new height.
      */
-    void handle_framebuffer_size_event(int width, int height);
+    static void handle_framebuffer_size_event(int width, int height);
 
     /**
      * @brief Handles what happens when a key is pressed.
      * @param key The pressed key.
      */
-    void handle_key_press_event(int key);
+    static void handle_key_press_event(int key);
 
     /**
      * @brief Handles what happens when a key is released.
      * @param key The pressed key.
      */
-    void handle_key_release_event(int key);
+    static void handle_key_release_event(int key);
 
     /**
      * @brief Handles what happens when the mouse is moved.
      * @param position_x The mouse's new horizontal position.
      * @param position_y The mouse's new vertical position.
      */
-    void handle_cursor_position_event(int position_x, int position_y);
+    static void handle_cursor_position_event(int position_x, int position_y);
 
     /**
      * @return How much time elapsed since the beginning of the program.
      */
-    float get_time() const;
+    static float get_time();
 
     /**
      * @return  How much time passed since the last frame.
      */
-    float get_delta() const;
+    static float get_delta();
 
     /**
      * @return Whether wireframe mode is enabled.
      */
-    bool is_wireframe_on() const;
+    static bool is_wireframe_on();
 
 private:
+    /**
+     * @brief Creates an event handler.
+     */
+    explicit EventHandler();
+
+    ~EventHandler();
+
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
     std::unordered_map<int, bool> repeatable_keys; ///< Stores repeatable keys and whether they are active.
@@ -104,7 +112,6 @@ private:
     float time;  ///< How much time elapsed since the beginning of the program.
     float delta; ///< How much time passed since the last frame.
 
-    Window& window;        ///< A pointer to the window.
     Camera* active_camera; ///< A pointer to the active camera.
 
     bool is_cursor_visible;       ///< Whether the mouse's cursor is visible.
