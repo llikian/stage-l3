@@ -62,8 +62,6 @@ private:
     Camera camera;          ///< The camera.
 
     /* Frustum Culling */
-    LineMesh frustum_lines;          ///< Mesh used to render the lines of the view frustum.
-    TriangleMesh frustum_faces;      ///< Mesh used to render the faces of the view frustum.
     Frustum frustum;                 ///< The frustum used for culling.
     bool is_spying_enabled;          ///< Whether the spying window is drawn.
     vec3 spy_camera_position;        ///< The spy camera's position.

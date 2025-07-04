@@ -22,7 +22,6 @@
 
 Application::Application()
     : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
-      frustum(camera, frustum_lines, frustum_faces),
       is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
       spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
                  2.0f * camera.get_far_distance()),
@@ -78,6 +77,7 @@ Application::Application()
     AssetManager::add_line_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_line_mesh("camera pyramid", create_pyramid_mesh,
                                 vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
+    AssetManager::add_triangle_and_line_mesh("frustum", create_frustum_meshes, camera);
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -153,10 +153,10 @@ void Application::run() {
     terrain->set_visibility(false);
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
+    Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
     /* Frustum Culling Tests */ {
         const Shader& shader = AssetManager::get_shader("flat");
         TriangleMesh& mesh = AssetManager::get_triangle_mesh("cube");
-        Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
             auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);
@@ -170,7 +170,6 @@ void Application::run() {
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
-        frustum.update(camera);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -179,8 +178,9 @@ void Application::run() {
 
         vec3 camera_position = camera.get_position();
         vec3 camera_direction = camera.get_direction();
-        mat4 view_projection = camera.get_view_projection_matrix();
+        frustum.view_projection = camera.get_view_projection_matrix();
 
+        // test_AABBs_root->transform.set_local_orientation(0.0f, 10.0f * EventHandler::get_time(), 0.0f);
         root->update_transform_and_children();
 
         draw_background();
@@ -199,7 +199,8 @@ void Application::run() {
             shader.use();
 
             if(are_axes_drawn) {
-                shader.set_uniform("u_mvp", view_projection * translate(camera_position + 2.0f * camera_direction));
+                shader.set_uniform("u_mvp", frustum.view_projection
+                    * translate(camera_position + 2.0f * camera_direction));
                 AssetManager::get_line_mesh("axes").draw(shader);
             }
         }
@@ -209,7 +210,7 @@ void Application::run() {
             shader.use();
 
             if(is_spying_enabled) {
-                shader.set_uniform("u_mvp", view_projection * spy_camera.get_model_matrix().scale(1024.0f));
+                shader.set_uniform("u_mvp", frustum.view_projection * spy_camera.get_model_matrix().scale(1024.0f));
                 shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
                 glLineWidth(3.0f);
                 AssetManager::get_line_mesh("camera pyramid").draw(shader);
@@ -236,21 +237,7 @@ void Application::run() {
         //     shader.set_uniform("u_frustum.right_plane.distance", frustum.right_plane.distance);
         // }
 
-            shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
-            shader.set_uniform("u_frustum.near_plane.distance", frustum.near_plane.distance);
-            shader.set_uniform("u_frustum.far_plane.normal", frustum.far_plane.normal);
-            shader.set_uniform("u_frustum.far_plane.distance", frustum.far_plane.distance);
-            shader.set_uniform("u_frustum.top_plane.normal", frustum.top_plane.normal);
-            shader.set_uniform("u_frustum.top_plane.distance", frustum.top_plane.distance);
-            shader.set_uniform("u_frustum.bottom_plane.normal", frustum.bottom_plane.normal);
-            shader.set_uniform("u_frustum.bottom_plane.distance", frustum.bottom_plane.distance);
-            shader.set_uniform("u_frustum.left_plane.normal", frustum.left_plane.normal);
-            shader.set_uniform("u_frustum.left_plane.distance", frustum.left_plane.distance);
-            shader.set_uniform("u_frustum.right_plane.normal", frustum.right_plane.normal);
-            shader.set_uniform("u_frustum.right_plane.distance", frustum.right_plane.distance);
-        }
-
-        scene_graph.draw(view_projection, frustum);
+        scene_graph.draw(frustum.view_projection, frustum);
 
         if(is_spying_enabled) { draw_spy_window(); }
 
@@ -291,7 +278,7 @@ void Application::draw_spy_window() {
 
         glLineWidth(5.0f);
         shader.set_uniform("u_mvp", mvp);
-        frustum_lines.draw(shader);
+        AssetManager::get_line_mesh("frustum").draw(shader);
         glLineWidth(1.0f);
     }
 
@@ -303,7 +290,7 @@ void Application::draw_spy_window() {
         glDisable(GL_CULL_FACE);
         shader.set_uniform("u_mvp", mvp);
         shader.set_uniform("u_color", faces_color);
-        frustum_faces.draw(shader);
+        AssetManager::get_triangle_mesh("frustum").draw(shader);
         glEnable(GL_CULL_FACE);
     }
 
