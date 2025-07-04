@@ -7,28 +7,14 @@
 
 layout (vertices = 4) out;
 
-struct Plane {
-    vec3 normal;
-    float distance;
-};
-
-struct Frustum {
-    Plane near_plane;
-    Plane far_plane;
-    Plane top_plane;
-    Plane bottom_plane;
-    Plane left_plane;
-    Plane right_plane;
-};
+uniform mat4 u_frustum_view_projection_matrix;
+uniform float u_chunk_size;
 
 struct Noise {
     float frequency;
     float amplitude;
     float height;
 };
-
-uniform Frustum u_frustum;
-uniform float u_chunk_size;
 
 float fade(in float x) {
     float x3 = x * x * x;
@@ -88,34 +74,42 @@ float get_height(vec2 position) {
     return max(max(heightPlain, heightPlateau), heightMountain);
 }
 
-vec3 get_position(vec2 pos) {
-    return vec3(pos.x, get_height(pos), pos.y);
+vec4 get_position(vec2 pos) {
+    return vec4(pos.x, get_height(pos), pos.y, 1.0f);
 }
 
-bool is_on_or_above_plane(Plane plane, vec3 point) {
-    return dot(plane.normal, point) - plane.distance >= 0.0f;
-}
+bool is_in_frustum(vec4 point[4]) {
+    uint points_on_or_above_plane[6] = { 0, 0, 0, 0, 0, 0 };
 
-bool is_in_frustum(Frustum frustum, vec3 point) {
-    return is_on_or_above_plane(frustum.near_plane, point) &&
-           is_on_or_above_plane(frustum.far_plane, point) &&
-           is_on_or_above_plane(frustum.top_plane, point) &&
-           is_on_or_above_plane(frustum.bottom_plane, point) &&
-           is_on_or_above_plane(frustum.left_plane, point) &&
-           is_on_or_above_plane(frustum.right_plane, point);
+    for(uint i = 0 ; i < 4 ; ++i) {
+        vec4 p = u_frustum_view_projection_matrix * point[i];
+        if(p.x < -p.w) { ++points_on_or_above_plane[0]; }
+        if(p.x > p.w) { ++points_on_or_above_plane[1]; }
+        if(p.y < -p.w) { ++points_on_or_above_plane[2]; }
+        if(p.y > p.w) { ++points_on_or_above_plane[3]; }
+        if(p.z < -p.w) { ++points_on_or_above_plane[4]; }
+        if(p.z > p.w) { ++points_on_or_above_plane[5]; }
+    }
+
+    for(uint i = 0 ; i < 6 ; ++i) {
+        if(points_on_or_above_plane[i] == 4) { return false; }
+    }
+
+    return true;
 }
 
 void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
     if(gl_InvocationID % 4 == 0) {
-        float level = 0.0f;
-        if(is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID].gl_Position.xz)) ||
-           is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID + 1].gl_Position.xz)) ||
-           is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID + 2].gl_Position.xz)) ||
-           is_in_frustum(u_frustum, get_position(gl_in[gl_InvocationID + 3].gl_Position.xz))) {
-            level = 16.0f;
-        }
+        vec4 points[4] = {
+            get_position(gl_in[gl_InvocationID].gl_Position.xz),
+            get_position(gl_in[gl_InvocationID + 1].gl_Position.xz),
+            get_position(gl_in[gl_InvocationID + 2].gl_Position.xz),
+            get_position(gl_in[gl_InvocationID + 3].gl_Position.xz)
+        };
+
+        float level = is_in_frustum(points) ? 16.0f : 0.0f;
 
         gl_TessLevelOuter[0] = level;
         gl_TessLevelOuter[1] = level;

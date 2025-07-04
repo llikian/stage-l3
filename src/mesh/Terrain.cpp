@@ -63,19 +63,7 @@ void Terrain::draw(const Frustum& frustum, const mat4& view_projection) const {
 
     shader.set_uniform("u_view_projection", view_projection);
     shader.set_uniform("u_chunk_size", chunk_size);
-
-    // shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
-    // shader.set_uniform("u_frustum.near_plane.distance", frustum.near_plane.distance);
-    // shader.set_uniform("u_frustum.far_plane.normal", frustum.far_plane.normal);
-    // shader.set_uniform("u_frustum.far_plane.distance", frustum.far_plane.distance);
-    // shader.set_uniform("u_frustum.top_plane.normal", frustum.top_plane.normal);
-    // shader.set_uniform("u_frustum.top_plane.distance", frustum.top_plane.distance);
-    // shader.set_uniform("u_frustum.bottom_plane.normal", frustum.bottom_plane.normal);
-    // shader.set_uniform("u_frustum.bottom_plane.distance", frustum.bottom_plane.distance);
-    // shader.set_uniform("u_frustum.left_plane.normal", frustum.left_plane.normal);
-    // shader.set_uniform("u_frustum.left_plane.distance", frustum.left_plane.distance);
-    // shader.set_uniform("u_frustum.right_plane.normal", frustum.right_plane.normal);
-    // shader.set_uniform("u_frustum.right_plane.distance", frustum.right_plane.distance);
+    shader.set_uniform("u_frustum_view_projection_matrix", frustum.view_projection);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_PATCHES, indices.size(), GL_UNSIGNED_INT, nullptr);
