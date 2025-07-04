@@ -302,17 +302,36 @@ mat4 operator -(const mat4& left, const mat4& right) {
 }
 
 mat4 operator *(const mat4& left, const mat4& right) {
-    mat4 result;
+    // mat4 result;
+    //
+    // for(int i = 0 ; i < 4 ; ++i) {
+    //     for(int j = 0 ; j < 4 ; ++j) {
+    //         for(int k = 0 ; k < 4 ; ++k) {
+    //             result(i, j) += left(i, k) * right(k, j);
+    //         }
+    //     }
+    // }
+    //
+    // return result;
 
-    for(int i = 0 ; i < 4 ; ++i) {
-        for(int j = 0 ; j < 4 ; ++j) {
-            for(int k = 0 ; k < 4 ; ++k) {
-                result(i, j) += left(i, k) * right(k, j);
-            }
-        }
-    }
-
-    return result;
+    return mat4(
+        left(0, 0) * right(0, 0) + left(0, 1) * right(1, 0) + left(0, 2) * right(2, 0) + left(0, 3) * right(3, 0),
+        left(0, 0) * right(0, 1) + left(0, 1) * right(1, 1) + left(0, 2) * right(2, 1) + left(0, 3) * right(3, 1),
+        left(0, 0) * right(0, 2) + left(0, 1) * right(1, 2) + left(0, 2) * right(2, 2) + left(0, 3) * right(3, 2),
+        left(0, 0) * right(0, 3) + left(0, 1) * right(1, 3) + left(0, 2) * right(2, 3) + left(0, 3) * right(3, 3),
+        left(1, 0) * right(0, 0) + left(1, 1) * right(1, 0) + left(1, 2) * right(2, 0) + left(1, 3) * right(3, 0),
+        left(1, 0) * right(0, 1) + left(1, 1) * right(1, 1) + left(1, 2) * right(2, 1) + left(1, 3) * right(3, 1),
+        left(1, 0) * right(0, 2) + left(1, 1) * right(1, 2) + left(1, 2) * right(2, 2) + left(1, 3) * right(3, 2),
+        left(1, 0) * right(0, 3) + left(1, 1) * right(1, 3) + left(1, 2) * right(2, 3) + left(1, 3) * right(3, 3),
+        left(2, 0) * right(0, 0) + left(2, 1) * right(1, 0) + left(2, 2) * right(2, 0) + left(2, 3) * right(3, 0),
+        left(2, 0) * right(0, 1) + left(2, 1) * right(1, 1) + left(2, 2) * right(2, 1) + left(2, 3) * right(3, 1),
+        left(2, 0) * right(0, 2) + left(2, 1) * right(1, 2) + left(2, 2) * right(2, 2) + left(2, 3) * right(3, 2),
+        left(2, 0) * right(0, 3) + left(2, 1) * right(1, 3) + left(2, 2) * right(2, 3) + left(2, 3) * right(3, 3),
+        left(3, 0) * right(0, 0) + left(3, 1) * right(1, 0) + left(3, 2) * right(2, 0) + left(3, 3) * right(3, 0),
+        left(3, 0) * right(0, 1) + left(3, 1) * right(1, 1) + left(3, 2) * right(2, 1) + left(3, 3) * right(3, 1),
+        left(3, 0) * right(0, 2) + left(3, 1) * right(1, 2) + left(3, 2) * right(2, 2) + left(3, 3) * right(3, 2),
+        left(3, 0) * right(0, 3) + left(3, 1) * right(1, 3) + left(3, 2) * right(2, 3) + left(3, 3) * right(3, 3)
+    );
 }
 
 mat4 operator +(const mat4& mat, float scalar) {
