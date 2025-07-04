@@ -150,7 +150,7 @@ void Application::run() {
 
     /* Other Entities */
     TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
-    // terrain->set_visibility(false);
+    terrain->set_visibility(false);
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     /* Frustum Culling Tests */ {
@@ -218,9 +218,23 @@ void Application::run() {
         }
 
         /* Terrain Shader */
-        if(terrain->get_visibility()) {
-            const Shader& shader = AssetManager::get_shader("terrain");
-            shader.use();
+        // if(terrain->get_visibility()) {
+        //     const Shader& shader = AssetManager::get_shader("terrain");
+        //     shader.use();
+        //
+        //     shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
+        //     shader.set_uniform("u_frustum.near_plane.distance", frustum.near_plane.distance);
+        //     shader.set_uniform("u_frustum.far_plane.normal", frustum.far_plane.normal);
+        //     shader.set_uniform("u_frustum.far_plane.distance", frustum.far_plane.distance);
+        //     shader.set_uniform("u_frustum.top_plane.normal", frustum.top_plane.normal);
+        //     shader.set_uniform("u_frustum.top_plane.distance", frustum.top_plane.distance);
+        //     shader.set_uniform("u_frustum.bottom_plane.normal", frustum.bottom_plane.normal);
+        //     shader.set_uniform("u_frustum.bottom_plane.distance", frustum.bottom_plane.distance);
+        //     shader.set_uniform("u_frustum.left_plane.normal", frustum.left_plane.normal);
+        //     shader.set_uniform("u_frustum.left_plane.distance", frustum.left_plane.distance);
+        //     shader.set_uniform("u_frustum.right_plane.normal", frustum.right_plane.normal);
+        //     shader.set_uniform("u_frustum.right_plane.distance", frustum.right_plane.distance);
+        // }
 
             shader.set_uniform("u_frustum.near_plane.normal", frustum.near_plane.normal);
             shader.set_uniform("u_frustum.near_plane.distance", frustum.near_plane.distance);
