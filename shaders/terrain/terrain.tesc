@@ -101,12 +101,12 @@ bool is_in_frustum(vec4 point[4]) {
 void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
-    if(gl_InvocationID % 4 == 0) {
+    if(gl_InvocationID == 0) {
         vec4 points[4] = {
-            get_position(gl_in[gl_InvocationID].gl_Position.xz),
-            get_position(gl_in[gl_InvocationID + 1].gl_Position.xz),
-            get_position(gl_in[gl_InvocationID + 2].gl_Position.xz),
-            get_position(gl_in[gl_InvocationID + 3].gl_Position.xz)
+            get_position(gl_in[0].gl_Position.xz),
+            get_position(gl_in[1].gl_Position.xz),
+            get_position(gl_in[2].gl_Position.xz),
+            get_position(gl_in[3].gl_Position.xz)
         };
 
         float level = is_in_frustum(points) ? 16.0f : 0.0f;
