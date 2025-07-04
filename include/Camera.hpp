@@ -102,11 +102,25 @@ public:
     mat4 get_rotation_matrix() const;
 
     /**
-     * @brief Calculates the camera's model matrix.
+     * @brief Calculates the camera's model matrix. This matrix is also the inverse of the camera's
+     * view matrix.
      * @return A transformation matrix that rotates towards where the camera is looking and translates
      * it to the camera's position.
      */
     mat4 get_model_matrix() const;
+
+    /**
+     * @brief Calculates the inverse of the projection matrix.
+     * @return The inverse of the projection matrix.
+     */
+    mat4 get_inverse_projection_matrix() const;
+
+    /**
+     * @brief Calculates the inverse of the view-projectino matrix.
+     * @return The inverse of the view matrix multiplied with the inverse of the projection matrix:\n
+     * (PV)^(-1) = V^(-1) * P^(-1).
+     */
+    mat4 get_inverse_view_projection_matrix() const;
 
     /**
      * @brief Sets the camera's position to a certain point.

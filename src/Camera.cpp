@@ -110,6 +110,19 @@ mat4 Camera::get_model_matrix() const {
     );
 }
 
+mat4 Camera::get_inverse_projection_matrix() const {
+    return mat4(
+        1.0f / projection_matrix(0, 0), 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f / projection_matrix(1, 1), 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, 1.0f / projection_matrix(2, 3), projection_matrix(2, 2) / projection_matrix(2, 3)
+    );
+}
+
+mat4 Camera::get_inverse_view_projection_matrix() const {
+    return get_model_matrix() * get_inverse_projection_matrix();
+}
+
 void Camera::set_position(const vec3& position) {
     this->position = position;
 
