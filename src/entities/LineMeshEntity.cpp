@@ -18,5 +18,5 @@ void LineMeshEntity::create_aabb() {
     vec3 min(std::numeric_limits<float>::max());
     vec3 max(std::numeric_limits<float>::lowest());
     mesh.get_min_max_axis_aligned_coordinates(min, max);
-    bounding_volume = new AABB(min, max);
+    aabb = new AABB(min, max);
 }

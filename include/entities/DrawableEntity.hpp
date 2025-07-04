@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include "culling/AABB.hpp"
 #include "Entity.hpp"
+#include "Shader.hpp"
 
 /**
  * @class DrawableEntity
@@ -52,7 +54,7 @@ public:
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
     const Shader& shader; ///< A pointer to the shader used when rendering.
-    BoundingVolume* bounding_volume;
+    AABB* aabb;
 
     static inline unsigned int total_drawable_entities = 0;
     static inline unsigned int total_not_hidden_entities = 0;

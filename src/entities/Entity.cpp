@@ -5,6 +5,9 @@
 
 #include "entities/Entity.hpp"
 
+#include <glad/glad.h>
+#include "AssetManager.hpp"
+#include "debug.hpp"
 #include "entities/DrawableEntity.hpp"
 #include "imgui.h"
 
@@ -54,10 +57,22 @@ void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& f
             DrawableEntity::total_not_hidden_entities++;
 
             DrawableEntity* entity = static_cast<DrawableEntity*>(this);
-            if(entity->bounding_volume != nullptr) {
-                if(entity->bounding_volume->is_in_frustum(frustum, transform)) {
+            if(entity->aabb != nullptr) {
+                if(entity->aabb->is_in_frustum(frustum.view_projection * transform.get_global_model())) {
+                    // if(entity->bounding_volume->is_in_frustum(frustum, transform)) {
                     DrawableEntity::total_drawn_entities++;
                     entity->draw(view_projection_matrix);
+
+#ifdef DEBUG_SHOW_BOUNDING_BOXES
+                    const Shader& bounding_volume_shader = AssetManager::get_shader("flat");
+                    bounding_volume_shader.use();
+                    bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix * entity->bounding_volume
+                                                              ->get_global_model_matrix(transform));
+                    bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    glLineWidth(3.0f);
+                    AssetManager::get_line_mesh("wireframe cube").draw(bounding_volume_shader);
+                    glLineWidth(1.0f);
+#endif
                 }
             } else {
                 DrawableEntity::total_drawn_entities++;

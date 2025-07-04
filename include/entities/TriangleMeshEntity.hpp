@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DrawableEntity.hpp"
+#include "mesh/TriangleMesh.hpp"
 
 /**
  * @class TriangleMeshEntity

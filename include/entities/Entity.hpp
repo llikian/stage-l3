@@ -6,7 +6,7 @@
 #pragma once
 
 #include <list>
-#include "culling/BoundingVolume.hpp"
+#include "culling/Frustum.hpp"
 #include "maths/Transform.hpp"
 
 enum EntityType {

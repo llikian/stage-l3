@@ -6,6 +6,7 @@
 #include "entities/ModelEntity.hpp"
 
 #include "AssetManager.hpp"
+#include "glad/glad.h"
 #include "imgui.h"
 
 ModelEntity::ModelEntity(const std::string& name, const Shader& shader, Model& model)
@@ -15,15 +16,6 @@ void ModelEntity::draw(const mat4& view_projection_matrix) {
     shader.use();
     update_uniforms(view_projection_matrix);
     model.draw(shader);
-
-    // const Shader& bounding_volume_shader = AssetManager::get_shader("flat");
-    // bounding_volume_shader.use();
-    // bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix
-    //                                             * bounding_volume->get_global_model_matrix(transform));
-    // bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-    // glLineWidth(3.0f);
-    // AssetManager::get_line_mesh("wireframe cube").draw(bounding_volume_shader);
-    // glLineWidth(1.0f);
 }
 
 void ModelEntity::add_to_object_editor() {
@@ -53,5 +45,5 @@ void ModelEntity::create_aabb() {
     vec3 min(std::numeric_limits<float>::max());
     vec3 max(std::numeric_limits<float>::lowest());
     model.get_min_max_axis_aligned_coordinates(min, max);
-    bounding_volume = new AABB(min, max);
+    aabb = new AABB(min, max);
 }
