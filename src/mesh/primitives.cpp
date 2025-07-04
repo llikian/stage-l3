@@ -195,37 +195,23 @@ void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec
 }
 
 void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& camera) {
-    vec3 points[8];
+    static const vec4 projection_space_points[8]{
+        vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        vec4(1.0f, 1.0f, -1.0f, 1.0f),
+        vec4(1.0f, -1.0f, 1.0f, 1.0f),
+        vec4(1.0f, -1.0f, -1.0f, 1.0f),
+        vec4(-1.0f, 1.0f, 1.0f, 1.0f),
+        vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+        vec4(-1.0f, -1.0f, 1.0f, 1.0f),
+        vec4(-1.0f, -1.0f, -1.0f, 1.0f)
+    };
 
-    float tan_half_fov = std::tan(camera.get_fov() / 2.0f);
-
-    // Dimensions of the near/far quads divided by 2
-    float far_height = camera.get_far_distance() * tan_half_fov;
-    float far_width = far_height * Window::get_aspect_ratio();
-
-    float near_height = camera.get_near_distance() * tan_half_fov;
-    float near_width = near_height * Window::get_aspect_ratio();
-
-    // Position of the center of the far/near quads and vectors
-    vec3 far_center = camera.get_position() + camera.get_far_distance() * camera.get_direction();
-    vec3 near_center = camera.get_position() + camera.get_near_distance() * camera.get_direction();
-
-    // Vector from the center of the far/near quad to the center of its top edge.
-    vec3 far_up = far_height * camera.get_up_vector();
-    vec3 near_up = near_height * camera.get_up_vector();
-
-    // Vector from the center of the far/near quad to the center of its top edge.
-    vec3 far_right = far_width * camera.get_right_vector();
-    vec3 near_right = near_width * camera.get_right_vector();
-
-    points[0] = far_center - far_right + far_up;
-    points[1] = far_center - far_right - far_up;
-    points[2] = far_center + far_right - far_up;
-    points[3] = far_center + far_right + far_up;
-    points[4] = near_center - near_right + near_up;
-    points[5] = near_center - near_right - near_up;
-    points[6] = near_center + near_right - near_up;
-    points[7] = near_center + near_right + near_up;
+    vec4 points[8];
+    mat4 inverse_projection = camera.get_inverse_projection_matrix();
+    for(int i = 0 ; i < 8 ; ++i) {
+        points[i] = inverse_projection * projection_space_points[i];
+        points[i] /= points[i].w;
+    }
 
     /* Line Mesh */
     lines.add_vertex(points[0]);
