@@ -30,9 +30,8 @@ set(SOURCES
         src/Window.cpp
 
         # Culling Module
-        src/culling/BoundingVolume.cpp
+        src/culling/AABB.cpp
         src/culling/Frustum.cpp
-        src/culling/Plane.cpp
 
         # Entities Module
         src/entities/DrawableEntity.cpp
