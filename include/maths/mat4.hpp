@@ -56,7 +56,7 @@ public:
      * @param column The column's index.
      * @return A reference to the element.
      */
-    float& operator ()(int row, int column);
+    inline float& operator ()(int row, int column) { return values[column][row]; }
 
     /**
      * @brief Accesses an element of the mat4.
@@ -64,7 +64,7 @@ public:
      * @param column The column's index.
      * @return A const reference to the element.
      */
-    const float& operator ()(int row, int column) const;
+    inline const float& operator ()(int row, int column) const { return values[column][row]; }
 
     /**
      * @brief Applies a transform that scales by the same factor in all 3 directions.

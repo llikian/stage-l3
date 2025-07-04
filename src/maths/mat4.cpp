@@ -46,14 +46,6 @@ mat4::mat4(float scalar)
         { 0.0f, 0.0f, 0.0f, scalar }
     } { }
 
-float& mat4::operator ()(int row, int column) {
-    return values[column][row];
-}
-
-const float& mat4::operator ()(int row, int column) const {
-    return values[column][row];
-}
-
 mat4& mat4::scale(float factor) {
     for(int i = 0 ; i < 3 ; ++i) {
         values[0][i] *= factor;
