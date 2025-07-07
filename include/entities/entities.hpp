@@ -10,5 +10,6 @@
 #include "FlatShadedMeshEntity.hpp"
 #include "LineMeshEntity.hpp"
 #include "ModelEntity.hpp"
+#include "SceneEntity.hpp"
 #include "TerrainEntity.hpp"
 #include "TriangleMeshEntity.hpp"

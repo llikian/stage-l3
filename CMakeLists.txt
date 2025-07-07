@@ -39,6 +39,7 @@ set(SOURCES
         src/entities/FlatShadedMeshEntity.cpp
         src/entities/LineMeshEntity.cpp
         src/entities/ModelEntity.cpp
+        src/entities/SceneEntity.cpp
         src/entities/TerrainEntity.cpp
         src/entities/TriangleMeshEntity.cpp
 
@@ -87,6 +88,7 @@ set(INCLUDES
         include
 
         # Libraries
+        lib/cgltf
         lib/glad/include
         lib/imgui
         lib/imgui/backends

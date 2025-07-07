@@ -167,6 +167,8 @@ void Application::run() {
     }
 #endif
 
+    root->add_child<SceneEntity>("avocado", "data/avocado/Avocado.gltf");
+
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
