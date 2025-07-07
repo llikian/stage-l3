@@ -67,6 +67,8 @@ set(SOURCES
         src/utility/Random.cpp
 
         # Libraries
+        lib/cgltf/cgltf.cpp
+
         lib/glad/src/glad.c
 
         lib/imgui/imgui.cpp
