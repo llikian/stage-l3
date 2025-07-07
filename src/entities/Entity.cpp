@@ -66,8 +66,8 @@ void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& f
 #ifdef DEBUG_SHOW_BOUNDING_BOXES
                     const Shader& bounding_volume_shader = AssetManager::get_shader("flat");
                     bounding_volume_shader.use();
-                    bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix * entity->bounding_volume
-                                                              ->get_global_model_matrix(transform));
+                    bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix
+                                                                * entity->aabb->get_global_model_matrix(transform));
                     bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
                     glLineWidth(3.0f);
                     AssetManager::get_line_mesh("wireframe cube").draw(bounding_volume_shader);

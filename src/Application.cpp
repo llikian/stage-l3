@@ -150,7 +150,7 @@ void Application::run() {
 
     /* Other Entities */
     TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
-    // terrain->set_visibility(false);
+    terrain->set_visibility(false);
 
 #ifdef DEBUG_ENABLE_FRUSTUM_TESTS
     Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
