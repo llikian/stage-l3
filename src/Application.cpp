@@ -7,11 +7,10 @@
 
 #include <cmath>
 #include <glad/glad.h>
-#include <ranges>
-
 #include "AssetManager.hpp"
 #include "debug.hpp"
 #include "entities/entities.hpp"
+#include "EventHandler.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -22,7 +21,8 @@
 
 Application::Application()
     : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
-      is_spying_enabled(true), spy_camera_position(30.0f), spy_camera_target(0.0f),
+      is_spying_enabled(true),
+      spy_camera_position(30.0f), spy_camera_target(0.0f),
       spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
                  2.0f * camera.get_far_distance()),
       are_axes_drawn(false) {
@@ -200,7 +200,7 @@ void Application::run() {
 
             if(are_axes_drawn) {
                 shader.set_uniform("u_mvp", frustum.view_projection
-                    * translate(camera_position + 2.0f * camera_direction));
+                                            * translate(camera_position + 2.0f * camera_direction));
                 AssetManager::get_line_mesh("axes").draw(shader);
             }
         }

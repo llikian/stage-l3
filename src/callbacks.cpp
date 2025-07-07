@@ -5,7 +5,7 @@
 
 #include "callbacks.hpp"
 
-#include "Application.hpp"
+#include "EventHandler.hpp"
 
 void window_size_callback(GLFWwindow* /* window */, int width, int height) {
     EventHandler::handle_window_size_event(width, height);

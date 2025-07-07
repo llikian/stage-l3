@@ -5,16 +5,10 @@
 
 #pragma once
 
-#include <unordered_map>
 #include "Camera.hpp"
 #include "culling/Frustum.hpp"
-#include "EventHandler.hpp"
-#include "mesh/LineMesh.hpp"
-#include "mesh/Model.hpp"
-#include "mesh/TriangleMesh.hpp"
 #include "SceneGraph.hpp"
 #include "Shader.hpp"
-#include "Window.hpp"
 
 /**
  * @class Application

@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include "Application.hpp"
 #include "AssetManager.hpp"
+#include "EventHandler.hpp"
+#include "Window.hpp"
 
 int main() {
     try {
