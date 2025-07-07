@@ -96,8 +96,13 @@ void Entity::add_to_object_editor() {
     }
 
     bool is_dirty = ImGui::DragFloat3("Local Position", &transform.get_local_position_reference().x);
-    is_dirty = is_dirty || ImGui::DragFloat3("Local Orientation", &transform.get_local_orientation_reference().x,
-                                             1.0f, 0.0f, 360.0f, "%.3f", ImGuiSliderFlags_WrapAround);
+
+    quaternion& orientation = transform.get_local_orientation_reference();
+    if(ImGui::DragFloat4("Local Orientation", &orientation.x, 0.1f)) {
+        is_dirty = true;
+        orientation.normalize();
+    }
+
     is_dirty = is_dirty || ImGui::DragFloat3("Local Scale", &transform.get_local_scale_reference().x, 0.1f, 0.1f);
 
     if(is_dirty) { transform.set_local_model_to_dirty(); }

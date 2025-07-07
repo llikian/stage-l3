@@ -40,15 +40,16 @@ public:
      * @brief Changes the local orientation of the transform.
      * @param orientation The transform's new orientation.
      */
-    void set_local_orientation(const vec3& orientation);
+    void set_local_orientation(const quaternion& orientation);
 
     /**
      * @brief Changes the local orientation of the transform.
-     * @param x The transform's new orientation around the x axis.
-     * @param y The transform's new orientation around the y axis.
-     * @param z The transform's new orientation around the z axis.
+     * @param x The value for the coefficient of the orientation quaternion's i imaginary unit.
+     * @param y The value for the coefficient of the orientation quaternion's j imaginary unit.
+     * @param z The value for the coefficient of the orientation quaternion's k imaginary unit.
+     * @param w The value for the real part of the orientation quaternion.
      */
-    void set_local_orientation(float x, float y, float z);
+    void set_local_orientation(float x, float y, float z, float w);
 
     /**
      * @brief Changes the local scale of the transform.
@@ -89,13 +90,13 @@ public:
     /**
      * @return The transform's local orientation.
      */
-    vec3 get_local_orientation() const;
+    quaternion get_local_orientation() const;
 
     /**
      * @return A reference to the transform's local orientation. If the value is modified,
      * set_local_model_to_dirty need to be called.
      */
-    vec3& get_local_orientation_reference();
+    quaternion& get_local_orientation_reference();
 
     /**
      * @return The transform's local scale.
@@ -171,9 +172,9 @@ public:
     void update_global_model(const mat4& parent_global_model);
 
 private:
-    vec3 local_position;    ///< The transform's local position.
-    vec3 local_orientation; ///< The transform's local orientation.
-    vec3 local_scale;       ///< The transform's local scale.
+    vec3 local_position;          ///< The transform's local position.
+    quaternion local_orientation; ///< The transform's local orientation.
+    vec3 local_scale;             ///< The transform's local scale.
 
     bool is_dirty; ///< Whether the local model was modified.
 

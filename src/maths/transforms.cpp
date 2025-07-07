@@ -148,7 +148,7 @@ mat4 rotate_z(float angle) {
 
 mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale) {
     vec3 cosine, sine;
-    
+
     if(rotation.x == 0.0f) {
         cosine.x = 1.0f;
         sine.x = 0.0f;
@@ -157,7 +157,7 @@ mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale
         cosine.x = std::cos(radians);
         sine.x = std::sin(radians);
     }
-    
+
     if(rotation.y == 0.0f) {
         cosine.y = 1.0f;
         sine.y = 0.0f;
@@ -166,7 +166,7 @@ mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale
         cosine.y = std::cos(radians);
         sine.y = std::sin(radians);
     }
-    
+
     if(rotation.z == 0.0f) {
         cosine.z = 1.0f;
         sine.z = 0.0f;
@@ -190,6 +190,27 @@ mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale
         scale.x * (-sine.y * cosine.z + sine.x * cosine.y * sine.z),
         scale.y * (sine.y * sine.z + sine.x * cosine.y * cosine.z),
         scale.z * cosine.x * cosine.y,
+        translation.z,
+
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+}
+
+mat4 TRS_matrix(const vec3& translation, const quaternion& rotation, const vec3& scale) {
+    return mat4(
+        scale.x * (1.0f - 2.0f * (rotation.y * rotation.y + rotation.z * rotation.z)),
+        scale.x * (2.0f * (rotation.x * rotation.y - rotation.w * rotation.z)),
+        scale.x * (2.0f * (rotation.x * rotation.z + rotation.w * rotation.y)),
+        translation.x,
+
+        scale.y * (2.0f * (rotation.x * rotation.y + rotation.w * rotation.z)),
+        scale.y * (1.0f - 2.0f * (rotation.x * rotation.x + rotation.z * rotation.z)),
+        scale.y * (2.0f * (rotation.y * rotation.z - rotation.w * rotation.x)),
+        translation.y,
+
+        scale.z * (2.0f * (rotation.x * rotation.z - rotation.w * rotation.y)),
+        scale.z * (2.0f * (rotation.y * rotation.z + rotation.w * rotation.x)),
+        scale.z * (1.0f - 2.0f * (rotation.x * rotation.x + rotation.y * rotation.y)),
         translation.z,
 
         0.0f, 0.0f, 0.0f, 1.0f

@@ -9,7 +9,7 @@
 
 Transform::Transform()
     : local_position(0.0f),
-      local_orientation(0.0f),
+      local_orientation(0.0f, 0.0f, 0.0f, 1.0f),
       local_scale(1.0f),
       is_dirty(true),
       global_model(1.0f) { }
@@ -26,15 +26,16 @@ void Transform::set_local_position(float x, float y, float z) {
     is_dirty = true;
 }
 
-void Transform::set_local_orientation(const vec3& rotation) {
-    local_orientation = rotation;
+void Transform::set_local_orientation(const quaternion& orientation) {
+    local_orientation = orientation;
     is_dirty = true;
 }
 
-void Transform::set_local_orientation(float x, float y, float z) {
+void Transform::set_local_orientation(float x, float y, float z, float w) {
     local_orientation.x = x;
     local_orientation.y = y;
     local_orientation.z = z;
+    local_orientation.w = w;
     is_dirty = true;
 }
 
@@ -67,11 +68,11 @@ vec3& Transform::get_local_position_reference() {
     return local_position;
 }
 
-vec3 Transform::get_local_orientation() const {
+quaternion Transform::get_local_orientation() const {
     return local_orientation;
 }
 
-vec3& Transform::get_local_orientation_reference() {
+quaternion& Transform::get_local_orientation_reference() {
     return local_orientation;
 }
 

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "mat4.hpp"
+#include "quaternion.hpp"
 #include "vec3.hpp"
 
 /**
@@ -128,6 +129,17 @@ mat4 rotate_z(float angle);
  * parameters.
  */
 mat4 TRS_matrix(const vec3& translation, const vec3& rotation, const vec3& scale);
+
+/**
+ * @brief Calculates the TRS matrix such that TRS=T*Rq*S, with T being a translation matrix, Rq
+ * being the rotation matrix derived from a quaternion S being a scale matrix.
+ * @param translation The value of the translation vector.
+ * @param rotation The rotation quaternion. Assumed to be a unit quaternion.
+ * @param scale The values of the scaling factors.
+ * @return The matrix that scales then rotates then translates a point according to the given
+ * parameters.
+ */
+mat4 TRS_matrix(const vec3& translation, const quaternion& rotation, const vec3& scale);
 
 /**
  * @brief Calculates the 'look at' matrix. That allows to simulate a camera.
