@@ -1,7 +1,7 @@
 /***************************************************************************************************
- * @file  stb_image.cpp
- * @brief Implementation file for the stb_image library
+ * @file  cgltf.cpp
+ * @brief Implementation file for the cgltf library
  **************************************************************************************************/
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#define CGLTF_IMPLEMENTATION
+#include "cgltf.h"
