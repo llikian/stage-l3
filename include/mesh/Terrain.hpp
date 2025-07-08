@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include <vector>
 #include "culling/Frustum.hpp"
-#include "TriangleMesh.hpp"
+#include "Shader.hpp"
 
 /**
  * @class Terrain
