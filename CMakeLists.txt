@@ -54,14 +54,12 @@ set(SOURCES
         src/maths/trigonometry.cpp
 
         # Mesh Module
-        src/mesh/LineMesh.cpp
+        src/mesh/Attribute.cpp
+        src/mesh/BetterMesh.cpp
         src/mesh/Material.cpp
-        src/mesh/Mesh.cpp
         src/mesh/Model.cpp
-        src/mesh/PointMesh.cpp
         src/mesh/primitives.cpp
         src/mesh/Terrain.cpp
-        src/mesh/TriangleMesh.cpp
 
         # Utility Module
         src/utility/hash.cpp
