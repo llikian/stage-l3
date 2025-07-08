@@ -113,6 +113,8 @@ void BetterMesh::apply_model_matrix(const mat4& model) {
 }
 
 void BetterMesh::enable_attribute(Attribute attribute, AttributeType type) {
+    if(type == AttributeType::NONE) { type = get_default_attribute_type(attribute); }
+
     AttributeType& old_type = get_attribute_type(attribute);
     stride += get_attribute_type_count(type) - get_attribute_type_count(old_type);
     old_type = type;
@@ -199,22 +201,22 @@ unsigned int BetterMesh::get_attribute_offset(Attribute attribute) const {
     return offset;
 }
 
-void BetterMesh::add_float(float value) {
+void BetterMesh::push_value(float value) {
     data.push_back(value);
 }
 
-void BetterMesh::add_vec2(const vec2& value) {
+void BetterMesh::push_value(const vec2& value) {
     data.push_back(value.x);
     data.push_back(value.y);
 }
 
-void BetterMesh::add_vec3(const vec3& value) {
+void BetterMesh::push_value(const vec3& value) {
     data.push_back(value.x);
     data.push_back(value.y);
     data.push_back(value.z);
 }
 
-void BetterMesh::add_vec4(const vec4& value) {
+void BetterMesh::push_value(const vec4& value) {
     data.push_back(value.x);
     data.push_back(value.y);
     data.push_back(value.z);

@@ -91,7 +91,7 @@ public:
 
     template <typename... Args>
     void add_vertex(Args&&... attributes) {
-        add_vertex(0, std::forward<Args>(attributes)...);
+        add_vertex_helper(0, std::forward<Args>(attributes)...);
     }
 
     void add_line(unsigned int start, unsigned int end);
@@ -107,17 +107,23 @@ private:
     unsigned int get_attribute_offset(Attribute attribute) const;
 
     template <typename Type, typename... Args>
-    void add_vertex(unsigned int attribute_id, Type&& first_attribute, Args&&... attributes) {
-        add_attribute_value(static_cast<Attribute>(attribute_id), std::forward<Type>(first_attribute));
-        add_vertex(++attribute_id, std::forward<Args>(attributes)...);
+    void add_vertex_helper(unsigned int attribute_id, Type&& first_attribute, Args&&... attributes) {
+        while(get_attribute_type(static_cast<Attribute>(attribute_id)) == AttributeType::NONE) {
+            ++attribute_id;
+        }
+
+        push_attribute_value(static_cast<Attribute>(attribute_id), std::forward<Type>(first_attribute));
+
+        add_vertex_helper(++attribute_id, std::forward<Args>(attributes)...);
     }
 
-    static void add_vertex(unsigned int) { }
+    static void add_vertex_helper(unsigned int) { }
 
     template <typename Type>
-    void add_attribute_value(Attribute attribute, Type&& value) {
+    void push_attribute_value(Attribute attribute, Type&& value) {
         AttributeType type = get_attribute_type(attribute);
         AttributeType value_type = get_attribute_type_from_value(value);
+
         if(type != value_type) {
             throw std::runtime_error("Trying to add an attribute value of type '"
                                      + get_attribute_type_string(value_type)
@@ -126,27 +132,13 @@ private:
                                      + "'.");
         }
 
-        switch(type) {
-            case AttributeType::FLOAT:
-                add_float(std::forward<Type>(value));
-                break;
-            case AttributeType::VEC2:
-                add_vec2(std::forward<Type>(value));
-                break;
-            case AttributeType::VEC3:
-                add_vec3(std::forward<Type>(value));
-                break;
-            case AttributeType::VEC4:
-                add_vec4(std::forward<Type>(value));
-                break;
-            default: break;
-        }
+        push_value(std::forward<Type>(value));
     }
 
-    void add_float(float value);
-    void add_vec2(const vec2& value);
-    void add_vec3(const vec3& value);
-    void add_vec4(const vec4& value);
+    void push_value(float value);
+    void push_value(const vec2& value);
+    void push_value(const vec3& value);
+    void push_value(const vec4& value);
 
     AttributeType& get_attribute_type(Attribute attribute);
 
