@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "TriangleMeshEntity.hpp"
+#include "MeshEntity.hpp"
 
 /**
  * @class FlatShadedMeshEntity
  * @brief A drawable that holds a mesh and a color in order to render it with flat shading.
  */
-class FlatShadedMeshEntity : public TriangleMeshEntity {
+class FlatShadedMeshEntity : public MeshEntity {
 public:
     /**
      * @brief Creates an entity with a certain name, the shader that will be used when rendering and
@@ -23,7 +23,7 @@ public:
      */
     FlatShadedMeshEntity(const std::string& name,
                          const Shader& shader,
-                         TriangleMesh& mesh,
+                         BetterMesh& mesh,
                          const vec4& color = vec4(1.0f));
 
     /**

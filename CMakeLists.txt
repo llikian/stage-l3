@@ -37,11 +37,10 @@ set(SOURCES
         src/entities/DrawableEntity.cpp
         src/entities/Entity.cpp
         src/entities/FlatShadedMeshEntity.cpp
-        src/entities/LineMeshEntity.cpp
+        src/entities/MeshEntity.cpp
         src/entities/ModelEntity.cpp
         src/entities/SceneEntity.cpp
         src/entities/TerrainEntity.cpp
-        src/entities/TriangleMeshEntity.cpp
 
         # Maths Module
         src/maths/functions.cpp
