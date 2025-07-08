@@ -7,10 +7,10 @@
 
 #include <filesystem>
 #include <vector>
+#include "BetterMesh.hpp"
 #include "Material.hpp"
 #include "maths/vec3.hpp"
 #include "Shader.hpp"
-#include "TriangleMesh.hpp"
 
 /**
  * @class Model
@@ -65,6 +65,6 @@ private:
                   const std::vector<vec2>& tex_coords,
                   std::vector<llvec3>& vertex_indices);
 
-    std::vector<TriangleMesh> meshes; ///< The meshes composing the model.
-    std::vector<Material> materials;  ///< The model's materials.
+    std::vector<BetterMesh> meshes;  ///< The meshes composing the model.
+    std::vector<Material> materials; ///< The model's materials.
 };

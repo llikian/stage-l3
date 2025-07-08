@@ -137,7 +137,6 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
     meshes.reserve(materials.size());
     for(unsigned int i = 0 ; i < materials.size() ; ++i) {
         add_mesh(positions, normals, tex_coords, vertex_indices[i]);
-        meshes.back().set_material(&materials[i]);
     }
 
 #ifdef DEBUG_LOG_MODEL_READ_INFO
@@ -206,7 +205,11 @@ void Model::add_mesh(const std::vector<vec3>& positions,
                      std::vector<vec3>& normals,
                      const std::vector<vec2>& tex_coords,
                      std::vector<llvec3>& vertex_indices) {
-    TriangleMesh& mesh = meshes.emplace_back();
+    BetterMesh& mesh = meshes.emplace_back();
+
+    // TODO: Actually enable only the necessary attributes.
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
 
     std::unordered_map<llvec3, long long, vector3_hash<long long>> unique_attribute_triplets;
 
@@ -235,11 +238,14 @@ void Model::add_mesh(const std::vector<vec3>& positions,
 
 void Model::draw(const Shader& shader) {
     shader.use();
-    for(TriangleMesh& mesh : meshes) { mesh.draw(shader); }
+    for(unsigned int i = 0 ; i < meshes.size() ; ++i) {
+        materials[i].update_shader_uniforms(shader);
+        meshes[i].draw();
+    }
 }
 
 void Model::apply_model_matrix(const mat4& model) {
-    for(TriangleMesh& mesh : meshes) { mesh.apply_model_matrix(model); }
+    for(BetterMesh& mesh : meshes) { mesh.apply_model_matrix(model); }
 }
 
 void Model::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
