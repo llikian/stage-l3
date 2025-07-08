@@ -82,17 +82,11 @@ public:
     void force_update_transform_and_children();
 
     /**
-     * @brief Check if the entity is drawable, draws it if it is and do the same thing for all children.
-     * @param view_projection_matrix
-     * @param frustum
+     * @brief Recursively draws this entity and its children if they're drawable.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     * @param frustum The view frustum.
      */
-    void draw_drawables(const mat4& view_projection_matrix, const Frustum& frustum);
-
-    /**
-     * @brief Returns whether this entity is drawable.
-     * @return false.
-     */
-    virtual bool is_drawable() const;
+    virtual void draw(const mat4& view_projection_matrix, const Frustum& frustum) const;
 
     /**
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n

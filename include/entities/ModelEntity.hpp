@@ -27,7 +27,7 @@ public:
      * @brief Updates uniforms then draws the model.
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
-    void draw(const mat4& view_projection_matrix) override;
+    void draw(const mat4& view_projection_matrix) const override;
 
     /**
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n

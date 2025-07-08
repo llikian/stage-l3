@@ -28,7 +28,7 @@ public:
      * @brief Updates uniforms then draws the mesh.
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
-    void draw(const mat4& view_projection_matrix) override;
+    void draw(const mat4& view_projection_matrix) const override;
 
     /**
      * @brief Updates these uniforms if they exist in the shader:\n
@@ -38,7 +38,7 @@ public:
      * - The material's uniforms
      * @param view_projection_matrix
      */
-    void update_uniforms(const mat4& view_projection_matrix) override;
+    void update_uniforms(const mat4& view_projection_matrix) const override;
 
     /**
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n

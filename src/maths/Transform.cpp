@@ -92,7 +92,7 @@ mat4 Transform::get_global_model() const {
     return global_model;
 }
 
-mat4& Transform::get_global_model_reference() {
+const mat4& Transform::get_global_model_const_reference() const {
     return global_model;
 }
 

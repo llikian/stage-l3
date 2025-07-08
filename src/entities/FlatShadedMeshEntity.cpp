@@ -13,7 +13,7 @@ FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name,
                                            const vec4& color)
     : MeshEntity(name, shader, mesh), color(color) { }
 
-void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) {
+void FlatShadedMeshEntity::update_uniforms(const mat4& view_projection_matrix) const {
     MeshEntity::update_uniforms(view_projection_matrix);
     shader.set_uniform_if_exists("u_color", color);
 }

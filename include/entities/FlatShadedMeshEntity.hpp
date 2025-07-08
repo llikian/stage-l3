@@ -34,7 +34,7 @@ public:
      * - u_color
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
-    void update_uniforms(const mat4& view_projection_matrix) override;
+    void update_uniforms(const mat4& view_projection_matrix) const override;
 
     /**
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n

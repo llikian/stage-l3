@@ -31,12 +31,12 @@ void SceneGraph::add_selected_entity_editor_to_imgui_window() const {
     }
 }
 
-void SceneGraph::draw(const mat4& view_projection_matrix, const Frustum& frustum) {
+void SceneGraph::draw(const mat4& view_projection_matrix, const Frustum& frustum) const {
     DrawableEntity::total_drawable_entities = 0;
     DrawableEntity::total_not_hidden_entities = 0;
     DrawableEntity::total_drawn_entities = 0;
 
-    root.draw_drawables(view_projection_matrix, frustum);
+    root.draw(view_projection_matrix, frustum);
 }
 
 void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {

@@ -49,42 +49,8 @@ void Entity::force_update_transform_and_children() {
     for(Entity* child : children) { child->force_update_transform_and_children(); }
 }
 
-void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& frustum) {
-    if(is_drawable()) {
-        DrawableEntity::total_drawable_entities++;
-
-        if(is_visible) {
-            DrawableEntity::total_not_hidden_entities++;
-
-            DrawableEntity* entity = static_cast<DrawableEntity*>(this);
-            if(entity->aabb != nullptr) {
-                if(entity->aabb->is_in_frustum(frustum.view_projection * transform.get_global_model())) {
-                    DrawableEntity::total_drawn_entities++;
-                    entity->draw(view_projection_matrix);
-
-#ifdef DEBUG_SHOW_BOUNDING_BOXES
-                    const Shader& bounding_volume_shader = AssetManager::get_shader("flat");
-                    bounding_volume_shader.use();
-                    bounding_volume_shader.set_uniform("u_mvp", view_projection_matrix
-                                                                * entity->aabb->get_global_model_matrix(transform));
-                    bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-                    glLineWidth(3.0f);
-                    AssetManager::get_mesh("wireframe cube").draw();
-                    glLineWidth(1.0f);
-#endif
-                }
-            } else {
-                DrawableEntity::total_drawn_entities++;
-                entity->draw(view_projection_matrix);
-            }
-        }
-    }
-
-    for(Entity* child : children) { child->draw_drawables(view_projection_matrix, frustum); }
-}
-
-bool Entity::is_drawable() const {
-    return false;
+void Entity::draw(const mat4& view_projection_matrix, const Frustum& frustum) const {
+    for(Entity* child : children) { child->draw(view_projection_matrix, frustum); }
 }
 
 void Entity::add_to_object_editor() {

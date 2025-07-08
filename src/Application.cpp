@@ -156,10 +156,16 @@ void Application::run() {
     Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
     /* Frustum Culling Tests */ {
         const Shader& shader = AssetManager::get_shader("flat");
-        Mesh& mesh = AssetManager::get_mesh("cube");
+        Mesh& cube = AssetManager::get_mesh("cube");
+        Mesh& sphere = AssetManager::get_mesh("sphere 16 32");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
-            auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);
+            auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, cube);
+            entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
+            entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
+            entity->create_aabb();
+
+            entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Sphere " + std::to_string(i), shader, sphere);
             entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
             entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
             entity->create_aabb();

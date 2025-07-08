@@ -12,7 +12,7 @@
 ModelEntity::ModelEntity(const std::string& name, const Shader& shader, Model& model)
     : DrawableEntity(name, shader), model(model) { }
 
-void ModelEntity::draw(const mat4& view_projection_matrix) {
+void ModelEntity::draw(const mat4& view_projection_matrix) const {
     shader.use();
     update_uniforms(view_projection_matrix);
     model.draw(shader);

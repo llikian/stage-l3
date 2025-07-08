@@ -35,7 +35,7 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      * @param frustum
      */
-    void draw(const mat4& view_projection_matrix, const Frustum& frustum);
+    void draw(const mat4& view_projection_matrix, const Frustum& frustum) const;
 
     Entity root; ///< The root of the scene graph.
 

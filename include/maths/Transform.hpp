@@ -116,10 +116,10 @@ public:
     mat4 get_global_model() const;
 
     /**
-     * @return A reference to the transform's global model, the product of the local model matrices
-     * of all its parents and itself.
+     * @return A const reference to the transform's global model, the product of the local model
+     * matrices of all its parents and itself.
      */
-    mat4& get_global_model_reference();
+    const mat4& get_global_model_const_reference() const;
 
     /**
      * @return The transform's global position.

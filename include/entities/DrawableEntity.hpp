@@ -22,30 +22,37 @@ public:
      */
     DrawableEntity(const std::string& name, const Shader& shader);
 
+    /**
+     * @brief Frees the aabb.
+     */
     ~DrawableEntity() override;
+
+    /**
+     * @brief Recursively draws this entity and its children if they're drawable.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     * @param frustum The view frustum.
+     */
+    void draw(const mat4& view_projection_matrix, const Frustum& frustum) const override;
 
     /**
      * @brief Updates uniforms then draws the entity.
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
-    virtual void draw(const mat4& view_projection_matrix) = 0;
+    virtual void draw(const mat4& view_projection_matrix) const = 0;
 
     /**
      * @brief Updates these uniforms if they exist in the shader:\n
      * - u_mvp\n
      * - u_model\n
      * - u_normals_model_matrix
-     * @param view_projection_matrix
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      */
-    virtual void update_uniforms(const mat4& view_projection_matrix);
-
-    virtual void create_aabb() = 0;
+    virtual void update_uniforms(const mat4& view_projection_matrix) const;
 
     /**
-     * @brief Returns whether this entity is drawable.
-     * @return true.
+     * @brief Creates the aabb for this entity, a bounding volume used for optimization.
      */
-    bool is_drawable() const override;
+    virtual void create_aabb() = 0;
 
     /**
      * @brief Returns the type of the entity.
@@ -54,7 +61,7 @@ public:
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
     const Shader& shader; ///< A pointer to the shader used when rendering.
-    AABB* aabb;
+    AABB* aabb;           ///< The bounding volume of the entity.
 
     static inline unsigned int total_drawable_entities = 0;
     static inline unsigned int total_not_hidden_entities = 0;
