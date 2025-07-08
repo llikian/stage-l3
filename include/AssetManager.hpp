@@ -37,7 +37,7 @@ public:
     static BetterMesh& add_mesh(const std::string& name);
 
     template <typename MeshFunc, typename... Args>
-    static BetterMesh& add_triangle_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+    static BetterMesh& add_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
         BetterMesh& mesh = get().meshes.emplace(name, BetterMesh()).first->second;
         std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
         return mesh;

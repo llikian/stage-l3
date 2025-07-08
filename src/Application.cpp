@@ -68,11 +68,11 @@ Application::Application()
                              });
 
     /* Meshes */
-    AssetManager::add_triangle_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
-    AssetManager::add_triangle_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
-    AssetManager::add_triangle_mesh("cube", create_cube_mesh);
+    AssetManager::add_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
+    AssetManager::add_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
+    AssetManager::add_mesh("cube", create_cube_mesh);
     AssetManager::add_mesh("wireframe cube", create_wireframe_cube_mesh);
-    AssetManager::add_triangle_mesh("screen", create_quad_mesh,
+    AssetManager::add_mesh("screen", create_quad_mesh,
                                     vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
