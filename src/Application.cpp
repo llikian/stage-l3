@@ -71,13 +71,13 @@ Application::Application()
     AssetManager::add_triangle_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
     AssetManager::add_triangle_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
     AssetManager::add_triangle_mesh("cube", create_cube_mesh);
-    AssetManager::add_line_mesh("wireframe cube", create_wireframe_cube_mesh);
+    AssetManager::add_mesh("wireframe cube", create_wireframe_cube_mesh);
     AssetManager::add_triangle_mesh("screen", create_quad_mesh,
                                     vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
-    AssetManager::add_line_mesh("axes", create_axes_mesh, 0.5f);
-    AssetManager::add_line_mesh("camera pyramid", create_pyramid_mesh,
+    AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
+    AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
                                 vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
-    AssetManager::add_triangle_and_line_mesh("frustum", create_frustum_meshes, camera);
+    AssetManager::add_two_meshes("frustum", create_frustum_meshes, camera);
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -124,7 +124,7 @@ void Application::run() {
     /* Light */
     FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light",
                                                                         AssetManager::get_shader("flat"),
-                                                                        AssetManager::get_triangle_mesh("sphere 8 16"));
+                                                                        AssetManager::get_mesh("sphere 8 16"));
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec3& light_color = light->color;
@@ -156,7 +156,7 @@ void Application::run() {
     Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
     /* Frustum Culling Tests */ {
         const Shader& shader = AssetManager::get_shader("flat");
-        TriangleMesh& mesh = AssetManager::get_triangle_mesh("cube");
+        TriangleMesh& mesh = AssetManager::get_mesh("cube");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
             auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);
@@ -203,7 +203,7 @@ void Application::run() {
             if(are_axes_drawn) {
                 shader.set_uniform("u_mvp", frustum.view_projection
                                             * translate(camera_position + 2.0f * camera_direction));
-                AssetManager::get_line_mesh("axes").draw(shader);
+                AssetManager::get_mesh("axes").draw();
             }
         }
 
@@ -215,7 +215,7 @@ void Application::run() {
                 shader.set_uniform("u_mvp", frustum.view_projection * spy_camera.get_model_matrix().scale(1024.0f));
                 shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
                 glLineWidth(3.0f);
-                AssetManager::get_line_mesh("camera pyramid").draw(shader);
+                AssetManager::get_mesh("camera pyramid").draw();
                 glLineWidth(1.0f);
             }
         }
@@ -250,7 +250,7 @@ void Application::draw_background() {
     shader.set_uniform("u_camera_up", camera.get_up_vector());
 
     if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-    AssetManager::get_triangle_mesh("screen").draw(shader);
+    AssetManager::get_mesh("screen").draw();
     if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
 }
 
@@ -268,7 +268,7 @@ void Application::draw_spy_window() {
 
         glLineWidth(5.0f);
         shader.set_uniform("u_mvp", mvp);
-        AssetManager::get_line_mesh("frustum").draw(shader);
+        AssetManager::get_mesh("frustum").draw();
         glLineWidth(1.0f);
     }
 
@@ -280,7 +280,7 @@ void Application::draw_spy_window() {
         glDisable(GL_CULL_FACE);
         shader.set_uniform("u_mvp", mvp);
         shader.set_uniform("u_color", faces_color);
-        AssetManager::get_triangle_mesh("frustum").draw(shader);
+        AssetManager::get_mesh("frustum").draw();
         glEnable(GL_CULL_FACE);
     }
 
