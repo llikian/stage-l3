@@ -205,7 +205,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
                      std::vector<vec3>& normals,
                      const std::vector<vec2>& tex_coords,
                      std::vector<llvec3>& vertex_indices) {
-    BetterMesh& mesh = meshes.emplace_back(Primitive::TRIANGLES);
+    Mesh& mesh = meshes.emplace_back(Primitive::TRIANGLES);
 
     // TODO: Actually enable only the necessary attributes.
     mesh.enable_attribute(Attribute::NORMAL);
@@ -245,7 +245,7 @@ void Model::draw(const Shader& shader) {
 }
 
 void Model::apply_model_matrix(const mat4& model) {
-    for(BetterMesh& mesh : meshes) { mesh.apply_model_matrix(model); }
+    for(Mesh& mesh : meshes) { mesh.apply_model_matrix(model); }
 }
 
 void Model::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {

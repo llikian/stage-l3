@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "BetterMesh.hpp"
 #include "Camera.hpp"
+#include "Mesh.hpp"
 
 /**
  * @brief Creates a mesh representing a sphere of radius 1.
@@ -14,19 +14,19 @@
  * @param horizontal_slices The amount of horizontal slices.
  * @param vertical_slices The amount of vertical slices.
  */
-void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices);
+void create_sphere_mesh(Mesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices);
 
 /**
  * @brief Creates a mesh representing a mesh of side 1.
  * @param mesh The mesh to create the cube in.
  */
-void create_cube_mesh(BetterMesh& mesh);
+void create_cube_mesh(Mesh& mesh);
 
 /**
  * @brief Creates a mesh representing a cube of side 1 using lines.
  * @param mesh The mesh to create the wireframe cube in.
  */
-void create_wireframe_cube_mesh(BetterMesh& mesh);
+void create_wireframe_cube_mesh(Mesh& mesh);
 
 /**
  * @brief Creates a mesh representing a quad as follow:
@@ -43,7 +43,7 @@ void create_wireframe_cube_mesh(BetterMesh& mesh);
  * @param B The lower left point of the quad.
  * @param C The lower right point of the quad.
  */
-void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C);
+void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C);
 
 /**
  * @brief Creates a mesh representing the 3 unit axes in their corrosponding colors:\n
@@ -53,7 +53,7 @@ void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3
  * @param mesh The mesh to create the axes in.
  * @param length The length of the axes.
  */
-void create_axes_mesh(BetterMesh& mesh, float length);
+void create_axes_mesh(Mesh& mesh, float length);
 
 /**
  * @brief Creates a mesh representing a wireframe pyramid, the fourth point of the base is calculated
@@ -65,7 +65,7 @@ void create_axes_mesh(BetterMesh& mesh, float length);
  * @param C The lower right point of the base.
  * @param height How far the pyramid's apex should be from the base.
  */
-void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height);
+void create_pyramid_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height);
 
 /**
  * @brief //TODO
@@ -73,4 +73,4 @@ void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const v
  * @param lines
  * @param camera
  */
-void create_frustum_meshes(BetterMesh& faces, BetterMesh& lines, const Camera& camera);
+void create_frustum_meshes(Mesh& faces, Mesh& lines, const Camera& camera);

@@ -10,7 +10,7 @@
 #include "maths/geometry.hpp"
 #include "Window.hpp"
 
-void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
+void create_sphere_mesh(Mesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
@@ -58,7 +58,7 @@ void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsign
     mesh.bind_buffers();
 }
 
-void create_cube_mesh(BetterMesh& mesh) {
+void create_cube_mesh(Mesh& mesh) {
     mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
@@ -110,7 +110,7 @@ void create_cube_mesh(BetterMesh& mesh) {
     mesh.bind_buffers();
 }
 
-void create_wireframe_cube_mesh(BetterMesh& mesh) {
+void create_wireframe_cube_mesh(Mesh& mesh) {
     mesh.set_primitive(Primitive::LINES);
 
     mesh.add_vertex(vec3(1.0f, 1.0f, 1.0f));    // 0: TOP - RIGHT - FRONT
@@ -152,7 +152,7 @@ void create_wireframe_cube_mesh(BetterMesh& mesh) {
     mesh.bind_buffers();
 }
 
-void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
     mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
@@ -171,7 +171,7 @@ void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3
     mesh.bind_buffers();
 }
 
-void create_axes_mesh(BetterMesh& mesh, float length) {
+void create_axes_mesh(Mesh& mesh, float length) {
     mesh.set_primitive(Primitive::LINES);
     mesh.enable_attribute(Attribute::COLOR);
 
@@ -190,7 +190,7 @@ void create_axes_mesh(BetterMesh& mesh, float length) {
     mesh.bind_buffers();
 }
 
-void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
+void create_pyramid_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
     mesh.set_primitive(Primitive::LINES);
 
     const vec3 BA = A - B;
@@ -215,7 +215,7 @@ void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const v
     mesh.bind_buffers();
 }
 
-void create_frustum_meshes(BetterMesh& faces, BetterMesh& lines, const Camera& camera) {
+void create_frustum_meshes(Mesh& faces, Mesh& lines, const Camera& camera) {
     static const vec4 projection_space_points[8]{
         vec4(1.0f, 1.0f, 1.0f, 1.0f),
         vec4(1.0f, 1.0f, -1.0f, 1.0f),

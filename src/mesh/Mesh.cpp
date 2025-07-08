@@ -1,24 +1,24 @@
 /***************************************************************************************************
- * @file  BetterMesh.cpp
- * @brief Implementation of the BetterMesh class
+ * @file  Mesh.cpp
+ * @brief Implementation of the Mesh class
  **************************************************************************************************/
 
-#include "mesh/BetterMesh.hpp"
+#include "mesh/Mesh.hpp"
 
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 
-BetterMesh::BetterMesh(Primitive primitive)
+Mesh::Mesh(Primitive primitive)
     : primitive(primitive), stride(0), VAO(0), VBO(0), EBO(0) {
     for(AttributeType& attribute : attributes) { attribute = AttributeType::NONE; }
     enable_attribute(Attribute::POSITION);
 }
 
-BetterMesh::~BetterMesh() {
+Mesh::~Mesh() {
     delete_buffers();
 }
 
-void BetterMesh::draw() const {
+void Mesh::draw() const {
     if(primitive == Primitive::NONE) {
         std::cout << "[WARNING] Mesh wasn't drawn as it didn't have a primitive.\n";
         return;
@@ -38,31 +38,31 @@ void BetterMesh::draw() const {
     }
 }
 
-void BetterMesh::set_primitive(Primitive primitive) {
+void Mesh::set_primitive(Primitive primitive) {
     this->primitive = primitive;
 }
 
-Primitive BetterMesh::get_primitive() const {
+Primitive Mesh::get_primitive() const {
     return primitive;
 }
 
-AttributeType BetterMesh::get_attribute_type(Attribute attribute) const {
+AttributeType Mesh::get_attribute_type(Attribute attribute) const {
     return attributes[static_cast<unsigned char>(attribute)];
 }
 
-bool BetterMesh::has_attribute(Attribute attribute) const {
+bool Mesh::has_attribute(Attribute attribute) const {
     return get_attribute_type(attribute) != AttributeType::NONE;
 }
 
-size_t BetterMesh::get_vertices_amount() const {
+size_t Mesh::get_vertices_amount() const {
     return data.size() / stride;
 }
 
-size_t BetterMesh::get_indices_amount() const {
+size_t Mesh::get_indices_amount() const {
     return indices.size();
 }
 
-void BetterMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
+void Mesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
     if(has_attribute(Attribute::POSITION)) {
         const unsigned int offset = get_attribute_offset(Attribute::POSITION);
         for(unsigned int i = offset ; i < data.size() ; i += stride) {
@@ -77,7 +77,7 @@ void BetterMesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maxim
     }
 }
 
-void BetterMesh::clear() {
+void Mesh::clear() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
@@ -85,13 +85,13 @@ void BetterMesh::clear() {
     indices.clear();
 }
 
-void BetterMesh::delete_buffers() {
+void Mesh::delete_buffers() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
 
-void BetterMesh::apply_model_matrix(const mat4& model) {
+void Mesh::apply_model_matrix(const mat4& model) {
     mat3 normals_model = transpose_inverse(model);
 
     const unsigned int pos_offset = get_attribute_offset(Attribute::POSITION);
@@ -112,7 +112,7 @@ void BetterMesh::apply_model_matrix(const mat4& model) {
     bind_buffers();
 }
 
-void BetterMesh::enable_attribute(Attribute attribute, AttributeType type) {
+void Mesh::enable_attribute(Attribute attribute, AttributeType type) {
     if(type == AttributeType::NONE) { type = get_default_attribute_type(attribute); }
 
     AttributeType& old_type = get_attribute_type(attribute);
@@ -120,42 +120,42 @@ void BetterMesh::enable_attribute(Attribute attribute, AttributeType type) {
     old_type = type;
 }
 
-void BetterMesh::disable_attribute(Attribute attribute) {
+void Mesh::disable_attribute(Attribute attribute) {
     AttributeType& type = get_attribute_type(attribute);
     stride -= get_attribute_type_count(type);
     type = AttributeType::NONE;
 }
 
-void BetterMesh::add_line(unsigned int start, unsigned int end) {
+void Mesh::add_line(unsigned int start, unsigned int end) {
     indices.push_back(start);
     indices.push_back(end);
 }
 
-void BetterMesh::add_line_triangle(unsigned int A, unsigned int B, unsigned int C) {
+void Mesh::add_line_triangle(unsigned int A, unsigned int B, unsigned int C) {
     add_line(A, B);
     add_line(B, C);
     add_line(C, A);
 }
 
-void BetterMesh::add_line_quad(unsigned int A, unsigned int B, unsigned int C, unsigned int D) {
+void Mesh::add_line_quad(unsigned int A, unsigned int B, unsigned int C, unsigned int D) {
     add_line(A, B);
     add_line(B, C);
     add_line(C, D);
     add_line(D, A);
 }
 
-void BetterMesh::add_triangle(unsigned int top, unsigned int left, unsigned int right) {
+void Mesh::add_triangle(unsigned int top, unsigned int left, unsigned int right) {
     indices.push_back(top);
     indices.push_back(left);
     indices.push_back(right);
 }
 
-void BetterMesh::add_face(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR) {
+void Mesh::add_face(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR) {
     add_triangle(topL, bottomL, bottomR);
     add_triangle(topL, bottomR, topR);
 }
 
-void BetterMesh::bind_buffers() {
+void Mesh::bind_buffers() {
     /* VAO */
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -187,7 +187,7 @@ void BetterMesh::bind_buffers() {
     }
 }
 
-unsigned int BetterMesh::get_attribute_offset(Attribute attribute) const {
+unsigned int Mesh::get_attribute_offset(Attribute attribute) const {
     const unsigned int attribute_id = static_cast<unsigned char>(attribute);
     unsigned int offset = 0;
 
@@ -199,28 +199,28 @@ unsigned int BetterMesh::get_attribute_offset(Attribute attribute) const {
     return offset;
 }
 
-void BetterMesh::push_value(float value) {
+void Mesh::push_value(float value) {
     data.push_back(value);
 }
 
-void BetterMesh::push_value(const vec2& value) {
+void Mesh::push_value(const vec2& value) {
     data.push_back(value.x);
     data.push_back(value.y);
 }
 
-void BetterMesh::push_value(const vec3& value) {
+void Mesh::push_value(const vec3& value) {
     data.push_back(value.x);
     data.push_back(value.y);
     data.push_back(value.z);
 }
 
-void BetterMesh::push_value(const vec4& value) {
+void Mesh::push_value(const vec4& value) {
     data.push_back(value.x);
     data.push_back(value.y);
     data.push_back(value.z);
     data.push_back(value.w);
 }
 
-AttributeType& BetterMesh::get_attribute_type(Attribute attribute) {
+AttributeType& Mesh::get_attribute_type(Attribute attribute) {
     return attributes[static_cast<unsigned char>(attribute)];
 }

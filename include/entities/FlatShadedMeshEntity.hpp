@@ -23,7 +23,7 @@ public:
      */
     FlatShadedMeshEntity(const std::string& name,
                          const Shader& shader,
-                         BetterMesh& mesh,
+                         Mesh& mesh,
                          const vec4& color = vec4(1.0f));
 
     /**

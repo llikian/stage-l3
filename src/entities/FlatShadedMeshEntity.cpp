@@ -9,7 +9,7 @@
 
 FlatShadedMeshEntity::FlatShadedMeshEntity(const std::string& name,
                                            const Shader& shader,
-                                           BetterMesh& mesh,
+                                           Mesh& mesh,
                                            const vec4& color)
     : MeshEntity(name, shader, mesh), color(color) { }
 

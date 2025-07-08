@@ -6,8 +6,8 @@
 #pragma once
 
 #include "DrawableEntity.hpp"
-#include "mesh/BetterMesh.hpp"
 #include "mesh/Material.hpp"
+#include "mesh/Mesh.hpp"
 
 /**
  * @class MeshEntity
@@ -22,7 +22,7 @@ public:
      * @param shader The shader used when rendering.
      * @param mesh The mesh to render.
      */
-    MeshEntity(const std::string& name, const Shader& shader, BetterMesh& mesh);
+    MeshEntity(const std::string& name, const Shader& shader, Mesh& mesh);
 
     /**
      * @brief Updates uniforms then draws the mesh.
@@ -62,6 +62,6 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_MESH; }
 
-    BetterMesh& mesh; ///< The mesh to render.
+    Mesh& mesh; ///< The mesh to render.
     Material* material; ///< The mesh's material.
 };

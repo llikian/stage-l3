@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include "mesh/BetterMesh.hpp"
+#include "mesh/Mesh.hpp"
 #include "mesh/Model.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -34,11 +34,11 @@ public:
     static Shader& add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
     static Texture& add_texture(const std::filesystem::path& path);
     static Model& add_model(const std::string& name, const std::filesystem::path& path);
-    static BetterMesh& add_mesh(const std::string& name);
+    static Mesh& add_mesh(const std::string& name);
 
     template <typename MeshFunc, typename... Args>
-    static BetterMesh& add_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
-        BetterMesh& mesh = get().meshes.emplace(name, BetterMesh()).first->second;
+    static Mesh& add_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+        Mesh& mesh = get().meshes.emplace(name, Mesh()).first->second;
         std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
         return mesh;
     }
@@ -50,15 +50,15 @@ public:
                                Args&&... args) {
         AssetManager& asset_manager = get();
         std::invoke(std::forward<MeshFunc>(create_mesh),
-                    asset_manager.meshes.emplace(first, BetterMesh()).first->second,
-                    asset_manager.meshes.emplace(second, BetterMesh()).first->second,
+                    asset_manager.meshes.emplace(first, Mesh()).first->second,
+                    asset_manager.meshes.emplace(second, Mesh()).first->second,
                     std::forward<Args>(args)...);
     }
 
     static Shader& get_shader(const std::string& shader_name);
     static Texture& get_texture(const std::string& texture_path);
     static Model& get_model(const std::string& model_name);
-    static BetterMesh& get_mesh(const std::string& mesh_name);
+    static Mesh& get_mesh(const std::string& mesh_name);
 
 private:
     AssetManager();
@@ -67,5 +67,5 @@ private:
     std::unordered_map<std::string, Shader> shaders;
     std::unordered_map<std::string, Texture> textures;
     std::unordered_map<std::string, Model> models;
-    std::unordered_map<std::string, BetterMesh> meshes;
+    std::unordered_map<std::string, Mesh> meshes;
 };

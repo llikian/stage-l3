@@ -156,7 +156,7 @@ void Application::run() {
     Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
     /* Frustum Culling Tests */ {
         const Shader& shader = AssetManager::get_shader("flat");
-        BetterMesh& mesh = AssetManager::get_mesh("cube");
+        Mesh& mesh = AssetManager::get_mesh("cube");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
             auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);

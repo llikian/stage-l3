@@ -7,7 +7,7 @@
 
 #include "imgui.h"
 
-MeshEntity::MeshEntity(const std::string& name, const Shader& shader, BetterMesh& mesh)
+MeshEntity::MeshEntity(const std::string& name, const Shader& shader, Mesh& mesh)
     : DrawableEntity(name, shader), mesh(mesh), material(nullptr) { }
 
 void MeshEntity::draw(const mat4& view_projection_matrix) {

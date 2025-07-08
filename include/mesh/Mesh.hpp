@@ -1,6 +1,6 @@
 /***************************************************************************************************
- * @file  BetterMesh.hpp
- * @brief Declaration of the BetterMesh class
+ * @file  Mesh.hpp
+ * @brief Declaration of the Mesh class
  **************************************************************************************************/
 
 #pragma once
@@ -22,13 +22,13 @@ enum class Primitive : unsigned char {
 };
 
 /**
- * @class BetterMesh
+ * @class Mesh
  * @brief
  */
-class BetterMesh {
+class Mesh {
 public:
-    explicit BetterMesh(Primitive primitive = Primitive::NONE);
-    ~BetterMesh();
+    explicit Mesh(Primitive primitive = Primitive::NONE);
+    ~Mesh();
 
     void draw() const;
 

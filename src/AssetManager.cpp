@@ -31,8 +31,8 @@ Model& AssetManager::add_model(const std::string& name, const std::filesystem::p
                          .first->second;
 }
 
-BetterMesh& AssetManager::add_mesh(const std::string& name) {
-    return get().meshes.emplace(name, BetterMesh()).first->second;
+Mesh& AssetManager::add_mesh(const std::string& name) {
+    return get().meshes.emplace(name, Mesh()).first->second;
 }
 
 Shader& AssetManager::get_shader(const std::string& shader_name) {
@@ -68,7 +68,7 @@ Model& AssetManager::get_model(const std::string& model_name) {
     return iterator->second;
 }
 
-BetterMesh& AssetManager::get_mesh(const std::string& mesh_name) {
+Mesh& AssetManager::get_mesh(const std::string& mesh_name) {
     AssetManager& asset_manager = get();
 
     auto iterator = asset_manager.meshes.find(mesh_name);
