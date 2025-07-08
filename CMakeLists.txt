@@ -54,7 +54,7 @@ set(SOURCES
 
         # Mesh Module
         src/mesh/Attribute.cpp
-        src/mesh/BetterMesh.cpp
+        src/mesh/Mesh.cpp
         src/mesh/Material.cpp
         src/mesh/Model.cpp
         src/mesh/primitives.cpp

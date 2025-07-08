@@ -263,11 +263,12 @@ void Application::draw_spy_window() {
     scene_graph.draw(spy_view_projection, frustum);
 
     /* Lines */ {
-        const Shader& shader = AssetManager::get_shader("line mesh");
+        const Shader& shader = AssetManager::get_shader("flat");
         shader.use();
 
         glLineWidth(5.0f);
         shader.set_uniform("u_mvp", mvp);
+        shader.set_uniform("u_color", vec4(1.0f));
         AssetManager::get_mesh("frustum lines").draw();
         glLineWidth(1.0f);
     }
