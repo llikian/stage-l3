@@ -59,7 +59,6 @@ void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& f
             DrawableEntity* entity = static_cast<DrawableEntity*>(this);
             if(entity->aabb != nullptr) {
                 if(entity->aabb->is_in_frustum(frustum.view_projection * transform.get_global_model())) {
-                    // if(entity->bounding_volume->is_in_frustum(frustum, transform)) {
                     DrawableEntity::total_drawn_entities++;
                     entity->draw(view_projection_matrix);
 
@@ -70,7 +69,7 @@ void Entity::draw_drawables(const mat4& view_projection_matrix, const Frustum& f
                                                                 * entity->aabb->get_global_model_matrix(transform));
                     bounding_volume_shader.set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
                     glLineWidth(3.0f);
-                    AssetManager::get_line_mesh("wireframe cube").draw(bounding_volume_shader);
+                    AssetManager::get_mesh("wireframe cube").draw();
                     glLineWidth(1.0f);
 #endif
                 }

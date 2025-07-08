@@ -155,7 +155,7 @@ private:
     unsigned int EBO;
 };
 
-constexpr unsigned int get_opengl_enum_for_primitive(Primitive primitive) {
+inline unsigned int get_opengl_enum_for_primitive(Primitive primitive) {
     switch(primitive) {
         case Primitive::POINTS: return GL_POINTS;
         case Primitive::LINES: return GL_LINES;

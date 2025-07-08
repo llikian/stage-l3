@@ -118,8 +118,6 @@ void BetterMesh::enable_attribute(Attribute attribute, AttributeType type) {
     AttributeType& old_type = get_attribute_type(attribute);
     stride += get_attribute_type_count(type) - get_attribute_type_count(old_type);
     old_type = type;
-
-    std::cout << "stride: " << stride << '\n';
 }
 
 void BetterMesh::disable_attribute(Attribute attribute) {

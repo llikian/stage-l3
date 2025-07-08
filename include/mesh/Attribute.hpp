@@ -26,7 +26,7 @@ enum class AttributeType : unsigned char {
     VEC4,
 };
 
-constexpr unsigned int get_attribute_type_count(AttributeType type) {
+inline unsigned int get_attribute_type_count(AttributeType type) {
     switch(type) {
         case AttributeType::FLOAT: return 1;
         case AttributeType::VEC2: return 2;
@@ -36,12 +36,12 @@ constexpr unsigned int get_attribute_type_count(AttributeType type) {
     }
 }
 
-constexpr AttributeType get_attribute_type_from_value(float) { return AttributeType::FLOAT; }
-constexpr AttributeType get_attribute_type_from_value(const vec2&) { return AttributeType::VEC2; }
-constexpr AttributeType get_attribute_type_from_value(const vec3&) { return AttributeType::VEC3; }
-constexpr AttributeType get_attribute_type_from_value(const vec4&) { return AttributeType::VEC4; }
+inline AttributeType get_attribute_type_from_value(float) { return AttributeType::FLOAT; }
+inline AttributeType get_attribute_type_from_value(const vec2&) { return AttributeType::VEC2; }
+inline AttributeType get_attribute_type_from_value(const vec3&) { return AttributeType::VEC3; }
+inline AttributeType get_attribute_type_from_value(const vec4&) { return AttributeType::VEC4; }
 
-constexpr AttributeType get_default_attribute_type(Attribute attribute) {
+inline AttributeType get_default_attribute_type(Attribute attribute) {
     switch(attribute) {
         case Attribute::POSITION: return AttributeType::VEC3;
         case Attribute::NORMAL: return AttributeType::VEC3;

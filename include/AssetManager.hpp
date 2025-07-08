@@ -44,11 +44,14 @@ public:
     }
 
     template <typename MeshFunc, typename... Args>
-    static void add_two_meshes(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+    static void add_two_meshes(const std::string& first,
+                               const std::string& second,
+                               MeshFunc&& create_mesh,
+                               Args&&... args) {
         AssetManager& asset_manager = get();
         std::invoke(std::forward<MeshFunc>(create_mesh),
-                    asset_manager.meshes.emplace(name, BetterMesh()).first->second,
-                    asset_manager.meshes.emplace(name, BetterMesh()).first->second,
+                    asset_manager.meshes.emplace(first, BetterMesh()).first->second,
+                    asset_manager.meshes.emplace(second, BetterMesh()).first->second,
                     std::forward<Args>(args)...);
     }
 

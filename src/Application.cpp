@@ -77,7 +77,7 @@ Application::Application()
     AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
                                 vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
-    AssetManager::add_two_meshes("frustum", create_frustum_meshes, camera);
+    AssetManager::add_two_meshes("frustum faces", "frustum lines", create_frustum_meshes, camera);
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -156,7 +156,7 @@ void Application::run() {
     Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
     /* Frustum Culling Tests */ {
         const Shader& shader = AssetManager::get_shader("flat");
-        TriangleMesh& mesh = AssetManager::get_mesh("cube");
+        BetterMesh& mesh = AssetManager::get_mesh("cube");
 
         for(unsigned int i = 0 ; i < 10'000 ; ++i) {
             auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, mesh);
@@ -268,7 +268,7 @@ void Application::draw_spy_window() {
 
         glLineWidth(5.0f);
         shader.set_uniform("u_mvp", mvp);
-        AssetManager::get_mesh("frustum").draw();
+        AssetManager::get_mesh("frustum lines").draw();
         glLineWidth(1.0f);
     }
 
@@ -280,7 +280,7 @@ void Application::draw_spy_window() {
         glDisable(GL_CULL_FACE);
         shader.set_uniform("u_mvp", mvp);
         shader.set_uniform("u_color", faces_color);
-        AssetManager::get_mesh("frustum").draw();
+        AssetManager::get_mesh("frustum faces").draw();
         glEnable(GL_CULL_FACE);
     }
 

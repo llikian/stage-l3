@@ -163,8 +163,8 @@ void SceneEntity::load(const std::filesystem::path& path) {
                 }
                 std::cout << '\n';
                 std::cout << "\t\t\t\t\t\toffset: " << accessor->offset << '\n';
-                std::cout << "\t\t\t\t\t\tstride: " << accessor->stride << '\n';
                 std::cout << "\t\t\t\t\t\tcount: " << accessor->count << '\n';
+                std::cout << "\t\t\t\t\t\tstride: " << accessor->stride << '\n';
             }
         }
     }

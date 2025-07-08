@@ -191,7 +191,7 @@ void create_axes_mesh(BetterMesh& mesh, float length) {
 }
 
 void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
-    mesh.set_primitive(Primitive::TRIANGLES);
+    mesh.set_primitive(Primitive::LINES);
 
     const vec3 BA = A - B;
     const vec3 BC = C - B;
