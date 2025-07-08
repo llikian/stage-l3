@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include "mesh/LineMesh.hpp"
+#include "mesh/BetterMesh.hpp"
 #include "mesh/Model.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -34,37 +34,28 @@ public:
     static Shader& add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
     static Texture& add_texture(const std::filesystem::path& path);
     static Model& add_model(const std::string& name, const std::filesystem::path& path);
-    static TriangleMesh& add_triangle_mesh(const std::string& name);
+    static BetterMesh& add_mesh(const std::string& name);
 
     template <typename MeshFunc, typename... Args>
-    static TriangleMesh& add_triangle_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
-        TriangleMesh& mesh = get().triangle_meshes.emplace(name, TriangleMesh()).first->second;
-        std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
-        return mesh;
-    }
-
-    static LineMesh& add_line_mesh(const std::string& name);
-
-    template <typename MeshFunc, typename... Args>
-    static LineMesh& add_line_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
-        LineMesh& mesh = get().line_meshes.emplace(name, LineMesh()).first->second;
+    static BetterMesh& add_triangle_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+        BetterMesh& mesh = get().meshes.emplace(name, BetterMesh()).first->second;
         std::invoke(std::forward<MeshFunc>(create_mesh), mesh, std::forward<Args>(args)...);
         return mesh;
     }
 
     template <typename MeshFunc, typename... Args>
-    static void add_triangle_and_line_mesh(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
+    static void add_two_meshes(const std::string& name, MeshFunc&& create_mesh, Args&&... args) {
         AssetManager& asset_manager = get();
-        TriangleMesh& triangle_mesh = asset_manager.triangle_meshes.emplace(name, TriangleMesh()).first->second;
-        LineMesh& line_mesh = asset_manager.line_meshes.emplace(name, LineMesh()).first->second;
-        std::invoke(std::forward<MeshFunc>(create_mesh), triangle_mesh, line_mesh, std::forward<Args>(args)...);
+        std::invoke(std::forward<MeshFunc>(create_mesh),
+                    asset_manager.meshes.emplace(name, BetterMesh()).first->second,
+                    asset_manager.meshes.emplace(name, BetterMesh()).first->second,
+                    std::forward<Args>(args)...);
     }
 
     static Shader& get_shader(const std::string& shader_name);
     static Texture& get_texture(const std::string& texture_path);
     static Model& get_model(const std::string& model_name);
-    static TriangleMesh& get_triangle_mesh(const std::string& mesh_name);
-    static LineMesh& get_line_mesh(const std::string& mesh_name);
+    static BetterMesh& get_mesh(const std::string& mesh_name);
 
 private:
     AssetManager();
@@ -73,6 +64,5 @@ private:
     std::unordered_map<std::string, Shader> shaders;
     std::unordered_map<std::string, Texture> textures;
     std::unordered_map<std::string, Model> models;
-    std::unordered_map<std::string, TriangleMesh> triangle_meshes;
-    std::unordered_map<std::string, LineMesh> line_meshes;
+    std::unordered_map<std::string, BetterMesh> meshes;
 };

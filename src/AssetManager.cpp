@@ -31,12 +31,8 @@ Model& AssetManager::add_model(const std::string& name, const std::filesystem::p
                          .first->second;
 }
 
-TriangleMesh& AssetManager::add_triangle_mesh(const std::string& name) {
-    return get().triangle_meshes.emplace(name, TriangleMesh()).first->second;
-}
-
-LineMesh& AssetManager::add_line_mesh(const std::string& name) {
-    return get().line_meshes.emplace(name, LineMesh()).first->second;
+BetterMesh& AssetManager::add_mesh(const std::string& name) {
+    return get().meshes.emplace(name, BetterMesh()).first->second;
 }
 
 Shader& AssetManager::get_shader(const std::string& shader_name) {
@@ -72,23 +68,12 @@ Model& AssetManager::get_model(const std::string& model_name) {
     return iterator->second;
 }
 
-TriangleMesh& AssetManager::get_triangle_mesh(const std::string& mesh_name) {
+BetterMesh& AssetManager::get_mesh(const std::string& mesh_name) {
     AssetManager& asset_manager = get();
 
-    auto iterator = asset_manager.triangle_meshes.find(mesh_name);
-    if(iterator == asset_manager.triangle_meshes.end()) {
+    auto iterator = asset_manager.meshes.find(mesh_name);
+    if(iterator == asset_manager.meshes.end()) {
         throw std::runtime_error("Couldn't find triangle mesh '" + mesh_name + "' in asset manager");
-    }
-
-    return iterator->second;
-}
-
-LineMesh& AssetManager::get_line_mesh(const std::string& mesh_name) {
-    AssetManager& asset_manager = get();
-
-    auto iterator = asset_manager.line_meshes.find(mesh_name);
-    if(iterator == asset_manager.line_meshes.end()) {
-        throw std::runtime_error("Couldn't find line meshe '" + mesh_name + "' in asset manager");
     }
 
     return iterator->second;
