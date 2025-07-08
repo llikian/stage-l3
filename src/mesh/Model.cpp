@@ -205,7 +205,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
                      std::vector<vec3>& normals,
                      const std::vector<vec2>& tex_coords,
                      std::vector<llvec3>& vertex_indices) {
-    BetterMesh& mesh = meshes.emplace_back();
+    BetterMesh& mesh = meshes.emplace_back(Primitive::TRIANGLES);
 
     // TODO: Actually enable only the necessary attributes.
     mesh.enable_attribute(Attribute::NORMAL);

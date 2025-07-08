@@ -11,6 +11,7 @@
 #include "Window.hpp"
 
 void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
+    mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
 
@@ -58,6 +59,7 @@ void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsign
 }
 
 void create_cube_mesh(BetterMesh& mesh) {
+    mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
 
@@ -109,6 +111,8 @@ void create_cube_mesh(BetterMesh& mesh) {
 }
 
 void create_wireframe_cube_mesh(BetterMesh& mesh) {
+    mesh.set_primitive(Primitive::LINES);
+
     mesh.add_vertex(vec3(1.0f, 1.0f, 1.0f));    // 0: TOP - RIGHT - FRONT
     mesh.add_vertex(vec3(1.0f, 1.0f, -1.0f));   // 1: TOP - RIGHT - BACK
     mesh.add_vertex(vec3(1.0f, -1.0f, 1.0f));   // 2: BOTTOM - RIGHT - FRONT
@@ -149,6 +153,7 @@ void create_wireframe_cube_mesh(BetterMesh& mesh) {
 }
 
 void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+    mesh.set_primitive(Primitive::TRIANGLES);
     mesh.enable_attribute(Attribute::NORMAL);
     mesh.enable_attribute(Attribute::TEX_COORDS);
 
@@ -167,6 +172,7 @@ void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3
 }
 
 void create_axes_mesh(BetterMesh& mesh, float length) {
+    mesh.set_primitive(Primitive::LINES);
     mesh.enable_attribute(Attribute::COLOR);
 
     const vec3 origin(0.0f, 0.0f, 0.0f);
@@ -185,6 +191,8 @@ void create_axes_mesh(BetterMesh& mesh, float length) {
 }
 
 void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
+    mesh.set_primitive(Primitive::TRIANGLES);
+
     const vec3 BA = A - B;
     const vec3 BC = C - B;
 
@@ -227,6 +235,8 @@ void create_frustum_meshes(BetterMesh& faces, BetterMesh& lines, const Camera& c
     }
 
     /* Line Mesh */
+    lines.set_primitive(Primitive::LINES);
+
     lines.add_vertex(vec3(points[0]));
     lines.add_vertex(vec3(points[1]));
     lines.add_vertex(vec3(points[2]));
@@ -255,6 +265,8 @@ void create_frustum_meshes(BetterMesh& faces, BetterMesh& lines, const Camera& c
     lines.add_line(7, 4);
 
     /* Face Mesh */
+    faces.set_primitive(Primitive::TRIANGLES);
+
     faces.add_vertex(vec3(points[0]));
     faces.add_vertex(vec3(points[1]));
     faces.add_vertex(vec3(points[2]));
