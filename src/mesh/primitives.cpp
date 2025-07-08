@@ -10,7 +10,10 @@
 #include "maths/geometry.hpp"
 #include "Window.hpp"
 
-void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
+void create_sphere_mesh(BetterMesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
+
     const float theta_step = PI_F / horizontal_slices; // theta in [-PI/2 ; PI/2]
     const float phi_step = TAU_F / vertical_slices;    // phi in [0 ; 2PI]
 
@@ -54,7 +57,10 @@ void create_sphere_mesh(TriangleMesh& mesh, unsigned int horizontal_slices, unsi
     mesh.bind_buffers();
 }
 
-void create_cube_mesh(TriangleMesh& mesh) {
+void create_cube_mesh(BetterMesh& mesh) {
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
+
     static const vec3 positions[8]{
         vec3(1.0f, 1.0f, 1.0f),   // 0: TOP - RIGHT - FRONT
         vec3(1.0f, 1.0f, -1.0f),  // 1: TOP - RIGHT - BACK
@@ -102,7 +108,7 @@ void create_cube_mesh(TriangleMesh& mesh) {
     mesh.bind_buffers();
 }
 
-void create_wireframe_cube_mesh(LineMesh& mesh) {
+void create_wireframe_cube_mesh(BetterMesh& mesh) {
     mesh.add_vertex(vec3(1.0f, 1.0f, 1.0f));    // 0: TOP - RIGHT - FRONT
     mesh.add_vertex(vec3(1.0f, 1.0f, -1.0f));   // 1: TOP - RIGHT - BACK
     mesh.add_vertex(vec3(1.0f, -1.0f, 1.0f));   // 2: BOTTOM - RIGHT - FRONT
@@ -142,20 +148,27 @@ void create_wireframe_cube_mesh(LineMesh& mesh) {
     mesh.bind_buffers();
 }
 
-void create_quad_mesh(TriangleMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+void create_quad_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
+
     const vec3 BA(A - B);
     const vec3 BC(C - B);
     const vec3 normal(normalize(cross(BA, BC)));
+
     mesh.add_vertex(A, normal, vec2(0.0f, 1.0f));
     mesh.add_vertex(B, normal, vec2(0.0f, 0.0f));
     mesh.add_vertex(C, normal, vec2(1.0f, 0.0f));
     mesh.add_vertex(B + BA + BC, normal, vec2(1.0f, 1.0f));
+
     mesh.add_face(0, 1, 2, 3);
 
     mesh.bind_buffers();
 }
 
-void create_axes_mesh(LineMesh& mesh, float length) {
+void create_axes_mesh(BetterMesh& mesh, float length) {
+    mesh.enable_attribute(Attribute::COLOR);
+
     const vec3 origin(0.0f, 0.0f, 0.0f);
     const vec3 axes[3]{
         vec3(1.0f, 0.0f, 0.0f),
@@ -171,7 +184,7 @@ void create_axes_mesh(LineMesh& mesh, float length) {
     mesh.bind_buffers();
 }
 
-void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
+void create_pyramid_mesh(BetterMesh& mesh, const vec3& A, const vec3& B, const vec3& C, float height) {
     const vec3 BA = A - B;
     const vec3 BC = C - B;
 
@@ -194,7 +207,7 @@ void create_pyramid_mesh(LineMesh& mesh, const vec3& A, const vec3& B, const vec
     mesh.bind_buffers();
 }
 
-void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& camera) {
+void create_frustum_meshes(BetterMesh& faces, BetterMesh& lines, const Camera& camera) {
     static const vec4 projection_space_points[8]{
         vec4(1.0f, 1.0f, 1.0f, 1.0f),
         vec4(1.0f, 1.0f, -1.0f, 1.0f),
@@ -214,14 +227,14 @@ void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& c
     }
 
     /* Line Mesh */
-    lines.add_vertex(points[0]);
-    lines.add_vertex(points[1]);
-    lines.add_vertex(points[2]);
-    lines.add_vertex(points[3]);
-    lines.add_vertex(points[4]);
-    lines.add_vertex(points[5]);
-    lines.add_vertex(points[6]);
-    lines.add_vertex(points[7]);
+    lines.add_vertex(vec3(points[0]));
+    lines.add_vertex(vec3(points[1]));
+    lines.add_vertex(vec3(points[2]));
+    lines.add_vertex(vec3(points[3]));
+    lines.add_vertex(vec3(points[4]));
+    lines.add_vertex(vec3(points[5]));
+    lines.add_vertex(vec3(points[6]));
+    lines.add_vertex(vec3(points[7]));
 
     // Far to Near Lines
     lines.add_line(0, 4);
@@ -242,14 +255,14 @@ void create_frustum_meshes(TriangleMesh& faces, LineMesh& lines, const Camera& c
     lines.add_line(7, 4);
 
     /* Face Mesh */
-    faces.add_vertex(points[0], vec3(), vec2());
-    faces.add_vertex(points[1], vec3(), vec2());
-    faces.add_vertex(points[2], vec3(), vec2());
-    faces.add_vertex(points[3], vec3(), vec2());
-    faces.add_vertex(points[4], vec3(), vec2());
-    faces.add_vertex(points[5], vec3(), vec2());
-    faces.add_vertex(points[6], vec3(), vec2());
-    faces.add_vertex(points[7], vec3(), vec2());
+    faces.add_vertex(vec3(points[0]));
+    faces.add_vertex(vec3(points[1]));
+    faces.add_vertex(vec3(points[2]));
+    faces.add_vertex(vec3(points[3]));
+    faces.add_vertex(vec3(points[4]));
+    faces.add_vertex(vec3(points[5]));
+    faces.add_vertex(vec3(points[6]));
+    faces.add_vertex(vec3(points[7]));
 
     faces.add_face(0, 1, 2, 3); // FAR
     faces.add_face(4, 5, 6, 7); // NEAR
