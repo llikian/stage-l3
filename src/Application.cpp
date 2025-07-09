@@ -139,17 +139,17 @@ void Application::run() {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
 
         /* Models */
-        // Model& sponza = AssetManager::add_model("sponza", "data/sponza/sponza.obj");
+        // Model& sponza = AssetManager::add_model("sponza", "data/obj/sponza/sponza.obj");
         // sponza.apply_model_matrix(scale(0.05f));
         // ModelEntity* sponza_entity = root->add_child<ModelEntity>("sponza", shader, sponza);
         // sponza_entity->create_aabb();
         // sponza_entity->transform.set_local_position(-200.0f, -40.0f, 0.0f);
 
-        // Model& vokselia = AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj");
+        // Model& vokselia = AssetManager::add_model("vokselia", "data/obj/vokselia/vokselia_spawn.obj");
         // vokselia.apply_model_matrix(scale(100.0f));
         // root->add_child<ModelEntity>("vokselia", shader, vokselia)->create_aabb();
 
-        // Model& bmw = AssetManager::add_model("bmw", "data/bmw/bmw.obj");
+        // Model& bmw = AssetManager::add_model("bmw", "data/obj/bmw/bmw.obj");
         // bmw.apply_model_matrix(scale(0.05f));
         // root->add_child<ModelEntity>("bmw", shader, bmw)->create_aabb();
     }
@@ -179,8 +179,8 @@ void Application::run() {
     }
 #endif
 
-    root->add_child<SceneEntity>("avocado", "data/avocado/Avocado.gltf")->transform.set_local_scale(100.0f);
-    // root->add_child<SceneEntity>("sponza", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
+    // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
+    root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(0.2f);
 
     /* Main Loop */
     while(!Window::should_close()) {
