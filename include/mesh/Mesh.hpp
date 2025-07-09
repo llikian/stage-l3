@@ -126,9 +126,9 @@ private:
 
         if(type != value_type) {
             throw std::runtime_error("Trying to add an attribute value of type '"
-                                     + get_attribute_type_string(value_type)
+                                     + attribute_type_to_string(value_type)
                                      + "' for an attribute that has type '"
-                                     + get_attribute_type_string(type)
+                                     + attribute_type_to_string(type)
                                      + "'.");
         }
 
