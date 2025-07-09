@@ -99,6 +99,10 @@ bool EventHandler::is_wireframe_on() {
     return get().is_wireframe_enabled;
 }
 
+bool EventHandler::is_culling_enabled() {
+    return get().is_face_culling_enabled;
+}
+
 EventHandler::EventHandler()
     : time(glfwGetTime()), delta(0.0f),
       active_camera(nullptr),

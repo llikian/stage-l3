@@ -285,11 +285,11 @@ void Application::draw_spy_window() {
         const Shader& shader = AssetManager::get_shader("flat");
         shader.use();
 
-        glDisable(GL_CULL_FACE);
+        if(EventHandler::is_culling_enabled()) { glDisable(GL_CULL_FACE); }
         shader.set_uniform("u_mvp", mvp);
         shader.set_uniform("u_color", faces_color);
         AssetManager::get_mesh("frustum faces").draw();
-        glEnable(GL_CULL_FACE);
+        if(EventHandler::is_culling_enabled()) { glEnable(GL_CULL_FACE); }
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -95,6 +95,11 @@ public:
      */
     static bool is_wireframe_on();
 
+    /**
+     * @return ///< Whether face culling is enabled.
+     */
+    static bool is_culling_enabled();
+
 private:
     /**
      * @brief Creates an event handler.
