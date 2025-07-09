@@ -29,6 +29,11 @@ void Mesh::draw() const {
         return;
     }
 
+    if(VAO == 0 || VBO == 0) {
+        std::cout << "[WARNING] Mesh wasn't drawn as its buffers aren't bound.\n";
+        return;
+    }
+
     glBindVertexArray(VAO);
 
     if(indices.empty()) {
