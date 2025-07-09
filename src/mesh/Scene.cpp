@@ -5,12 +5,14 @@
 
 #include "mesh/Scene.hpp"
 
+#include <ranges>
+
 #include "AssetManager.hpp"
 #include "debug.hpp"
 #include "utility/LifetimeLogger.hpp"
 
 Scene::Scene(const std::filesystem::path& path)
-    : meshes(nullptr), meshes_count(0) {
+    : meshes(nullptr), meshes_count(0), primitives_count(nullptr) {
     load(path);
 }
 
@@ -154,37 +156,59 @@ void Scene::load(const std::filesystem::path& path) {
                                              + ' ');
             }
 
-            std::vector<unsigned int> indices;
-            indices.resize(cgltf_accessor_unpack_indices(c_primitive.indices, nullptr, sizeof(unsigned int), 0));
-            cgltf_accessor_unpack_indices(c_primitive.indices, indices.data(), sizeof(unsigned int), indices.size());
-            mesh.push_indices_buffer(indices);
-            std::cout << "\tindices: " << indices.size() << '\n';
+            if(c_primitive.indices != nullptr) {
+                std::vector<unsigned int> indices;
+                unsigned int indices_count = c_primitive.indices->count;
+                indices.resize(indices_count);
+                cgltf_accessor_unpack_indices(c_primitive.indices, indices.data(), sizeof(unsigned int), indices_count);
+                mesh.push_indices_buffer(indices);
+
+#ifdef DEBUG_LOG_GLTF_READ_INFO
+                std::cout << "\tINDICES: " << indices.size() << '\n';
+#endif
+            }
 
             AttributeInfo* attributes = new AttributeInfo[c_primitive.attributes_count];
 
-            static constexpr unsigned int MAX_ATTRIBUTE = static_cast<unsigned char>(Attribute::AMOUNT);
-            std::vector<unsigned int> attributes_order(MAX_ATTRIBUTE, MAX_ATTRIBUTE);
-            unsigned int valid_attributes_count = 0;
-
-            unsigned int vertices_count = 0;
+            constexpr unsigned int ATTRIBUTES_AMOUNT = static_cast<unsigned char>(Attribute::AMOUNT);
+            // Used to push the vertex attributes int he right order. (i.e. position then normal then tex_coords...)
+            std::vector<unsigned int> attributes_indices(ATTRIBUTES_AMOUNT, ATTRIBUTES_AMOUNT);
 
             for(unsigned int k = 0 ; k < c_primitive.attributes_count ; ++k) {
-                read_attribute(attributes[k], c_primitive.attributes[k]);
-                if(!(attributes[k].type == AttributeType::NONE || attributes[k].data.empty())) {
-                    ++valid_attributes_count;
+                AttributeInfo& attribute = attributes[k];
+                read_attribute(attribute, c_primitive.attributes[k]);
 
-                    attributes_order[static_cast<unsigned char>(attributes[k].attribute)] = k;
+                if(!(attribute.type == AttributeType::NONE || attribute.data.empty())) {
+                    mesh.enable_attribute(attribute.attribute, attribute.type);
+                    attributes_indices[static_cast<unsigned char>(attribute.attribute)] = k;
 
-                    vertices_count = attributes[k].data.size() / get_attribute_type_count(attributes[k].type);
-                    std::cout << '\t' << attribute_to_string(attributes[k].attribute) << ": " << vertices_count << '\n';
+#ifdef DEBUG_LOG_GLTF_READ_INFO
+                    std::cout << '\t' << attribute_to_string(attribute.attribute)
+                        << " (" << attribute_type_to_string(attribute.type) << "): "
+                        << attribute.data.size() << "\n";
+#endif
                 }
             }
 
+            // Remove the vertex attributes that aren't enabled
+            unsigned int valid_attributes_count = 0;
+            unsigned int next_index = ATTRIBUTES_AMOUNT - 1;
+            for(unsigned int k = 0 ; k < ATTRIBUTES_AMOUNT ; ++k) {
+                if(attributes_indices[k] == ATTRIBUTES_AMOUNT) {
+                    while(attributes_indices[next_index] == ATTRIBUTES_AMOUNT) { next_index--; }
+                    if(next_index < k) { break; }
+                    std::swap(attributes_indices[k], attributes_indices[next_index--]);
+                } else {
+                    ++valid_attributes_count;
+                }
+            }
+            attributes_indices.resize(valid_attributes_count);
+
+            unsigned int vertices_count = c_primitive.attributes[0].data->count;
             for(unsigned int k = 0 ; k < vertices_count ; ++k) {
-                for(unsigned int index : attributes_order) {
-                    if(index != MAX_ATTRIBUTE) {
-                        mesh.push_values(&attributes[index].data[k], get_attribute_type_count(attributes[index].type));
-                    }
+                for(unsigned int index : attributes_indices) {
+                    mesh.push_values(&attributes[index].data[k * attributes[index].component_count],
+                                     attributes[index].component_count);
                 }
             }
 
@@ -212,7 +236,6 @@ void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute&
             break;
         case cgltf_attribute_type_color:
             attribute_info.attribute = Attribute::COLOR;
-            std::cout << "color";
             break;
         default:
             std::cout << "\tUnhandled or invalid attribute: '"
@@ -241,6 +264,8 @@ void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute&
                                      + '.');
     }
 
-    attribute_info.data.resize(cgltf_accessor_unpack_floats(c_accessor, nullptr, 0));
+    attribute_info.component_count = get_attribute_type_count(attribute_info.type);
+
+    attribute_info.data.resize(c_accessor->count * attribute_info.component_count);
     cgltf_accessor_unpack_floats(c_accessor, attribute_info.data.data(), attribute_info.data.size());
 }

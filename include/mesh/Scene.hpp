@@ -13,6 +13,7 @@
 struct AttributeInfo {
     Attribute attribute;
     AttributeType type;
+    unsigned int component_count;
     std::vector<float> data;
 };
 
