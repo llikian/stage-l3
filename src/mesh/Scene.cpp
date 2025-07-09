@@ -46,6 +46,16 @@ void Scene::draw(const mat4& view_projection_matrix, const Transform& transform)
 
             shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
 
+            /* Material */
+            shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
+            shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
+            shader.set_uniform_if_exists("u_specular", vec3(1.0f));
+            shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
+            int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
+            if(u_diffuse_map_location != -1) {
+                AssetManager::get_texture("default").bind(0);
+            }
+
             meshes[i][j].draw();
         }
     }
