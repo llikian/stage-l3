@@ -222,11 +222,11 @@ void Mesh::push_value(const vec4& value) {
 }
 
 void Mesh::push_values(const float* values, unsigned int n) {
-    for(unsigned int i = 0 ; i < n ; ++i) { data.push_back(values[n]); }
+    for(unsigned int i = 0 ; i < n ; ++i) { data.push_back(values[i]); }
 }
 
 void Mesh::push_indices_buffer(const std::vector<unsigned int>& indices) {
-    for(unsigned int index : indices) { this->indices.push_back(index); }
+    this->indices.insert(this->indices.end(), indices.begin(), indices.end());
 }
 
 AttributeType& Mesh::get_attribute_type(Attribute attribute) {
