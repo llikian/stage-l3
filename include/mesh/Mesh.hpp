@@ -101,7 +101,16 @@ public:
     void add_triangle(unsigned int top, unsigned int left, unsigned int right);
     void add_face(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR);
 
+
     void bind_buffers();
+
+    void push_value(float value);
+    void push_value(const vec2& value);
+    void push_value(const vec3& value);
+    void push_value(const vec4& value);
+    void push_values(const float* values, unsigned int n);
+
+    void push_indices_buffer(const std::vector<unsigned int>& indices);
 
 private:
     unsigned int get_attribute_offset(Attribute attribute) const;
@@ -134,11 +143,6 @@ private:
 
         push_value(std::forward<Type>(value));
     }
-
-    void push_value(float value);
-    void push_value(const vec2& value);
-    void push_value(const vec3& value);
-    void push_value(const vec4& value);
 
     AttributeType& get_attribute_type(Attribute attribute);
 

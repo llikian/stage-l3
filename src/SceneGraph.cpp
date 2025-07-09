@@ -61,6 +61,9 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
         case ENTITY_TYPE_TERRAIN:
             label += " T";
             break;
+        case ENTITY_TYPE_SCENE:
+            label += " S";
+            break;
         default:
             label += '?';
             break;

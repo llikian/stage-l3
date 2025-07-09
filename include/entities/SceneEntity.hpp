@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <filesystem>
-#include "Entity.hpp"
+#include "DrawableEntity.hpp"
+#include "mesh/Scene.hpp"
 
 /**
  * @class SceneEntity
@@ -28,5 +28,5 @@ public:
     constexpr EntityType get_type() const override { return ENTITY_TYPE_SCENE; }
 
 private:
-    void load(const std::filesystem::path& path);
+    Scene scene;
 };

@@ -174,6 +174,7 @@ void Application::run() {
 #endif
 
     root->add_child<SceneEntity>("avocado", "data/avocado/Avocado.gltf");
+    // root->add_child<SceneEntity>("sponza", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
 
     /* Main Loop */
     while(!Window::should_close()) {
