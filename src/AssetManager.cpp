@@ -6,13 +6,14 @@
 #include "AssetManager.hpp"
 
 #include <ranges>
+#include "mesh/primitives.hpp"
 
 Shader& AssetManager::add_shader(const std::string& name,
                                  const std::initializer_list<std::filesystem::path>& paths_list) {
     return get().shaders.emplace(std::piecewise_construct,
-                                          std::forward_as_tuple(name),
-                                          std::forward_as_tuple(paths_list, name))
-                         .first->second;
+                                 std::forward_as_tuple(name),
+                                 std::forward_as_tuple(paths_list, name))
+                .first->second;
 }
 
 Texture& AssetManager::add_texture(const std::filesystem::path& path) {
@@ -26,9 +27,9 @@ Texture& AssetManager::add_texture(const std::filesystem::path& path) {
 
 Model& AssetManager::add_model(const std::string& name, const std::filesystem::path& path) {
     return get().models.emplace(std::piecewise_construct,
-                                         std::forward_as_tuple(name),
-                                         std::forward_as_tuple(path))
-                         .first->second;
+                                std::forward_as_tuple(name),
+                                std::forward_as_tuple(path))
+                .first->second;
 }
 
 Mesh& AssetManager::add_mesh(const std::string& name) {
@@ -77,6 +78,20 @@ Mesh& AssetManager::get_mesh(const std::string& mesh_name) {
     }
 
     return iterator->second;
+}
+
+Shader& AssetManager::get_relevant_shader_from_mesh(const Mesh& mesh) {
+    AssetManager& asset_manager = get();
+    switch(mesh.get_primitive()) {
+        case Primitive::POINTS:
+            return asset_manager.shaders["point mesh"];
+        case Primitive::LINES:
+            return asset_manager.shaders[mesh.has_attribute(Attribute::COLOR) ? "line mesh" : "flat"];
+        case Primitive::TRIANGLES:
+            return asset_manager.shaders[mesh.has_attribute(Attribute::NORMAL) ? "blinn-phong" : "flat"];
+        default:
+            return asset_manager.shaders["flat"];
+    }
 }
 
 AssetManager::AssetManager() { }

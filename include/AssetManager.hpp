@@ -60,6 +60,8 @@ public:
     static Model& get_model(const std::string& model_name);
     static Mesh& get_mesh(const std::string& mesh_name);
 
+    static Shader& get_relevant_shader_from_mesh(const Mesh& mesh);
+
 private:
     AssetManager();
     ~AssetManager();
