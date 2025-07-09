@@ -25,6 +25,13 @@ Texture& AssetManager::add_texture(const std::filesystem::path& path) {
                : iterator->second;
 }
 
+Texture& AssetManager::add_texture(const std::string& name, const vec3& color) {
+    return get().textures.emplace(std::piecewise_construct,
+                                 std::forward_as_tuple(name),
+                                 std::forward_as_tuple(color))
+                .first->second;
+}
+
 Model& AssetManager::add_model(const std::string& name, const std::filesystem::path& path) {
     return get().models.emplace(std::piecewise_construct,
                                 std::forward_as_tuple(name),
@@ -47,12 +54,12 @@ Shader& AssetManager::get_shader(const std::string& shader_name) {
     return iterator->second;
 }
 
-Texture& AssetManager::get_texture(const std::string& texture_path) {
+Texture& AssetManager::get_texture(const std::string& texture_name_or_path) {
     AssetManager& asset_manager = get();
 
-    auto iterator = asset_manager.textures.find(texture_path);
+    auto iterator = asset_manager.textures.find(texture_name_or_path);
     if(iterator == asset_manager.textures.end()) {
-        throw std::runtime_error("Couldn't find texture '" + texture_path + "' in asset manager");
+        throw std::runtime_error("Couldn't find texture '" + texture_name_or_path + "' in asset manager");
     }
 
     return iterator->second;
@@ -82,6 +89,7 @@ Mesh& AssetManager::get_mesh(const std::string& mesh_name) {
 
 Shader& AssetManager::get_relevant_shader_from_mesh(const Mesh& mesh) {
     AssetManager& asset_manager = get();
+
     switch(mesh.get_primitive()) {
         case Primitive::POINTS:
             return asset_manager.shaders["point mesh"];

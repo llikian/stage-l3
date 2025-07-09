@@ -33,6 +33,7 @@ public:
      */
     static Shader& add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
     static Texture& add_texture(const std::filesystem::path& path);
+    static Texture& add_texture(const std::string& name, const vec3& color);
     static Model& add_model(const std::string& name, const std::filesystem::path& path);
     static Mesh& add_mesh(const std::string& name);
 
@@ -56,7 +57,7 @@ public:
     }
 
     static Shader& get_shader(const std::string& shader_name);
-    static Texture& get_texture(const std::string& texture_path);
+    static Texture& get_texture(const std::string& texture_name_or_path);
     static Model& get_model(const std::string& model_name);
     static Mesh& get_mesh(const std::string& mesh_name);
 

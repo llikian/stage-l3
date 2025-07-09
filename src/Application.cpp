@@ -73,11 +73,17 @@ Application::Application()
     AssetManager::add_mesh("cube", create_cube_mesh);
     AssetManager::add_mesh("wireframe cube", create_wireframe_cube_mesh);
     AssetManager::add_mesh("screen", create_quad_mesh,
-                                    vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
+                           vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
     AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
-                                vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
+                           vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
     AssetManager::add_two_meshes("frustum faces", "frustum lines", create_frustum_meshes, camera);
+
+    /* Textures */
+    AssetManager::add_texture("default", vec3(1.0f));
+    AssetManager::add_texture("red", vec3(1.0f, 0.0f, 0.0f));
+    AssetManager::add_texture("green", vec3(0.0f, 1.0f, 0.0f));
+    AssetManager::add_texture("blue", vec3(0.0f, 0.0f, 1.0f));
 
     /* ---- Framebuffer ---- */
     glGenFramebuffers(1, &FBO);
@@ -133,11 +139,11 @@ void Application::run() {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
 
         /* Models */
-        Model& sponza = AssetManager::add_model("sponza", "data/sponza/sponza.obj");
-        sponza.apply_model_matrix(scale(0.05f));
-        ModelEntity* sponza_entity = root->add_child<ModelEntity>("sponza", shader, sponza);
-        sponza_entity->create_aabb();
-        sponza_entity->transform.set_local_position(-200.0f, -40.0f, 0.0f);
+        // Model& sponza = AssetManager::add_model("sponza", "data/sponza/sponza.obj");
+        // sponza.apply_model_matrix(scale(0.05f));
+        // ModelEntity* sponza_entity = root->add_child<ModelEntity>("sponza", shader, sponza);
+        // sponza_entity->create_aabb();
+        // sponza_entity->transform.set_local_position(-200.0f, -40.0f, 0.0f);
 
         // Model& vokselia = AssetManager::add_model("vokselia", "data/vokselia/vokselia_spawn.obj");
         // vokselia.apply_model_matrix(scale(100.0f));
@@ -173,7 +179,7 @@ void Application::run() {
     }
 #endif
 
-    root->add_child<SceneEntity>("avocado", "data/avocado/Avocado.gltf");
+    root->add_child<SceneEntity>("avocado", "data/avocado/Avocado.gltf")->transform.set_local_scale(100.0f);
     // root->add_child<SceneEntity>("sponza", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
 
     /* Main Loop */
