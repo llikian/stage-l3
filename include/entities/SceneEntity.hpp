@@ -27,6 +27,19 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_SCENE; }
 
+    /**
+     * @brief Recursively draws this entity and its children if they're drawable.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     * @param frustum The view frustum.
+     */
+    void draw(const mat4& view_projection_matrix, const Frustum& frustum) const override;
+
+    /**
+     * @brief Draws the scene.
+     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
+     */
+    void draw(const mat4& view_projection_matrix) const;
+
 private:
     Scene scene;
 };

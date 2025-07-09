@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include "cgltf.h"
+#include "maths/Transform.hpp"
 #include "mesh/Mesh.hpp"
 
 struct AttributeInfo {
@@ -24,7 +25,7 @@ public:
     explicit Scene(const std::filesystem::path& path);
     ~Scene();
 
-    void draw() const;
+    void draw(const mat4& view_projection_matrix, const Transform& transform) const;
 
     static void check_cgltf_result(cgltf_result result, const std::string& error_message);
     static std::string cgltf_primitive_type_to_string(cgltf_primitive_type primitive_type);
