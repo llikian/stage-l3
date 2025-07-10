@@ -60,6 +60,10 @@ Application::Application()
                                  "shaders/vertex/default.vert",
                                  "shaders/fragment/blinn_phong.frag"
                              });
+    AssetManager::add_shader("metallic-roughness", {
+                                 "shaders/vertex/default.vert",
+                                 "shaders/fragment/metallic_roughness.frag"
+                             });
     AssetManager::add_shader("terrain", {
                                  "shaders/terrain/terrain.vert",
                                  "shaders/terrain/terrain.tesc",
