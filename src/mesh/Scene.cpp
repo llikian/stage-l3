@@ -9,7 +9,18 @@
 
 #include "AssetManager.hpp"
 #include "debug.hpp"
+#include "maths/functions.hpp"
 #include "utility/LifetimeLogger.hpp"
+
+MeshInfo::MeshInfo(): material(nullptr) { }
+
+MeshInfo::~MeshInfo() {
+    if(material != nullptr) {
+        material->albedo_map.free();
+        material->metallic_roughness_map.free();
+    }
+    delete material;
+}
 
 Scene::Scene(const std::filesystem::path& path)
     : meshes(nullptr), meshes_count(0), primitives_count(nullptr) {
@@ -28,7 +39,10 @@ Scene::~Scene() {
 void Scene::draw(const mat4& view_projection_matrix, const Transform& transform) const {
     for(unsigned int i = 0 ; i < meshes_count ; ++i) {
         for(unsigned int j = 0 ; j < primitives_count[i] ; ++j) {
-            const Shader& shader = AssetManager::get_relevant_shader_from_mesh(meshes[i][j]);
+            const MRMaterial* material = meshes[i][j].material;
+            const Shader& shader = material == nullptr
+                                       ? AssetManager::get_relevant_shader_from_mesh(meshes[i][j].mesh)
+                                       : AssetManager::get_shader("metallic-roughness");
             shader.use();
 
             const mat4& global_model = transform.get_global_model_const_reference();
@@ -46,17 +60,26 @@ void Scene::draw(const mat4& view_projection_matrix, const Transform& transform)
 
             shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
 
-            /* Material */
-            shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
-            shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
-            shader.set_uniform_if_exists("u_specular", vec3(1.0f));
-            shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
-            int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
-            if(u_diffuse_map_location != -1) {
-                AssetManager::get_texture("default").bind(0);
+            if(material != nullptr) { // mettalic roughness
+                material->albedo_map.bind(0);
+                material->metallic_roughness_map.bind(1);
+
+                shader.set_uniform_if_exists("u_material.albedo", material->albedo);
+                shader.set_uniform_if_exists("u_material.metallic", material->metallic);
+                shader.set_uniform_if_exists("u_material.roughness", material->roughness);
+                shader.set_uniform_if_exists("u_material.fresnel0", material->fresnel0);
+            } else { // blinn phong
+                shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
+                shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
+                shader.set_uniform_if_exists("u_specular", vec3(1.0f));
+                shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
+                int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
+                if(u_diffuse_map_location != -1) {
+                    AssetManager::get_texture("default").bind(0);
+                }
             }
 
-            meshes[i][j].draw();
+            meshes[i][j].mesh.draw();
         }
     }
 }
@@ -124,7 +147,7 @@ void Scene::load(const std::filesystem::path& path) {
 #endif
 
     cgltf_options options{};
-    cgltf_data* data = nullptr;
+    cgltf_data* data;
 
     cgltf_result result = cgltf_parse_file(&options, path.c_str(), &data);
     check_cgltf_result(result, "Failed to read gltf file '" + path.string() + "': ");
@@ -135,20 +158,70 @@ void Scene::load(const std::filesystem::path& path) {
     result = cgltf_validate(data);
     check_cgltf_result(result, "Failed to validate data.");
 
-    meshes = new Mesh*[data->meshes_count];
+    meshes = new MeshInfo*[data->meshes_count];
     meshes_count = data->meshes_count;
     primitives_count = new unsigned int[data->meshes_count];
 
     for(unsigned int i = 0 ; i < data->meshes_count ; ++i) {
         const cgltf_mesh& c_mesh = data->meshes[i];
 
-        meshes[i] = new Mesh[c_mesh.primitives_count];
+        meshes[i] = new MeshInfo[c_mesh.primitives_count];
         primitives_count[i] = c_mesh.primitives_count;
 
         for(unsigned int j = 0 ; j < c_mesh.primitives_count ; ++j) {
             const cgltf_primitive& c_primitive = c_mesh.primitives[j];
 
-            Mesh& mesh = meshes[i][j];
+            MRMaterial*& material = meshes[i][j].material;
+
+            if(c_primitive.material != nullptr) {
+                if(c_primitive.material->has_pbr_metallic_roughness) {
+                    std::cout << "\tHas metallic roughness.\n";
+                    const cgltf_material* c_material = c_primitive.material;
+                    const auto& [base_color_texture,
+                        metallic_roughness_texture,
+                        base_color_factor,
+                        metallic_factor,
+                        roughness_factor] = c_material->pbr_metallic_roughness;
+
+                    material = new MRMaterial;
+                    material->albedo.x = base_color_factor[0];
+                    material->albedo.y = base_color_factor[1];
+                    material->albedo.z = base_color_factor[2];
+                    material->albedo.w = base_color_factor[3];
+                    material->metallic = metallic_factor;
+                    material->roughness = roughness_factor;
+
+                    // TODO: Use cgltf buffers instead of loading the image
+                    if(base_color_texture.texture != nullptr) {
+                        char* uri = base_color_texture.texture->image->uri;
+                        if(uri != nullptr) {
+                            material->albedo_map = AssetManager::add_texture(path.parent_path() / uri);
+                        } else {
+                            material->albedo_map.create(base_color_texture);
+                        }
+                    } else {
+                        material->albedo_map.create(255, 255, 255);
+                    }
+
+                    if(metallic_roughness_texture.texture != nullptr) {
+                        char* uri = metallic_roughness_texture.texture->image->uri;
+                        if(uri != nullptr) {
+                            material->metallic_roughness_map = AssetManager::add_texture(path.parent_path() / uri);
+                        } else {
+                            material->metallic_roughness_map.create(metallic_roughness_texture);
+                        }
+                    } else {
+                        material->metallic_roughness_map.create(255, 255, 255);
+                    }
+
+                    float ior = c_material->has_ior ? c_material->ior.ior : 1.5f;
+                    material->fresnel0 = pow2((ior - 1.0f) / (ior + 1.0f));
+                }
+
+                if(c_primitive.material->has_pbr_specular_glossiness) { std::cout << "\tHas specular glossiness.\n"; }
+            }
+
+            Mesh& mesh = meshes[i][j].mesh;
 
             switch(c_primitive.type) {
                 case cgltf_primitive_type_points:

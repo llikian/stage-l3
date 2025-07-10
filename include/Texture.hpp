@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cgltf.h"
 #include "Image.hpp"
 #include "maths/vec3.hpp"
 
@@ -102,6 +103,8 @@ public:
      * @param b The b component of the texture's color.
      */
     void create(unsigned char r, unsigned char g, unsigned char b);
+
+    void create(const cgltf_texture_view& texture_view);
 
     /**
      * @brief Binds the texture to a specifc texture unit.

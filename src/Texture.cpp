@@ -98,6 +98,100 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
     b_has_transparency = false;
 }
 
+void Texture::create(const cgltf_texture_view& texture_view) {
+    init();
+
+    const cgltf_texture* texture = texture_view.texture;
+    const cgltf_sampler* sampler = texture->sampler;
+
+    switch(sampler->wrap_s) {
+        case cgltf_wrap_mode_clamp_to_edge:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            break;
+        case cgltf_wrap_mode_mirrored_repeat:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+            break;
+        case cgltf_wrap_mode_repeat:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            break;
+        default: break;
+    }
+
+    switch(sampler->wrap_t) {
+        case cgltf_wrap_mode_clamp_to_edge:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            break;
+        case cgltf_wrap_mode_mirrored_repeat:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+            break;
+        case cgltf_wrap_mode_repeat:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            break;
+        default: break;
+    }
+
+    switch(sampler->min_filter) {
+        case cgltf_filter_type_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            break;
+        case cgltf_filter_type_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            break;
+        case cgltf_filter_type_nearest_mipmap_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            break;
+        case cgltf_filter_type_linear_mipmap_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+            break;
+        case cgltf_filter_type_nearest_mipmap_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+            break;
+        case cgltf_filter_type_linear_mipmap_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            break;
+        default: break;
+    }
+
+    switch(sampler->mag_filter) {
+        case cgltf_filter_type_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            break;
+        case cgltf_filter_type_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            break;
+        case cgltf_filter_type_nearest_mipmap_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            break;
+        case cgltf_filter_type_linear_mipmap_nearest:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+            break;
+        case cgltf_filter_type_nearest_mipmap_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+            break;
+        case cgltf_filter_type_linear_mipmap_linear:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            break;
+        default: break;
+    }
+
+    switch(texture->image->buffer_view->type) {
+        case cgltf_buffer_view_type_invalid:
+            std::cout << "cgltf_buffer_view_type_invalid" << '\n';
+            break;
+        case cgltf_buffer_view_type_indices:
+            std::cout << "cgltf_buffer_view_type_indices" << '\n';
+            break;
+        case cgltf_buffer_view_type_vertices:
+            std::cout << "cgltf_buffer_view_type_vertices" << '\n';
+            break;
+        case cgltf_buffer_view_type_max_enum:
+            std::cout << "cgltf_buffer_view_type_max_enum" << '\n';
+            break;
+    }
+
+    // TODO : Finish writing this
+}
+
 void Texture::bind(unsigned int texUnit) const {
     glActiveTexture(GL_TEXTURE0 + texUnit);
     glBindTexture(GL_TEXTURE_2D, id);

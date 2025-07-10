@@ -9,12 +9,21 @@
 #include "cgltf.h"
 #include "maths/Transform.hpp"
 #include "mesh/Mesh.hpp"
+#include "mesh/MRMaterial.hpp"
 
 struct AttributeInfo {
     Attribute attribute;
     AttributeType type;
     unsigned int component_count;
     std::vector<float> data;
+};
+
+struct MeshInfo {
+    MeshInfo();
+
+    ~MeshInfo();
+    Mesh mesh;
+    MRMaterial* material;
 };
 
 /**
@@ -34,7 +43,7 @@ public:
     static std::string cgltf_type_to_string(cgltf_type type);
 
 private:
-    Mesh** meshes;
+    MeshInfo** meshes;
     unsigned int meshes_count;
     unsigned int* primitives_count;
 
