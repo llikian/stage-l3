@@ -57,6 +57,7 @@ set(SOURCES
         src/mesh/Mesh.cpp
         src/mesh/Material.cpp
         src/mesh/Model.cpp
+        src/mesh/MRMaterial.cpp
         src/mesh/primitives.cpp
         src/mesh/Scene.cpp
         src/mesh/Terrain.cpp

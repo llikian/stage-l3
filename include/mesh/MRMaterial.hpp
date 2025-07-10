@@ -12,6 +12,8 @@
  * @brief Metallic-Roughness material.
  */
 struct MRMaterial {
+    MRMaterial();
+
     Texture albedo_map;
     Texture metallic_roughness_map;
     vec4 albedo;
