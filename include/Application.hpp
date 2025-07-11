@@ -7,6 +7,7 @@
 
 #include "Camera.hpp"
 #include "culling/Frustum.hpp"
+#include "mesh/MRMaterial.hpp"
 #include "SceneGraph.hpp"
 #include "Shader.hpp"
 
@@ -66,4 +67,7 @@ private:
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
 
     bool are_axes_drawn; ///< Whether the axes are drawn.
+
+
+    MRMaterial material;
 };

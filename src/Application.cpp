@@ -14,6 +14,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "maths/functions.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
@@ -186,6 +187,13 @@ void Application::run() {
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(0.2f);
 
+    material.base_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    material.base_color_map.create(255, 255, 255);
+    material.metallic = 1.0f;
+    material.roughness = 0.5f;
+    material.metallic_roughness_map.create(255, 255, 255);
+    material.fresnel0 = 0.04f;
+
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
@@ -211,6 +219,31 @@ void Application::run() {
             shader.set_uniform("u_camera_position", camera_position);
             shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
             shader.set_uniform("u_light_position", light_position);
+        }
+
+        /* Metallic-Roughness Shader */ {
+            const Shader& shader = AssetManager::get_shader("metallic-roughness");
+            shader.use();
+
+            shader.set_uniform("u_camera_position", camera_position);
+            shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
+            shader.set_uniform("u_light_position", light_position);
+            shader.set_uniform("u_material.base_color_map", 0);
+            shader.set_uniform("u_material.metallic_roughness_map", 1);
+
+            mat4 model = scale(10.0f);
+            shader.set_uniform("u_model", model);
+            shader.set_uniform("u_mvp", frustum.view_projection * model);
+            shader.set_uniform("u_normals_model_matrix", transpose_inverse(model));
+
+            material.base_color_map.bind(0);
+            material.metallic_roughness_map.bind(1);
+            shader.set_uniform("u_material.base_color", material.base_color);
+            shader.set_uniform("u_material.metallic", material.metallic);
+            shader.set_uniform("u_material.roughness", material.roughness);
+            shader.set_uniform("u_material.fresnel0", material.fresnel0);
+
+            AssetManager::get_mesh("sphere 16 32").draw();
         }
 
         /* Line Mesh Shader */ {
@@ -360,6 +393,13 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("Camera:");
     ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
     ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
+
+    ImGui::NewLine();
+    ImGui::ColorPicker4("base_color", &material.base_color.x);
+    ImGui::SliderFloat("Metallic", &material.metallic, 0.0f, 1.0f);
+    ImGui::SliderFloat("Roughness", &material.roughness, 0.0f, 1.0f);
+    static float ior = 1.5f;
+    if(ImGui::DragFloat("IOR", &ior, 0.1f, 0.0f)) { material.fresnel0 = pow2((ior - 1.0f) / (ior + 1.0f)); }
 
     ImGui::NewLine();
     ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);

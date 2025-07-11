@@ -12,11 +12,11 @@
 #include "maths/functions.hpp"
 #include "utility/LifetimeLogger.hpp"
 
-MeshInfo::MeshInfo(): material(nullptr) { }
+MeshInfo::MeshInfo() : material(nullptr) { }
 
 MeshInfo::~MeshInfo() {
     if(material != nullptr) {
-        material->albedo_map.free();
+        material->base_color_map.free();
         material->metallic_roughness_map.free();
     }
     delete material;
@@ -61,10 +61,10 @@ void Scene::draw(const mat4& view_projection_matrix, const Transform& transform)
             shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
 
             if(material != nullptr) { // mettalic roughness
-                material->albedo_map.bind(0);
+                material->base_color_map.bind(0);
                 material->metallic_roughness_map.bind(1);
 
-                shader.set_uniform_if_exists("u_material.albedo", material->albedo);
+                shader.set_uniform_if_exists("u_material.base_color", material->base_color);
                 shader.set_uniform_if_exists("u_material.metallic", material->metallic);
                 shader.set_uniform_if_exists("u_material.roughness", material->roughness);
                 shader.set_uniform_if_exists("u_material.fresnel0", material->fresnel0);
@@ -184,10 +184,10 @@ void Scene::load(const std::filesystem::path& path) {
                         roughness_factor] = c_material->pbr_metallic_roughness;
 
                     material = new MRMaterial;
-                    material->albedo.x = base_color_factor[0];
-                    material->albedo.y = base_color_factor[1];
-                    material->albedo.z = base_color_factor[2];
-                    material->albedo.w = base_color_factor[3];
+                    material->base_color.x = base_color_factor[0];
+                    material->base_color.y = base_color_factor[1];
+                    material->base_color.z = base_color_factor[2];
+                    material->base_color.w = base_color_factor[3];
                     material->metallic = metallic_factor;
                     material->roughness = roughness_factor;
 
@@ -195,12 +195,12 @@ void Scene::load(const std::filesystem::path& path) {
                     if(base_color_texture.texture != nullptr) {
                         char* uri = base_color_texture.texture->image->uri;
                         if(uri != nullptr) {
-                            material->albedo_map = AssetManager::add_texture(path.parent_path() / uri);
+                            material->base_color_map = AssetManager::add_texture(path.parent_path() / uri);
                         } else {
-                            material->albedo_map.create(base_color_texture);
+                            material->base_color_map.create(base_color_texture);
                         }
                     } else {
-                        material->albedo_map.create(255, 255, 255);
+                        material->base_color_map.create(255, 255, 255);
                     }
 
                     if(metallic_roughness_texture.texture != nullptr) {
@@ -214,8 +214,9 @@ void Scene::load(const std::filesystem::path& path) {
                         material->metallic_roughness_map.create(255, 255, 255);
                     }
 
-                    float ior = c_material->has_ior ? c_material->ior.ior : 1.5f;
-                    material->fresnel0 = pow2((ior - 1.0f) / (ior + 1.0f));
+                    if(c_material->has_ior) {
+                        material->fresnel0 = pow2((c_material->has_ior - 1.0f) / (c_material->has_ior + 1.0f));
+                    }
                 }
 
                 if(c_primitive.material->has_pbr_specular_glossiness) { std::cout << "\tHas specular glossiness.\n"; }
