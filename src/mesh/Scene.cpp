@@ -37,50 +37,48 @@ Scene::~Scene() {
 }
 
 void Scene::draw(const mat4& view_projection_matrix, const Transform& transform) const {
-    for(unsigned int i = 0 ; i < meshes_count ; ++i) {
-        for(unsigned int j = 0 ; j < primitives_count[i] ; ++j) {
-            const MRMaterial* material = meshes[i][j].material;
-            const Shader& shader = material == nullptr
-                                       ? AssetManager::get_relevant_shader_from_mesh(meshes[i][j].mesh)
-                                       : AssetManager::get_shader("metallic-roughness");
-            shader.use();
+    for(const auto& [mesh_id, primitive_id] : indices_order) {
+        const MRMaterial* material = meshes[mesh_id][primitive_id].material;
+        const Shader& shader = material == nullptr
+                                   ? AssetManager::get_relevant_shader_from_mesh(meshes[mesh_id][primitive_id].mesh)
+                                   : AssetManager::get_shader("metallic-roughness");
+        shader.use();
 
-            const mat4& global_model = transform.get_global_model_const_reference();
-            shader.set_uniform_if_exists("u_model", global_model);
+        const mat4& global_model = transform.get_global_model_const_reference();
+        shader.set_uniform_if_exists("u_model", global_model);
 
-            int u_mvp_location = shader.get_uniform_location("u_mvp");
-            if(u_mvp_location != -1) {
-                Shader::set_uniform(u_mvp_location, view_projection_matrix * global_model);
-            }
-
-            int u_normals_model_matrix_location = shader.get_uniform_location("u_normals_model_matrix");
-            if(u_normals_model_matrix_location != -1) {
-                Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
-            }
-
-            shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
-
-            if(material != nullptr) { // mettalic roughness
-                material->base_color_map.bind(0);
-                material->metallic_roughness_map.bind(1);
-
-                shader.set_uniform_if_exists("u_material.base_color", material->base_color);
-                shader.set_uniform_if_exists("u_material.metallic", material->metallic);
-                shader.set_uniform_if_exists("u_material.roughness", material->roughness);
-                shader.set_uniform_if_exists("u_material.fresnel0", material->fresnel0);
-            } else { // blinn phong
-                shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
-                shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
-                shader.set_uniform_if_exists("u_specular", vec3(1.0f));
-                shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
-                int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
-                if(u_diffuse_map_location != -1) {
-                    AssetManager::get_texture("default").bind(0);
-                }
-            }
-
-            meshes[i][j].mesh.draw();
+        int u_mvp_location = shader.get_uniform_location("u_mvp");
+        if(u_mvp_location != -1) {
+            Shader::set_uniform(u_mvp_location, view_projection_matrix * global_model);
         }
+
+        int u_normals_model_matrix_location = shader.get_uniform_location("u_normals_model_matrix");
+        if(u_normals_model_matrix_location != -1) {
+            Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
+        }
+
+        shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
+
+        if(material != nullptr) { // mettalic roughness
+            material->base_color_map.bind(0);
+            material->metallic_roughness_map.bind(1);
+
+            shader.set_uniform_if_exists("u_material.base_color", material->base_color);
+            shader.set_uniform_if_exists("u_material.metallic", material->metallic);
+            shader.set_uniform_if_exists("u_material.roughness", material->roughness);
+            shader.set_uniform_if_exists("u_material.fresnel0", material->fresnel0);
+        } else { // blinn phong
+            shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
+            shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
+            shader.set_uniform_if_exists("u_specular", vec3(1.0f));
+            shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
+            int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
+            if(u_diffuse_map_location != -1) {
+                AssetManager::get_texture("default").bind(0);
+            }
+        }
+
+        meshes[mesh_id][primitive_id].mesh.draw();
     }
 }
 
@@ -164,6 +162,8 @@ void Scene::load(const std::filesystem::path& path) {
     meshes_count = data->meshes_count;
     primitives_count = new unsigned int[data->meshes_count];
 
+    std::vector<vector2<unsigned int>> transparent_indices_order;
+
     for(unsigned int i = 0 ; i < data->meshes_count ; ++i) {
         const cgltf_mesh& c_mesh = data->meshes[i];
 
@@ -211,6 +211,12 @@ void Scene::load(const std::filesystem::path& path) {
                 }
 
                 if(c_primitive.material->has_pbr_specular_glossiness) { std::cout << "\tHas specular glossiness.\n"; }
+            }
+
+            if(material != nullptr && material->has_transparency()) {
+                transparent_indices_order.emplace_back(i, j);
+            } else {
+                indices_order.emplace_back(i, j);
             }
 
             Mesh& mesh = meshes[i][j].mesh;
@@ -294,6 +300,8 @@ void Scene::load(const std::filesystem::path& path) {
     }
 
     cgltf_free(data);
+
+    for(const vector2<unsigned int>& index : transparent_indices_order) { indices_order.push_back(index); }
 }
 
 void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute& c_attribute) {

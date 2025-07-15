@@ -47,6 +47,8 @@ private:
     unsigned int meshes_count;
     unsigned int* primitives_count;
 
+    std::vector<vector2<unsigned int>> indices_order;
+
     void load(const std::filesystem::path& path);
     static void read_attribute(AttributeInfo& attribute_info, const cgltf_attribute& c_attribute);
 };
