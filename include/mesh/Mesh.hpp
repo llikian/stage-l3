@@ -53,6 +53,8 @@ public:
      */
     size_t get_indices_amount() const;
 
+    AttributeType get_attribute_type(Attribute attribute);
+
     /**
      * @brief Calculates the minimum and maximum value for each coordinate for every position in the
      * mesh. If the mesh doesn't have positions, does nothing.
@@ -101,7 +103,6 @@ public:
     void add_triangle(unsigned int top, unsigned int left, unsigned int right);
     void add_face(unsigned int topL, unsigned int bottomL, unsigned int bottomR, unsigned int topR);
 
-
     void bind_buffers();
 
     void push_value(float value);
@@ -144,7 +145,7 @@ private:
         push_value(std::forward<Type>(value));
     }
 
-    AttributeType& get_attribute_type(Attribute attribute);
+    AttributeType& get_attribute_type_ref(Attribute attribute);
 
     Primitive primitive;
 

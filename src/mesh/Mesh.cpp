@@ -67,6 +67,10 @@ size_t Mesh::get_indices_amount() const {
     return indices.size();
 }
 
+AttributeType Mesh::get_attribute_type(Attribute attribute) {
+    return attributes[static_cast<unsigned char>(attribute)];
+}
+
 void Mesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
     if(has_attribute(Attribute::POSITION)) {
         const unsigned int offset = get_attribute_offset(Attribute::POSITION);
@@ -120,13 +124,13 @@ void Mesh::apply_model_matrix(const mat4& model) {
 void Mesh::enable_attribute(Attribute attribute, AttributeType type) {
     if(type == AttributeType::NONE) { type = get_default_attribute_type(attribute); }
 
-    AttributeType& old_type = get_attribute_type(attribute);
+    AttributeType& old_type = get_attribute_type_ref(attribute);
     stride += get_attribute_type_count(type) - get_attribute_type_count(old_type);
     old_type = type;
 }
 
 void Mesh::disable_attribute(Attribute attribute) {
-    AttributeType& type = get_attribute_type(attribute);
+    AttributeType& type = get_attribute_type_ref(attribute);
     stride -= get_attribute_type_count(type);
     type = AttributeType::NONE;
 }
@@ -192,18 +196,6 @@ void Mesh::bind_buffers() {
     }
 }
 
-unsigned int Mesh::get_attribute_offset(Attribute attribute) const {
-    const unsigned int attribute_id = static_cast<unsigned char>(attribute);
-    unsigned int offset = 0;
-
-    for(unsigned int i = 0 ; i < attribute_id ; ++i) {
-        Attribute attr = static_cast<Attribute>(i);
-        offset += get_attribute_type_count(get_attribute_type(attr));
-    }
-
-    return offset;
-}
-
 void Mesh::push_value(float value) {
     data.push_back(value);
 }
@@ -234,6 +226,18 @@ void Mesh::push_indices_buffer(const std::vector<unsigned int>& indices) {
     this->indices.insert(this->indices.end(), indices.begin(), indices.end());
 }
 
-AttributeType& Mesh::get_attribute_type(Attribute attribute) {
+unsigned int Mesh::get_attribute_offset(Attribute attribute) const {
+    const unsigned int attribute_id = static_cast<unsigned char>(attribute);
+    unsigned int offset = 0;
+
+    for(unsigned int i = 0 ; i < attribute_id ; ++i) {
+        Attribute attr = static_cast<Attribute>(i);
+        offset += get_attribute_type_count(get_attribute_type(attr));
+    }
+
+    return offset;
+}
+
+AttributeType& Mesh::get_attribute_type_ref(Attribute attribute) {
     return attributes[static_cast<unsigned char>(attribute)];
 }
