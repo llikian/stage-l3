@@ -74,3 +74,28 @@ void create_pyramid_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C
  * @param camera
  */
 void create_frustum_meshes(Mesh& faces, Mesh& lines, const Camera& camera);
+
+/**
+ * @brief Creates a mesh representing an icosphere. It is created by subdividing the vertices of a
+ * dodecahedron as many times as we want then normalizing these vertices. The subdivision pattern
+ * looks like this:
+ * \verbatim
+ * ---------
+ * |   A   |
+ * |  / \  |
+ * | B---C |
+ * ---------
+ *
+ * Turns into:
+ * ---------------
+ * |      A      |
+ * |     / \     |
+ * |    D---F    |
+ * |   / \ / \   |
+ * |  B---E---C  |
+ * ---------------
+ * \endverbatim
+ * @param mesh The mesh to create the icosphere in.
+ * @param subdivisions How many times to subdivide.
+ */
+void create_icosphere_mesh(Mesh& mesh, unsigned int subdivisions);

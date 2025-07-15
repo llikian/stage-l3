@@ -6,6 +6,8 @@
 #include "mesh/primitives.hpp"
 
 #include <cmath>
+#include <functional>
+
 #include "maths/constants.hpp"
 #include "maths/geometry.hpp"
 #include "Window.hpp"
@@ -285,4 +287,102 @@ void create_frustum_meshes(Mesh& faces, Mesh& lines, const Camera& camera) {
 
     lines.bind_buffers();
     faces.bind_buffers();
+}
+
+void create_icosphere_mesh(Mesh& mesh, unsigned int subdivisions) {
+    static constexpr unsigned int faces[12][5]{
+        { 13, 5, 18, 4, 12 },
+        { 12, 4, 10, 8, 0 },
+        { 13, 12, 0, 16, 1 },
+        { 13, 1, 9, 11, 5 },
+        { 1, 16, 17, 3, 9 },
+        { 0, 8, 2, 17, 16 },
+        { 5, 11, 7, 19, 18 },
+        { 4, 18, 19, 6, 10 },
+        { 9, 3, 15, 7, 11 },
+        { 10, 6, 14, 2, 8 },
+        { 17, 2, 14, 15, 3 },
+        { 19, 7, 15, 14, 6 }
+    };
+
+    std::vector<vec3> vertices{
+        normalize(vec3(1.0f, 1.0f, 1.0f)),    // 0
+        normalize(vec3(1.0f, 1.0f, -1.0f)),   // 1
+        normalize(vec3(1.0f, -1.0f, 1.0f)),   // 2
+        normalize(vec3(1.0f, -1.0f, -1.0f)),  // 3
+        normalize(vec3(-1.0f, 1.0f, 1.0f)),   // 4
+        normalize(vec3(-1.0f, 1.0f, -1.0f)),  // 5
+        normalize(vec3(-1.0f, -1.0f, 1.0f)),  // 6
+        normalize(vec3(-1.0f, -1.0f, -1.0f)), // 7
+
+        normalize(vec3(INV_GOLDEN_RATIO_F, 0.0f, GOLDEN_RATIO_F)),   // 8
+        normalize(vec3(INV_GOLDEN_RATIO_F, 0.0f, -GOLDEN_RATIO_F)),  // 9
+        normalize(vec3(-INV_GOLDEN_RATIO_F, 0.0f, GOLDEN_RATIO_F)),  // 10
+        normalize(vec3(-INV_GOLDEN_RATIO_F, 0.0f, -GOLDEN_RATIO_F)), // 11
+
+        normalize(vec3(0.0f, GOLDEN_RATIO_F, INV_GOLDEN_RATIO_F)),   // 12
+        normalize(vec3(0.0f, GOLDEN_RATIO_F, -INV_GOLDEN_RATIO_F)),  // 13
+        normalize(vec3(0.0f, -GOLDEN_RATIO_F, INV_GOLDEN_RATIO_F)),  // 14
+        normalize(vec3(0.0f, -GOLDEN_RATIO_F, -INV_GOLDEN_RATIO_F)), // 15
+
+        normalize(vec3(GOLDEN_RATIO_F, INV_GOLDEN_RATIO_F, 0.0f)),  // 16
+        normalize(vec3(GOLDEN_RATIO_F, -INV_GOLDEN_RATIO_F, 0.0f)), // 17
+        normalize(vec3(-GOLDEN_RATIO_F, INV_GOLDEN_RATIO_F, 0.0f)), // 18
+        normalize(vec3(-GOLDEN_RATIO_F, -INV_GOLDEN_RATIO_F, 0.0f)) // 19
+    };
+
+    std::vector<unsigned int> indices;
+
+    std::function<void(unsigned int, unsigned int, unsigned int, unsigned int)> add_triangle =
+        [&](unsigned int A, unsigned int B, unsigned int C, unsigned int depth) {
+        if(depth > 0) {
+            vertices.push_back(0.5f * (vertices[A] + vertices[B]));
+            unsigned int AB = vertices.size() - 1;
+            vertices.push_back(0.5f * (vertices[B] + vertices[C]));
+            unsigned int BC = vertices.size() - 1;
+            vertices.push_back(0.5f * (vertices[C] + vertices[A]));
+            unsigned int CA = vertices.size() - 1;
+
+            add_triangle(A, AB, CA, depth - 1);
+            add_triangle(AB, B, BC, depth - 1);
+            add_triangle(CA, BC, C, depth - 1);
+            add_triangle(AB, BC, CA, depth - 1);
+        } else {
+            indices.push_back(A);
+            indices.push_back(B);
+            indices.push_back(C);
+        }
+    };
+
+    for(unsigned int i = 0 ; i < 12 ; ++i) {
+        const unsigned int* face = faces[i];
+        vertices.push_back(0.2f * (vertices[face[0]]
+                                   + vertices[face[1]]
+                                   + vertices[face[2]]
+                                   + vertices[face[3]]
+                                   + vertices[face[4]]));
+
+        unsigned int index = vertices.size() - 1;
+
+        add_triangle(face[0], face[1], index, subdivisions);
+        add_triangle(face[1], face[2], index, subdivisions);
+        add_triangle(face[2], face[3], index, subdivisions);
+        add_triangle(face[3], face[4], index, subdivisions);
+        add_triangle(face[4], face[0], index, subdivisions);
+    }
+
+    mesh.set_primitive(Primitive::TRIANGLES);
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
+
+    for(const vec3& vertex : vertices) {
+        vec3 project_on_sphere = normalize(vertex);
+        vec2 tex_coords(std::atan2(project_on_sphere.x, project_on_sphere.z) / (2.0f * PI_F) + 0.5f,
+                        0.5f + 0.5f * project_on_sphere.y);
+        mesh.add_vertex(project_on_sphere, project_on_sphere, tex_coords);
+    }
+
+    for(int i = 0 ; i + 2 < indices.size() ; i += 3) { mesh.add_triangle(indices[i], indices[i + 1], indices[i + 2]); }
+
+    mesh.bind_buffers();
 }
