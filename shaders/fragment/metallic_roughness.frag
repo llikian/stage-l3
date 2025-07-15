@@ -48,6 +48,10 @@ float V_Smith_GGX_correlated(float normal_dot_view, float normal_dot_light, floa
     return 0.5f / (view_GGX + light_GGX);
 }
 
+float diffuse_lambert() {
+    return INV_PI;
+}
+
 vec3 brdf(vec3 base_color, float metallic, float roughness) {
     vec3 normal = normalize(v_normal);
 
@@ -65,10 +69,10 @@ vec3 brdf(vec3 base_color, float metallic, float roughness) {
     float D = D_GGX(normal_dot_halfway, roughness);
     float V = V_Smith_GGX_correlated(normal_dot_view, normal_dot_light, roughness);
 
-    vec3 specular = (D * V) * F;
-    vec3 diffuse = (INV_PI * (1.0f - metallic) * base_color) * (1.0f - F);
+    vec3 specular = D * V * F;
+    vec3 diffuse = (1.0f - metallic) * diffuse_lambert() * base_color;
 
-    return (diffuse + specular) * u_light_color;
+    return normal_dot_light * (diffuse + specular) * 4.0f * u_light_color;
 }
 
 void main() {
@@ -77,6 +81,7 @@ void main() {
     float metallic = u_material.metallic * metallic_roughness.b;
     float roughness = u_material.roughness * metallic_roughness.g;
 
-    frag_color.rgb = brdf(base_color.rgb, metallic, roughness);
+    vec3 ambient = 0.2f * base_color.rgb;
+    frag_color.rgb = ambient + brdf(base_color.rgb, metallic, roughness);
     frag_color.a = base_color.a;
 }
