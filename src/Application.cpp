@@ -57,6 +57,10 @@ Application::Application()
                                  "shaders/vertex/position_only.vert",
                                  "shaders/fragment/flat.frag"
                              });
+    AssetManager::add_shader("lambert", {
+                                 "shaders/vertex/position_and_normal.vert",
+                                 "shaders/fragment/lambert.frag"
+                             });
     AssetManager::add_shader("blinn-phong", {
                                  "shaders/vertex/default.vert",
                                  "shaders/fragment/blinn_phong.frag"
@@ -75,6 +79,9 @@ Application::Application()
     /* Meshes */
     AssetManager::add_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
     AssetManager::add_mesh("sphere 16 32", create_sphere_mesh, 16, 32);
+    AssetManager::add_mesh("icosphere 0", create_icosphere_mesh, 0);
+    AssetManager::add_mesh("icosphere 1", create_icosphere_mesh, 1);
+    AssetManager::add_mesh("icosphere 2", create_icosphere_mesh, 2);
     AssetManager::add_mesh("cube", create_cube_mesh);
     AssetManager::add_mesh("wireframe cube", create_wireframe_cube_mesh);
     AssetManager::add_mesh("screen", create_quad_mesh,
@@ -135,7 +142,7 @@ void Application::run() {
     /* Light */
     FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light",
                                                                         AssetManager::get_shader("flat"),
-                                                                        AssetManager::get_mesh("sphere 8 16"));
+                                                                        AssetManager::get_mesh("icosphere 1"));
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec4& light_color = light->color;
@@ -247,6 +254,13 @@ void Application::run() {
                 AssetManager::get_mesh("camera pyramid").draw();
                 glLineWidth(1.0f);
             }
+        }
+
+        /* Lambert Shader */ {
+            const Shader& shader = AssetManager::get_shader("lambert");
+            shader.use();
+            shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
+            shader.set_uniform("u_light_position", light_position);
         }
 
         /* Terrain Shader */
