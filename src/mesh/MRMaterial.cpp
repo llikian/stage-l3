@@ -10,3 +10,7 @@ MRMaterial::MRMaterial()
       roughness(0.5f),
       fresnel0(0.04f) // Index of Refraction = 1.5f
 { }
+
+bool MRMaterial::has_transparency() const {
+    return base_color.w < 1.0f || base_color_map.has_transparency();
+}

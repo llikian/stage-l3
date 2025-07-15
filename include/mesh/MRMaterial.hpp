@@ -14,6 +14,11 @@
 struct MRMaterial {
     MRMaterial();
 
+    /**
+     * @return Whether the material's base color or base color map have transparency.
+     */
+    bool has_transparency() const;
+
     vec4 base_color; ///< Diffuse albedo for dielectrics / Specular color for metals.
     Texture base_color_map; ///< Diffuse albedo for dielectrics / Specular color for metals.
     float metallic; ///< Whether a surface appears to be dielectric (0.0) or metallic (1.0). Usually a binary value.
