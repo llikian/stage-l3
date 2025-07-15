@@ -146,6 +146,8 @@ void Scene::load(const std::filesystem::path& path) {
     std::cout << "Reading scene from file '" << path.filename().string() << "':\n";
 #endif
 
+    const std::filesystem::path parent_path = path.parent_path();
+
     cgltf_options options{};
     cgltf_data* data;
 
@@ -191,27 +193,16 @@ void Scene::load(const std::filesystem::path& path) {
                     material->metallic = metallic_factor;
                     material->roughness = roughness_factor;
 
-                    // TODO: Use cgltf buffers instead of loading the image
                     if(base_color_texture.texture != nullptr) {
-                        char* uri = base_color_texture.texture->image->uri;
-                        if(uri != nullptr) {
-                            material->base_color_map = AssetManager::add_texture(path.parent_path() / uri);
-                        } else {
-                            material->base_color_map.create(base_color_texture);
-                        }
+                        material->base_color_map.create(parent_path, base_color_texture);
                     } else {
                         material->base_color_map.create(255, 255, 255);
                     }
 
                     if(metallic_roughness_texture.texture != nullptr) {
-                        char* uri = metallic_roughness_texture.texture->image->uri;
-                        if(uri != nullptr) {
-                            material->metallic_roughness_map = AssetManager::add_texture(path.parent_path() / uri);
-                        } else {
-                            material->metallic_roughness_map.create(metallic_roughness_texture);
-                        }
+                        material->metallic_roughness_map.create(parent_path, metallic_roughness_texture);
                     } else {
-                        material->metallic_roughness_map.create(255, 255, 255);
+                        material->metallic_roughness_map.create(vec3(0.0f, 0.5f, 0.0f));
                     }
 
                     if(c_material->has_ior) {

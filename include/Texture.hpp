@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <filesystem>
+
 #include "cgltf.h"
 #include "Image.hpp"
 #include "maths/vec3.hpp"
@@ -20,8 +22,9 @@ public:
     /**
      * @brief Constructs a texture by loading an image and assigning its data to a new texture.
      * @param path The image's path.
+     * @param flip_vertically Whether to flip the image on vertically.
      */
-    explicit Texture(const std::string& path);
+    explicit Texture(const std::string& path, bool flip_vertically = true);
 
     /**
      * @brief Constructs a texture by assigning an image's data to a new texture.
@@ -72,8 +75,9 @@ public:
      * the Texture class already had an active texture (id != 0) and you no longer wish to use that
      * texture, be sure to call the free method beforehand.
      * @param path The image's path.
+     * @param flip_vertically Whether to flip the image on vertically.
      */
-    void create(const std::string& path);
+    void create(const std::string& path, bool flip_vertically = true);
 
     /**
      * @brief Creates a texture by assigning an image's data to a new texture.
@@ -104,7 +108,7 @@ public:
      */
     void create(unsigned char r, unsigned char g, unsigned char b);
 
-    void create(const cgltf_texture_view& texture_view);
+    void create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view);
 
     /**
      * @brief Binds the texture to a specifc texture unit.

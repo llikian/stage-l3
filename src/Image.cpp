@@ -10,8 +10,8 @@
 #include "glad/glad.h"
 #include "stb_image.h"
 
-Image::Image(const std::string& path) {
-    stbi_set_flip_vertically_on_load(true);
+Image::Image(const std::string& path, bool flip_vertically) {
+    stbi_set_flip_vertically_on_load(flip_vertically);
 
     int w, h, c;
     data = stbi_load(path.c_str(), &w, &h, &c, 0);

@@ -7,15 +7,17 @@
 
 #include <glad/glad.h>
 
+#include "AssetManager.hpp"
+
 #ifdef DEBUG
 #include "debug.hpp"
 #endif
 
 Texture::Texture() : id(0), b_has_transparency(false) { }
 
-Texture::Texture(const std::string& path)
+Texture::Texture(const std::string& path, bool flip_vertically)
     : id(0), b_has_transparency(false) {
-    create(path);
+    create(path, flip_vertically);
 }
 
 Texture::Texture(const Image& image)
@@ -58,8 +60,16 @@ void Texture::free() {
     id = 0;
 }
 
-void Texture::create(const std::string& path) {
-    create(Image(path));
+void Texture::create(const std::string& path, bool flip_vertically) {
+    Texture* asset_manager_texture = AssetManager::get_texture_ptr(path);
+
+    if(asset_manager_texture == nullptr) {
+        create(Image(path, flip_vertically));
+        AssetManager::add_texture(path, *this);
+    } else {
+        id = asset_manager_texture->id;
+        b_has_transparency = asset_manager_texture->b_has_transparency;
+    }
 }
 
 void Texture::create(const Image& image) {
@@ -98,7 +108,7 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
     b_has_transparency = false;
 }
 
-void Texture::create(const cgltf_texture_view& texture_view) {
+void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view) {
     init();
 
     const cgltf_texture* texture = texture_view.texture;
@@ -174,22 +184,29 @@ void Texture::create(const cgltf_texture_view& texture_view) {
         default: break;
     }
 
-    switch(texture->image->buffer_view->type) {
-        case cgltf_buffer_view_type_invalid:
-            std::cout << "cgltf_buffer_view_type_invalid" << '\n';
-            break;
-        case cgltf_buffer_view_type_indices:
-            std::cout << "cgltf_buffer_view_type_indices" << '\n';
-            break;
-        case cgltf_buffer_view_type_vertices:
-            std::cout << "cgltf_buffer_view_type_vertices" << '\n';
-            break;
-        case cgltf_buffer_view_type_max_enum:
-            std::cout << "cgltf_buffer_view_type_max_enum" << '\n';
-            break;
+    if(texture->image->buffer_view != nullptr) {
+        switch(texture->image->buffer_view->type) {
+            case cgltf_buffer_view_type_invalid:
+                std::cout << "cgltf_buffer_view_type_invalid" << '\n';
+                break;
+            case cgltf_buffer_view_type_indices:
+                std::cout << "cgltf_buffer_view_type_indices" << '\n';
+                break;
+            case cgltf_buffer_view_type_vertices:
+                std::cout << "cgltf_buffer_view_type_vertices" << '\n';
+                break;
+            case cgltf_buffer_view_type_max_enum:
+                std::cout << "cgltf_buffer_view_type_max_enum" << '\n';
+                break;
+        }
     }
 
-    // TODO : Finish writing this
+    if(texture->image->uri != nullptr) {
+        *this = AssetManager::add_texture(parent_path / texture->image->uri, false);
+    } else {
+        // TODO implement loading textures without URIs.
+        throw std::runtime_error("Didn't implement textures without URIs yet :p");
+    }
 }
 
 void Texture::bind(unsigned int texUnit) const {

@@ -16,8 +16,9 @@ public:
     /**
      * @brief Loads the image at the specified path.
      * @param path The path to the image.
+     * @param flip_vertically Whether to flip the image on vertically.
      */
-    explicit Image(const std::string& path);
+    explicit Image(const std::string& path, bool flip_vertically = true);
 
     /**
      * @brief Frees all the allocated memory.
