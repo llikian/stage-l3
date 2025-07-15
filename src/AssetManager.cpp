@@ -87,6 +87,50 @@ Mesh& AssetManager::get_mesh(const std::string& mesh_name) {
     return iterator->second;
 }
 
+Shader* AssetManager::get_shader_ptr(const std::string& shader_name) {
+    AssetManager& asset_manager = get();
+
+    auto iterator = asset_manager.shaders.find(shader_name);
+    return iterator == asset_manager.shaders.end() ? nullptr : &iterator->second;
+}
+
+Texture* AssetManager::get_texture_ptr(const std::string& texture_name_or_path) {
+    AssetManager& asset_manager = get();
+
+    auto iterator = asset_manager.textures.find(texture_name_or_path);
+    return iterator == asset_manager.textures.end() ? nullptr : &iterator->second;
+}
+
+Model* AssetManager::get_model_ptr(const std::string& model_name) {
+    AssetManager& asset_manager = get();
+
+    auto iterator = asset_manager.models.find(model_name);
+    return iterator == asset_manager.models.end() ? nullptr : &iterator->second;
+}
+
+Mesh* AssetManager::get_mesh_ptr(const std::string& mesh_name) {
+    AssetManager& asset_manager = get();
+
+    auto iterator = asset_manager.meshes.find(mesh_name);
+    return iterator == asset_manager.meshes.end() ? nullptr : &iterator->second;
+}
+
+bool AssetManager::has_shader(const std::string& shader_name) {
+    return get().shaders.contains(shader_name);
+}
+
+bool AssetManager::has_texture(const std::string& texture_name_or_path) {
+    return get().textures.contains(texture_name_or_path);
+}
+
+bool AssetManager::has_model(const std::string& model_name) {
+    return get().models.contains(model_name);
+}
+
+bool AssetManager::has_mesh(const std::string& mesh_name) {
+    return get().meshes.contains(mesh_name);
+}
+
 Shader& AssetManager::get_relevant_shader_from_mesh(const Mesh& mesh) {
     AssetManager& asset_manager = get();
 

@@ -61,6 +61,16 @@ public:
     static Model& get_model(const std::string& model_name);
     static Mesh& get_mesh(const std::string& mesh_name);
 
+    static Shader* get_shader_ptr(const std::string& shader_name);
+    static Texture* get_texture_ptr(const std::string& texture_name_or_path);
+    static Model* get_model_ptr(const std::string& model_name);
+    static Mesh* get_mesh_ptr(const std::string& mesh_name);
+
+    static bool has_shader(const std::string& shader_name);
+    static bool has_texture(const std::string& texture_name_or_path);
+    static bool has_model(const std::string& model_name);
+    static bool has_mesh(const std::string& mesh_name);
+
     static Shader& get_relevant_shader_from_mesh(const Mesh& mesh);
 
 private:
