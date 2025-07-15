@@ -137,6 +137,7 @@ Window::Window()
     glViewport(0, 0, width, height);
 
     glEnable(GL_CULL_FACE);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);

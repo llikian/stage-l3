@@ -15,6 +15,8 @@ enum class Attribute : unsigned char {
     TEX_COORDS,
     COLOR,
 
+    POINT_SIZE,
+
     AMOUNT
 };
 
@@ -50,6 +52,7 @@ inline AttributeType get_default_attribute_type(Attribute attribute) {
         case Attribute::NORMAL: return AttributeType::VEC3;
         case Attribute::TEX_COORDS: return AttributeType::VEC2;
         case Attribute::COLOR: return AttributeType::VEC3;
+        case Attribute::POINT_SIZE: return AttributeType::FLOAT;
         default: return AttributeType::NONE;
     }
 }
@@ -60,6 +63,7 @@ inline std::string attribute_to_string(Attribute attribute) {
         case Attribute::NORMAL: return "NORMAL";
         case Attribute::TEX_COORDS: return "TEX_COORDS";
         case Attribute::COLOR: return "COLOR";
+        case Attribute::POINT_SIZE: return "POINT_SIZE";
         default: return "INVALID";
     }
 }
