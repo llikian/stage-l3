@@ -7,6 +7,7 @@
 
 #include <cmath>
 
+#include "maths/constants.hpp"
 #include "maths/trigonometry.hpp"
 #include "maths/vec2.hpp"
 
@@ -109,7 +110,7 @@ quaternion euler_to_quaternion(const vec3& angles) {
         cosine.x = 1.0f;
         sine.x = 0.0f;
     } else {
-        float radians = degrees_to_radians(angles.x);
+        float radians = degrees_to_radians(angles.x) / 2.0f;
         cosine.x = std::cos(radians);
         sine.x = std::sin(radians);
     }
@@ -118,7 +119,7 @@ quaternion euler_to_quaternion(const vec3& angles) {
         cosine.y = 1.0f;
         sine.y = 0.0f;
     } else {
-        float radians = degrees_to_radians(angles.y);
+        float radians = degrees_to_radians(angles.y) / 2.0f;
         cosine.y = std::cos(radians);
         sine.y = std::sin(radians);
     }
@@ -127,7 +128,7 @@ quaternion euler_to_quaternion(const vec3& angles) {
         cosine.z = 1.0f;
         sine.z = 0.0f;
     } else {
-        float radians = degrees_to_radians(angles.z);
+        float radians = degrees_to_radians(angles.z) / 2.0f;
         cosine.z = std::cos(radians);
         sine.z = std::sin(radians);
     }
@@ -138,6 +139,19 @@ quaternion euler_to_quaternion(const vec3& angles) {
         cosine.x * cosine.y * sine.z - sine.x * sine.y * cosine.z,
         cosine.x * cosine.y * cosine.z + sine.x * sine.y * sine.z
     );
+}
+
+vec3 quaternion_to_euler(const quaternion& q) {
+    vec3 radians;
+
+    radians.x = std::atan2(2.0f * (q.w * q.x + q.y * q.z),
+                           1.0f - 2.0f * (q.x * q.x + q.y * q.y));
+    radians.y = -PI_HALF_F + 2.0f * std::atan2(std::sqrt(1.0f + 2.0f * (q.w * q.y - q.x * q.z)),
+                                               std::sqrt(1.0f - 2.0f * (q.w * q.y - q.x * q.z)));
+    radians.z = std::atan2(2.0f * (q.w * q.z + q.x * q.y),
+                           1.0f - 2.0f * (q.y * q.y + q.z * q.z));
+
+    return vec3(radians_to_degrees(radians.x), radians_to_degrees(radians.y), radians_to_degrees(radians.z));
 }
 
 std::ostream& operator <<(std::ostream& stream, const quaternion& q) {

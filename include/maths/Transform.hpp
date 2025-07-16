@@ -43,6 +43,12 @@ public:
     void set_local_orientation(const quaternion& orientation);
 
     /**
+     * @brief Changes the local orientation of the transform using euler angles.
+     * @param angles Rotation angles in degrees around each axis.
+     */
+    void set_local_orientation_euler(const vec3& angles);
+
+    /**
      * @brief Changes the local orientation of the transform.
      * @param x The value for the coefficient of the orientation quaternion's i imaginary unit.
      * @param y The value for the coefficient of the orientation quaternion's j imaginary unit.

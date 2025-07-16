@@ -104,11 +104,18 @@ struct quaternion {
 };
 
 /**
- * @brief Converts a rotation with euler angles to a quaternion.
+ * @brief Converts a rotation with euler angles to its equivalent with a quaternion.
  * @param angles Rotation angles in degrees around each axis.
  * @return The quaternion corresponding to the euler rotation.
  */
 quaternion euler_to_quaternion(const vec3& angles);
+
+/**
+ * @brief Converts a rotation with a quaternion to its equivalent with euler angles.
+ * @param q A unit quaternion representing a rotation.
+ * @return The rotation angles in degrees around each axix.
+ */
+vec3 quaternion_to_euler(const quaternion& q);
 
 /**
  * @brief Outputs a quaternion to an output stream with the following format: "xi + yj + zk + w".

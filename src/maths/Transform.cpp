@@ -31,6 +31,11 @@ void Transform::set_local_orientation(const quaternion& orientation) {
     is_dirty = true;
 }
 
+void Transform::set_local_orientation_euler(const vec3& angles) {
+    local_orientation = euler_to_quaternion(angles);
+    is_dirty = true;
+}
+
 void Transform::set_local_orientation(float x, float y, float z, float w) {
     local_orientation.x = x;
     local_orientation.y = y;
