@@ -7,6 +7,9 @@
 
 #include <cmath>
 
+#include "maths/trigonometry.hpp"
+#include "maths/vec2.hpp"
+
 quaternion::quaternion() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
 
 quaternion::quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) { }
@@ -99,11 +102,49 @@ void quaternion::normalize() {
     w /= length;
 }
 
+quaternion euler_to_quaternion(const vec3& angles) {
+    vec3 cosine, sine;
+
+    if(angles.x == 0.0f) {
+        cosine.x = 1.0f;
+        sine.x = 0.0f;
+    } else {
+        float radians = degrees_to_radians(angles.x);
+        cosine.x = std::cos(radians);
+        sine.x = std::sin(radians);
+    }
+
+    if(angles.y == 0.0f) {
+        cosine.y = 1.0f;
+        sine.y = 0.0f;
+    } else {
+        float radians = degrees_to_radians(angles.y);
+        cosine.y = std::cos(radians);
+        sine.y = std::sin(radians);
+    }
+
+    if(angles.z == 0.0f) {
+        cosine.z = 1.0f;
+        sine.z = 0.0f;
+    } else {
+        float radians = degrees_to_radians(angles.z);
+        cosine.z = std::cos(radians);
+        sine.z = std::sin(radians);
+    }
+
+    return quaternion(
+        sine.x * cosine.y * cosine.z - cosine.x * sine.y * sine.z,
+        cosine.x * sine.y * cosine.z + sine.x * cosine.y * sine.z,
+        cosine.x * cosine.y * sine.z - sine.x * sine.y * cosine.z,
+        cosine.x * cosine.y * cosine.z + sine.x * sine.y * sine.z
+    );
+}
+
 std::ostream& operator <<(std::ostream& stream, const quaternion& q) {
     std::cout << q.x << 'i'
-              << ((q.y >= 0) ? " + " : " - ") << fabs(q.y) << 'j'
-              << ((q.z >= 0) ? " + " : " - ") << fabs(q.y) << 'k'
-              << ((q.w >= 0) ? " + " : " - ") << fabs(q.y);
+        << ((q.y >= 0) ? " + " : " - ") << fabs(q.y) << 'j'
+        << ((q.z >= 0) ? " + " : " - ") << fabs(q.y) << 'k'
+        << ((q.w >= 0) ? " + " : " - ") << fabs(q.y);
 
     return stream;
 }
