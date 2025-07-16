@@ -202,6 +202,11 @@ void Application::run() {
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(0.2f);
 
+    // SceneEntity* spheres = root->add_child<SceneEntity>("spheres", "data/gltf/spheres/MetalRoughSpheres.gltf");
+    // spheres->transform.set_local_orientation_euler(vec3(90.0f, 0.0f, 180.0f));
+    // spheres->transform.set_local_position(vec3(0.0f, 11.0f, -20.0f));
+    // light->transform.set_local_position(vec3(0.0f, 0.0f, 5.0f));
+
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
