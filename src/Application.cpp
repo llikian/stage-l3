@@ -22,6 +22,14 @@
 
 Application::Application()
     : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
+      cubemap({
+          "data/environments/town/px.png",
+          "data/environments/town/nx.png",
+          "data/environments/town/py.png",
+          "data/environments/town/ny.png",
+          "data/environments/town/pz.png",
+          "data/environments/town/nz.png"
+      }),
       is_spying_enabled(false),
       spy_camera_position(30.0f), spy_camera_target(0.0f),
       spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
@@ -230,6 +238,8 @@ void Application::run() {
             shader.set_uniform("u_light_position", light_position);
             shader.set_uniform("u_material.base_color_map", 0);
             shader.set_uniform("u_material.metallic_roughness_map", 1);
+            // shader.set_uniform("u_cubemap", 2);
+            // cubemap.bind(2);
         }
 
         /* Line Mesh Shader */ {

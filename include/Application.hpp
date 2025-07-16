@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Camera.hpp"
+#include "Cubemap.hpp"
 #include "culling/Frustum.hpp"
 #include "mesh/MRMaterial.hpp"
 #include "SceneGraph.hpp"
@@ -55,6 +56,8 @@ private:
 
     SceneGraph scene_graph; ///< Scene graph.
     Camera camera;          ///< The camera.
+
+    Cubemap cubemap;
 
     /* Frustum Culling */
     Frustum frustum;                 ///< The frustum used for culling.

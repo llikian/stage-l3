@@ -22,6 +22,7 @@ set(SOURCES
         src/Application.cpp
         src/callbacks.cpp
         src/Camera.cpp
+        src/Cubemap.cpp
         src/EventHandler.cpp
         src/Image.cpp
         src/SceneGraph.cpp

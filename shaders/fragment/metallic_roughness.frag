@@ -18,6 +18,8 @@ uniform vec3 u_light_color;
 uniform vec3 u_light_position;
 uniform vec3 u_camera_position;
 
+//uniform samplerCube u_cubemap;
+
 struct Material {
     vec4 base_color;
     sampler2D base_color_map;
