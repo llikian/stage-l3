@@ -26,7 +26,7 @@ struct Material {
     float metallic;
     float roughness;
     sampler2D metallic_roughness_map;
-    float fresnel0;
+    float reflectance;
 };
 
 uniform Material u_material;
@@ -35,7 +35,8 @@ float pow2(float x) { return x * x; }
 float pow5(float x) { return x * x * x * x * x; }
 
 vec3 F_Schlick(vec3 F0, float light_dot_halfway) {
-    return F0 + (1.0f - F0) * pow5(1.0f - light_dot_halfway);
+    float f = pow5(1.0f - light_dot_halfway);
+    return f + (1.0f - f) * F0;
 }
 
 float D_GGX(float normal_dot_halfway, float roughness) {
@@ -65,14 +66,15 @@ vec3 brdf(vec3 base_color, float metallic, float roughness) {
     float normal_dot_view = max(dot(normal, view_direction), 0.0f);
     float normal_dot_halfway = max(dot(normal, halfway_direction), 0.0f);
 
-    vec3 F0 = mix(vec3(u_material.fresnel0), base_color, metallic);
+    vec3 F0 = mix(vec3(0.16f * pow2(u_material.reflectance)), base_color, metallic);
 
-    vec3 F = F_Schlick(F0, max(dot(view_direction, halfway_direction), 0.0f));
+    vec3 F = F_Schlick(F0, max(dot(light_direction, halfway_direction), 0.0f));
     float D = D_GGX(normal_dot_halfway, roughness);
     float V = V_Smith_GGX_correlated(normal_dot_view, normal_dot_light, roughness);
-
     vec3 specular = D * V * F;
-    vec3 diffuse = (1.0f - metallic) * diffuse_lambert() * base_color;
+
+    vec3 diffuse_color = (1.0f - metallic) * base_color;
+    vec3 diffuse = diffuse_lambert() * diffuse_color;
 
     return normal_dot_light * (diffuse + specular) * 4.0f * u_light_color;
 }
@@ -82,6 +84,7 @@ void main() {
     vec3 metallic_roughness = texture(u_material.metallic_roughness_map, v_tex_coords).rgb;
     float metallic = u_material.metallic * metallic_roughness.b;
     float roughness = u_material.roughness * metallic_roughness.g;
+    roughness = max(roughness * roughness, 0.01f);
 
     vec3 ambient = 0.2f * base_color.rgb;
     frag_color.rgb = ambient + brdf(base_color.rgb, metallic, roughness);

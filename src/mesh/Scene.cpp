@@ -66,7 +66,7 @@ void Scene::draw(const mat4& view_projection_matrix, const Transform& transform)
             shader.set_uniform_if_exists("u_material.base_color", material->base_color);
             shader.set_uniform_if_exists("u_material.metallic", material->metallic);
             shader.set_uniform_if_exists("u_material.roughness", material->roughness);
-            shader.set_uniform_if_exists("u_material.fresnel0", material->fresnel0);
+            shader.set_uniform_if_exists("u_material.reflectance", material->reflectance);
         } else { // blinn phong
             shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
             shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
@@ -206,7 +206,7 @@ void Scene::load(const std::filesystem::path& path) {
                     }
 
                     if(c_material->has_ior) {
-                        material->fresnel0 = pow2((c_material->has_ior - 1.0f) / (c_material->has_ior + 1.0f));
+                        material->reflectance = (c_material->ior.ior - 1.0f) / (c_material->ior.ior + 1.0f) / 0.4f;
                     }
                 }
 
