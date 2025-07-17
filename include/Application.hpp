@@ -70,4 +70,6 @@ private:
     unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
 
     bool are_axes_drawn; ///< Whether the axes are drawn.
+
+    float light_intensity;
 };

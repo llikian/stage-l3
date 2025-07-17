@@ -16,11 +16,10 @@ const float INV_PI = 0.318309886183790f;
 
 uniform vec3 u_light_color;
 uniform vec3 u_light_position;
+uniform float u_light_intensity;
 uniform vec3 u_camera_position;
 
 //uniform samplerCube u_cubemap;
-
-uniform bool u_cond;
 
 struct Material {
     vec4 base_color;
@@ -78,16 +77,21 @@ vec3 brdf(vec3 base_color, float metallic, float roughness) {
     vec3 diffuse_color = (1.0f - metallic) * base_color;
     vec3 diffuse = diffuse_lambert() * diffuse_color;
 
-    return normal_dot_light * (diffuse + specular) * 3.0f * u_light_color;
+    return normal_dot_light * (diffuse + specular) * u_light_intensity * u_light_color;
 }
 
 void main() {
-    vec4 base_color = u_material.base_color * texture(u_material.base_color_map, v_tex_coords);
+    vec4 base_color = texture(u_material.base_color_map, v_tex_coords);
+
+    frag_color.a = base_color.a;
+    if (frag_color.a < 0.2f) { discard; }
+
     vec2 metallic_roughness = texture(u_material.metallic_roughness_map, v_tex_coords).bg;
     float metallic = u_material.metallic * metallic_roughness.x;
     float roughness = u_material.roughness * metallic_roughness.y;
     roughness = max(roughness * roughness, 0.01f);
 
-    vec3 ambient = 0.2f * base_color.rgb;
-    frag_color = vec4(ambient + brdf(base_color.rgb, metallic, roughness), base_color.a);
+    vec3 ambient = 0.01f * base_color.rgb;
+    frag_color.rgb = ambient + brdf(base_color.rgb, metallic, roughness);
+    frag_color.rgb = pow(frag_color.rgb, vec3(1.0f / 2.2f)); // Gamma Correction
 }

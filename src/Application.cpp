@@ -154,6 +154,7 @@ void Application::run() {
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec4& light_color = light->color;
+    light_intensity = 1.0f;
 
     /* Models */ {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
@@ -241,6 +242,7 @@ void Application::run() {
             shader.set_uniform("u_camera_position", camera_position);
             shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
             shader.set_uniform("u_light_position", light_position);
+            shader.set_uniform("u_light_intensity", light_intensity);
             shader.set_uniform("u_material.base_color_map", 0);
             shader.set_uniform("u_material.metallic_roughness_map", 1);
             // shader.set_uniform("u_cubemap", 2);
@@ -396,6 +398,9 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
     ImGui::Text("Total Not Hidden Entities: %d", DrawableEntity::total_not_hidden_entities);
     ImGui::Text("Total Drawn Entities: %d", DrawableEntity::total_drawn_entities);
+
+    ImGui::NewLine();
+    ImGui::DragFloat("Light Intensity", &light_intensity, 0.25f, 1.0f, 100.0f);
 
     ImGui::NewLine();
     ImGui::Text("Camera:");
