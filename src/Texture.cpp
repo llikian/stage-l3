@@ -28,7 +28,6 @@ void Texture::init() {
 #ifdef DEBUG_LOG_TEXTURE_LIFETIME
     std::cout << "Created texture " << id << ".\n";
 #endif
-    glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture::free() {
@@ -46,6 +45,7 @@ void Texture::create(unsigned int width,
                      unsigned int format,
                      bool srgb) {
     init();
+    bind();
 
     int internal_format;
     unsigned int channels_amount;
@@ -112,6 +112,7 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
 
 void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view, bool srgb) {
     init();
+    bind();
 
     const cgltf_texture* texture = texture_view.texture;
     const cgltf_sampler* sampler = texture->sampler;
