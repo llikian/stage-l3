@@ -75,7 +75,7 @@ void Texture::create(unsigned int width,
     glGenerateMipmap(GL_TEXTURE_2D);
 
     b_has_transparency = false;
-    if(channels_amount == 4) {
+    if(data != nullptr && channels_amount == 4) {
         for(unsigned int j = 0 ; j < height ; ++j) {
             for(unsigned int i = 0 ; i < width ; ++i) {
                 if(data[4 * (j * width + i) + 3] < 255) {
