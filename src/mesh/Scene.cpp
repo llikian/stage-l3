@@ -194,13 +194,13 @@ void Scene::load(const std::filesystem::path& path) {
                     material->roughness = roughness_factor;
 
                     if(base_color_texture.texture != nullptr) {
-                        material->base_color_map.create(parent_path, base_color_texture);
+                        material->base_color_map.create(parent_path, base_color_texture, true);
                     } else {
                         material->base_color_map.create(255, 255, 255);
                     }
 
                     if(metallic_roughness_texture.texture != nullptr) {
-                        material->metallic_roughness_map.create(parent_path, metallic_roughness_texture);
+                        material->metallic_roughness_map.create(parent_path, metallic_roughness_texture, false);
                     } else {
                         material->metallic_roughness_map.create(vec3(0.0f, 0.5f, 0.0f));
                     }

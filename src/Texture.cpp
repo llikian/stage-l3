@@ -15,26 +15,6 @@
 
 Texture::Texture() : id(0), b_has_transparency(false) { }
 
-Texture::Texture(const std::string& path, bool flip_vertically)
-    : id(0), b_has_transparency(false) {
-    create(path, flip_vertically);
-}
-
-Texture::Texture(const Image& image)
-    : id(0), b_has_transparency(false) {
-    create(image);
-}
-
-Texture::Texture(const vec3& color)
-    : id(0), b_has_transparency(false) {
-    create(color);
-}
-
-Texture::Texture(unsigned char r, unsigned char g, unsigned char b)
-    : id(0), b_has_transparency(false) {
-    create(r, g, b);
-}
-
 Texture::Texture(const Texture& texture) : id(texture.id), b_has_transparency(texture.has_transparency()) { }
 
 Texture& Texture::operator=(const Texture& texture) {
@@ -60,30 +40,42 @@ void Texture::free() {
     id = 0;
 }
 
-void Texture::create(const std::string& path, bool flip_vertically) {
-    Texture* asset_manager_texture = AssetManager::get_texture_ptr(path);
-
-    if(asset_manager_texture == nullptr) {
-        create(Image(path, flip_vertically));
-        AssetManager::add_texture(path, *this);
-    } else {
-        id = asset_manager_texture->id;
-        b_has_transparency = asset_manager_texture->b_has_transparency;
-    }
-}
-
-void Texture::create(const Image& image) {
+void Texture::create(unsigned int width,
+                     unsigned int height,
+                     const unsigned char* data,
+                     unsigned int format,
+                     bool srgb) {
     init();
 
-    unsigned int width = image.get_width();
-    unsigned int height = image.get_height();
-    unsigned int format = image.get_color_format();
-    const unsigned char* data = image.get_data();
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    int internal_format;
+    unsigned int channels_amount;
+    switch(format) {
+        case GL_RGB:
+            internal_format = srgb ? GL_SRGB8 : GL_RGB8;
+            channels_amount = 3;
+            break;
+        case GL_RGBA:
+            internal_format = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+            channels_amount = 4;
+            break;
+        case GL_RED:
+            internal_format = GL_R8;
+            channels_amount = 1;
+            break;
+        case GL_RG:
+            internal_format = GL_RG8;
+            channels_amount = 2;
+            break;
+        default:
+            std::cout << "[WARNING] Texture wasn't created: Format unknown.\n";
+            return;
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     b_has_transparency = false;
-    if(image.get_channels_amount() == 4) {
+    if(channels_amount == 4) {
         for(unsigned int j = 0 ; j < height ; ++j) {
             for(unsigned int i = 0 ; i < width ; ++i) {
                 if(data[4 * (j * width + i) + 3] < 255) {
@@ -95,20 +87,30 @@ void Texture::create(const Image& image) {
     }
 }
 
+void Texture::create(const std::string& path, bool flip_vertically, bool srgb) {
+    Image image(path, flip_vertically);
+    create(image.get_width(), image.get_height(), image.get_data(), image.get_color_format(), srgb);
+}
+
+void Texture::create(const Image& image, bool srgb) {
+    create(image.get_width(), image.get_height(), image.get_data(), image.get_color_format(), srgb);
+}
+
 void Texture::create(const vec3& color) {
-    create(static_cast<unsigned char>(color.x * 255.0f),
-           static_cast<unsigned char>(color.y * 255.0f),
-           static_cast<unsigned char>(color.z * 255.0f));
+    unsigned char c[3]{
+        static_cast<unsigned char>(color.x * 255.0f),
+        static_cast<unsigned char>(color.y * 255.0f),
+        static_cast<unsigned char>(color.z * 255.0f)
+    };
+    create(1, 1, c, GL_RGB, false);
 }
 
 void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
-    init();
-    unsigned char c[3]{ r, g, b };
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, c);
-    b_has_transparency = false;
+    unsigned char color[3]{ r, g, b };
+    create(1, 1, color, GL_RGB, false);
 }
 
-void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view) {
+void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view, bool srgb) {
     init();
 
     const cgltf_texture* texture = texture_view.texture;
@@ -202,7 +204,7 @@ void Texture::create(const std::filesystem::path& parent_path, const cgltf_textu
     }
 
     if(texture->image->uri != nullptr) {
-        *this = AssetManager::add_texture(parent_path / texture->image->uri, false);
+        *this = AssetManager::add_texture(parent_path / texture->image->uri, false, srgb);
     } else {
         // TODO implement loading textures without URIs.
         throw std::runtime_error("Didn't implement textures without URIs yet :p");

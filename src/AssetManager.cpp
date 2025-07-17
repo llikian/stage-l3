@@ -16,13 +16,17 @@ Shader& AssetManager::add_shader(const std::string& name,
                 .first->second;
 }
 
-Texture& AssetManager::add_texture(const std::filesystem::path& path, bool flip_vertically) {
+Texture& AssetManager::add_texture(const std::filesystem::path& path, bool flip_vertically, bool srgb) {
     AssetManager& asset_manager = get();
     auto iterator = asset_manager.textures.find(path);
 
-    return iterator == asset_manager.textures.end()
-               ? asset_manager.textures.emplace(path.string(), Texture(path, flip_vertically)).first->second
-               : iterator->second;
+    if(iterator == asset_manager.textures.end()) {
+        Texture texture;
+        texture.create(path, flip_vertically, srgb);
+        return asset_manager.textures.emplace(path.string(), texture).first->second;
+    }
+
+    return iterator->second;
 }
 
 Texture& AssetManager::add_texture(const std::string& name, const Texture& texture) {
@@ -30,7 +34,9 @@ Texture& AssetManager::add_texture(const std::string& name, const Texture& textu
 }
 
 Texture& AssetManager::add_texture(const std::string& name, const vec3& color) {
-    return get().textures.emplace(name, Texture(color)).first->second;
+    Texture texture;
+    texture.create(color);
+    return get().textures.emplace(name, texture).first->second;
 }
 
 Model& AssetManager::add_model(const std::string& name, const std::filesystem::path& path) {

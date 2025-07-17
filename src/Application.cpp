@@ -307,9 +307,9 @@ void Application::draw_background() {
     shader.set_uniform("u_camera_right", camera.get_right_vector());
     shader.set_uniform("u_camera_up", camera.get_up_vector());
 
-    if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+    if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
     AssetManager::get_mesh("screen").draw();
-    if(EventHandler::is_wireframe_on()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+    if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
 }
 
 void Application::draw_spy_window() {
@@ -336,11 +336,11 @@ void Application::draw_spy_window() {
         const Shader& shader = AssetManager::get_shader("flat");
         shader.use();
 
-        if(EventHandler::is_culling_enabled()) { glDisable(GL_CULL_FACE); }
+        if(EventHandler::is_face_culling_enabled()) { glDisable(GL_CULL_FACE); }
         shader.set_uniform("u_mvp", mvp);
         shader.set_uniform("u_color", faces_color);
         AssetManager::get_mesh("frustum faces").draw();
-        if(EventHandler::is_culling_enabled()) { glEnable(GL_CULL_FACE); }
+        if(EventHandler::is_face_culling_enabled()) { glEnable(GL_CULL_FACE); }
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -192,7 +192,8 @@ void Model::parse_mtl_file(const std::filesystem::path& path) {
             stream >> texture_path;
             while(stream >> buffer) { texture_path += ' ' + buffer; }
             for(char& c : texture_path) { if(c == '\\') { c = '/'; } }
-            materials[material_index].diffuse_map = AssetManager::add_texture(path.parent_path() / texture_path);
+            materials[material_index].diffuse_map =
+                AssetManager::add_texture(path.parent_path() / texture_path, true, true);
         }
     }
 

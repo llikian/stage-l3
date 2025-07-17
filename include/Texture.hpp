@@ -17,34 +17,10 @@
  */
 class Texture {
 public:
+    /**
+     * @brief Default constructor. Initializes the texture id to 0, the default texture.
+     */
     Texture();
-
-    /**
-     * @brief Constructs a texture by loading an image and assigning its data to a new texture.
-     * @param path The image's path.
-     * @param flip_vertically Whether to flip the image on vertically.
-     */
-    explicit Texture(const std::string& path, bool flip_vertically = true);
-
-    /**
-     * @brief Constructs a texture by assigning an image's data to a new texture.
-     * @param image The image.
-     */
-    explicit Texture(const Image& image);
-
-    /**
-     * @brief Constructs a 1*1px texture with a specific color.
-     * @param color The color of the texture.
-     */
-    explicit Texture(const vec3& color);
-
-    /**
-     * @brief Constructs a 1*1px texture with a specific color.
-     * @param r The r component of the texture's color.
-     * @param g The g component of the texture's color.
-     * @param b The b component of the texture's color.
-     */
-    Texture(unsigned char r, unsigned char g, unsigned char b);
 
     /**
      * @brief Copy constructor.
@@ -75,14 +51,28 @@ public:
     void free();
 
     /**
+     * @brief Creates a texture with the specified, width, height, data and format.
+     * @warning The responsibility of freeing the texture goes to the user, so if this instance of
+     * the Texture class already had an active texture (id != 0) and you no longer wish to use that
+     * texture, be sure to call the free method beforehand.
+     * @param width The texture's width.
+     * @param height The texture's height.
+     * @param data The texture's image data.
+     * @param format The image data's format.
+     * @param srgb Whether to set the internal format to SRGB.
+     */
+    void create(unsigned int width, unsigned int height, const unsigned char* data, unsigned int format, bool srgb);
+
+    /**
      * @brief Creates a texture by loading an image and assigning its data to a new texture.
      * @warning The responsibility of freeing the texture goes to the user, so if this instance of
      * the Texture class already had an active texture (id != 0) and you no longer wish to use that
      * texture, be sure to call the free method beforehand.
      * @param path The image's path.
      * @param flip_vertically Whether to flip the image on vertically.
+     * @param srgb Whether to set the internal format to SRGB.
      */
-    void create(const std::string& path, bool flip_vertically = true);
+    void create(const std::string& path, bool flip_vertically, bool srgb);
 
     /**
      * @brief Creates a texture by assigning an image's data to a new texture.
@@ -90,8 +80,9 @@ public:
      * the Texture class already had an active texture (id != 0) and you no longer wish to use that
      * texture, be sure to call the free method beforehand.
      * @param image The image.
+     * @param srgb Whether to set the internal format to SRGB.
      */
-    void create(const Image& image);
+    void create(const Image& image, bool srgb);
 
     /**
      * @brief Creates a 1*1px texture with a specific color.
@@ -114,12 +105,16 @@ public:
     void create(unsigned char r, unsigned char g, unsigned char b);
 
     /**
-     * @brief Creates a texture with a texture
+     * @brief Creates a texture using a GLTF texture view.
+     * @warning The responsibility of freeing the texture goes to the user, so if this instance of
+     * the Texture class already had an active texture (id != 0) and you no longer wish to use that
+     * texture, be sure to call the free method beforehand.
      * @param parent_path The path to the folder where the GLTF file containing the texture is in.
      * @param texture_view The GLTF texture view that contains all the information regarding the
      * texture.
+     * @param srgb Whether to set the internal format to SRGB.
      */
-    void create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view);
+    void create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view, bool srgb);
 
     /**
      * @brief Binds the texture to a specifc texture unit.

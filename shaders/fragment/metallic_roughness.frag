@@ -20,6 +20,8 @@ uniform vec3 u_camera_position;
 
 //uniform samplerCube u_cubemap;
 
+uniform bool u_cond;
+
 struct Material {
     vec4 base_color;
     sampler2D base_color_map;
@@ -76,17 +78,16 @@ vec3 brdf(vec3 base_color, float metallic, float roughness) {
     vec3 diffuse_color = (1.0f - metallic) * base_color;
     vec3 diffuse = diffuse_lambert() * diffuse_color;
 
-    return normal_dot_light * (diffuse + specular) * 4.0f * u_light_color;
+    return normal_dot_light * (diffuse + specular) * 3.0f * u_light_color;
 }
 
 void main() {
     vec4 base_color = u_material.base_color * texture(u_material.base_color_map, v_tex_coords);
-    vec3 metallic_roughness = texture(u_material.metallic_roughness_map, v_tex_coords).rgb;
-    float metallic = u_material.metallic * metallic_roughness.b;
-    float roughness = u_material.roughness * metallic_roughness.g;
+    vec2 metallic_roughness = texture(u_material.metallic_roughness_map, v_tex_coords).bg;
+    float metallic = u_material.metallic * metallic_roughness.x;
+    float roughness = u_material.roughness * metallic_roughness.y;
     roughness = max(roughness * roughness, 0.01f);
 
     vec3 ambient = 0.2f * base_color.rgb;
-    frag_color.rgb = ambient + brdf(base_color.rgb, metallic, roughness);
-    frag_color.a = base_color.a;
+    frag_color = vec4(ambient + brdf(base_color.rgb, metallic, roughness), base_color.a);
 }

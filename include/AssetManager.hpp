@@ -32,7 +32,7 @@ public:
      * @param paths_list The paths to each of the different shaders (parameter to the value's constructor).
      */
     static Shader& add_shader(const std::string& name, const std::initializer_list<std::filesystem::path>& paths_list);
-    static Texture& add_texture(const std::filesystem::path& path, bool flip_vertically = true);
+    static Texture& add_texture(const std::filesystem::path& path, bool flip_vertically, bool srgb);
     static Texture& add_texture(const std::string& name, const Texture& texture);
     static Texture& add_texture(const std::string& name, const vec3& color);
     static Model& add_model(const std::string& name, const std::filesystem::path& path);
