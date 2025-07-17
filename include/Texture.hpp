@@ -108,6 +108,12 @@ public:
      */
     void create(unsigned char r, unsigned char g, unsigned char b);
 
+    /**
+     * @brief Creates a texture with a texture
+     * @param parent_path The path to the folder where the GLTF file containing the texture is in.
+     * @param texture_view The GLTF texture view that contains all the information regarding the
+     * texture.
+     */
     void create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view);
 
     /**
