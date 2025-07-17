@@ -65,6 +65,11 @@ public:
     Texture& operator=(const Texture& texture);
 
     /**
+     * @brief Creates a texture.
+     */
+    void init();
+
+    /**
      * @brief Deletes the texture.
      */
     void free();
@@ -138,11 +143,6 @@ public:
     bool has_transparency() const;
 
 private:
-    /**
-     * @brief Creates a texture.
-     */
-    void init();
-
     unsigned int id;         ///< Texture id.
     bool b_has_transparency; ///< Whether the texture has transparency.
 };
