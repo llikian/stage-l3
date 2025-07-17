@@ -24,6 +24,7 @@ set(SOURCES
         src/Camera.cpp
         src/Cubemap.cpp
         src/EventHandler.cpp
+        src/Framebuffer.cpp
         src/Image.cpp
         src/SceneGraph.cpp
         src/Shader.cpp
