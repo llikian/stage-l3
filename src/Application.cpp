@@ -21,7 +21,7 @@
 #include "utility/Random.hpp"
 
 Application::Application()
-    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
+    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f), framebuffer(Window::get_width(), Window::get_height()),
       cubemap({
           "data/environments/town/px.png",
           "data/environments/town/nx.png",
@@ -34,6 +34,7 @@ Application::Application()
       spy_camera_position(30.0f), spy_camera_target(0.0f),
       spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
                  2.0f * camera.get_far_distance()),
+      spy_framebuffer(Window::get_width(), Window::get_height()),
       are_axes_drawn(false) {
     /* ---- Event Handler ---- */
     EventHandler::set_active_camera(&camera);
@@ -83,6 +84,10 @@ Application::Application()
                                  "shaders/terrain/terrain.tese",
                                  "shaders/terrain/terrain.frag"
                              });
+    AssetManager::add_shader("post processing", {
+                                 "shaders/vertex/position_and_texcoords_no_mvp.vert",
+                                 "shaders/fragment/post_processing.frag"
+                             });
 
     /* Meshes */
     AssetManager::add_mesh("sphere 8 16", create_sphere_mesh, 8, 16);
@@ -105,40 +110,11 @@ Application::Application()
     AssetManager::add_texture("green", vec3(0.0f, 1.0f, 0.0f));
     AssetManager::add_texture("blue", vec3(0.0f, 0.0f, 1.0f));
 
-    /* ---- Framebuffer ---- */
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    glGenTextures(1, &spy_window_texture);
-    glBindTexture(GL_TEXTURE_2D, spy_window_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::get_width(), Window::get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, spy_window_texture, 0);
-
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::get_width(), Window::get_height());
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw std::runtime_error("Couldn't create framebuffer");
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
     /* ---- Other ---- */
     // glfwSwapInterval(0); // disable vsync
 }
 
 Application::~Application() {
-    glDeleteRenderbuffers(1, &RBO);
-    glDeleteTextures(1, &spy_window_texture);
-    glDeleteFramebuffers(1, &FBO);
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -215,6 +191,8 @@ void Application::run() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        framebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         vec3 camera_position = camera.get_position();
@@ -289,6 +267,21 @@ void Application::run() {
 
         scene_graph.draw(frustum.view_projection, frustum);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        /* Post Processing Shader */ {
+            const Shader& shader = AssetManager::get_shader("post processing");
+            shader.use();
+            shader.set_uniform("u_texture", 0);
+            shader.set_uniform("u_texture_resolution", framebuffer.get_resolution());
+            shader.set_uniform("u_resolution", Window::get_resolution());
+            framebuffer.bind_texture(0);
+
+            if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+            AssetManager::get_mesh("screen").draw();
+            if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+        }
+
         if(is_spying_enabled) { draw_spy_window(); }
 
         draw_imgui_debug_window();
@@ -315,7 +308,7 @@ void Application::draw_background() {
 }
 
 void Application::draw_spy_window() {
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    spy_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mat4 spy_view_projection = spy_camera.get_view_projection_matrix();
     mat4 mvp = spy_view_projection * camera.get_model_matrix();
@@ -345,8 +338,6 @@ void Application::draw_spy_window() {
         if(EventHandler::is_face_culling_enabled()) { glEnable(GL_CULL_FACE); }
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     /* ImGui Spy Window */ {
         static ImVec2 win_pos(0.0f, 0.0f);
         static ImVec2 win_size(0.0f, 0.0f);
@@ -368,7 +359,7 @@ void Application::draw_spy_window() {
         glViewport(0, 0, available_size.x, available_size.y);
 
         ImGui::GetWindowDrawList()->AddImage(
-            spy_window_texture,
+            spy_framebuffer.get_texture_id(),
             cursor_position,
             ImVec2(cursor_position.x + available_size.x, cursor_position.y + available_size.y),
             ImVec2(0.0f, 1.0f),

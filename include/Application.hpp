@@ -8,6 +8,7 @@
 #include "Camera.hpp"
 #include "Cubemap.hpp"
 #include "culling/Frustum.hpp"
+#include "Framebuffer.hpp"
 #include "mesh/MRMaterial.hpp"
 #include "SceneGraph.hpp"
 #include "Shader.hpp"
@@ -54,20 +55,19 @@ private:
      */
     void draw_imgui_object_ediot_window() const;
 
-    SceneGraph scene_graph; ///< Scene graph.
-    Camera camera;          ///< The camera.
+    SceneGraph scene_graph;  ///< Scene graph.
+    Camera camera;           ///< The camera.
+    Framebuffer framebuffer; ///< The framebuffer used to render.
 
     Cubemap cubemap;
 
     /* Frustum Culling */
-    Frustum frustum;                 ///< The frustum used for culling.
-    bool is_spying_enabled;          ///< Whether the spying window is drawn.
-    vec3 spy_camera_position;        ///< The spy camera's position.
-    vec3 spy_camera_target;          ///< Where the spy camera is looking at.
-    Camera spy_camera;               ///< The camera used to test frustum culling.
-    unsigned int FBO;                ///< Frame Buffer Object.
-    unsigned int RBO;                ///< Rendering Buffer Object.
-    unsigned int spy_window_texture; ///< The id of the texture the framebuffer will render on.
+    Frustum frustum;             ///< The frustum used for culling.
+    bool is_spying_enabled;      ///< Whether the spying window is drawn.
+    vec3 spy_camera_position;    ///< The spy camera's position.
+    vec3 spy_camera_target;      ///< Where the spy camera is looking at.
+    Camera spy_camera;           ///< The camera used to test frustum culling.
+    Framebuffer spy_framebuffer; ///< Framebuffer used to render the spy window.
 
     bool are_axes_drawn; ///< Whether the axes are drawn.
 
