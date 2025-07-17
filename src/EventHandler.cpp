@@ -78,7 +78,7 @@ void EventHandler::handle_key_release_event(int key) {
 void EventHandler::handle_cursor_position_event(int position_x, int position_y) {
     EventHandler& event_handler = get();
 
-    if(!event_handler.is_cursor_visible) {
+    if(!event_handler.b_is_cursor_visible) {
         event_handler.active_camera->look_around(position_y - event_handler.mouse_position.y,
                                                  position_x - event_handler.mouse_position.x);
     }
@@ -95,19 +95,23 @@ float EventHandler::get_delta() {
     return get().delta;
 }
 
-bool EventHandler::is_wireframe_on() {
-    return get().is_wireframe_enabled;
+bool EventHandler::is_cursor_visible() {
+    return get().b_is_cursor_visible;
 }
 
-bool EventHandler::is_culling_enabled() {
-    return get().is_face_culling_enabled;
+bool EventHandler::is_wireframe_enabled() {
+    return get().b_is_wireframe_enabled;
+}
+
+bool EventHandler::is_face_culling_enabled() {
+    return get().b_is_face_culling_enabled;
 }
 
 EventHandler::EventHandler()
     : time(glfwGetTime()), delta(0.0f),
       active_camera(nullptr),
-      is_cursor_visible(glfwGetInputMode(Window::get_glfw(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
-      is_face_culling_enabled(true), is_wireframe_enabled(false) {
+      b_is_cursor_visible(glfwGetInputMode(Window::get_glfw(), GLFW_CURSOR) == GLFW_CURSOR_NORMAL),
+      b_is_face_culling_enabled(true), b_is_wireframe_enabled(false) {
     GLFWwindow* win = Window::get_glfw();
     glfwSetWindowSizeCallback(win, window_size_callback);
     glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
@@ -120,17 +124,17 @@ EventHandler::EventHandler()
 
     /* Toggles */
     associate_action_to_key(GLFW_KEY_TAB, false, [this] {
-        int mode = is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL;
+        int mode = b_is_cursor_visible ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL;
         glfwSetInputMode(Window::get_glfw(), GLFW_CURSOR, mode);
-        is_cursor_visible = !is_cursor_visible;
+        b_is_cursor_visible = !b_is_cursor_visible;
     });
     associate_action_to_key(GLFW_KEY_F, false, [this] {
-        (is_face_culling_enabled ? glDisable : glEnable)(GL_CULL_FACE);
-        is_face_culling_enabled = !is_face_culling_enabled;
+        (b_is_face_culling_enabled ? glDisable : glEnable)(GL_CULL_FACE);
+        b_is_face_culling_enabled = !b_is_face_culling_enabled;
     });
     associate_action_to_key(GLFW_KEY_Z, false, [this] {
-        glPolygonMode(GL_FRONT_AND_BACK, is_wireframe_enabled ? GL_FILL : GL_LINE);
-        is_wireframe_enabled = !is_wireframe_enabled;
+        glPolygonMode(GL_FRONT_AND_BACK, b_is_wireframe_enabled ? GL_FILL : GL_LINE);
+        b_is_wireframe_enabled = !b_is_wireframe_enabled;
     });
 
     /* Camera */
@@ -141,5 +145,3 @@ EventHandler::EventHandler()
     associate_action_to_key(GLFW_KEY_SPACE, true, [this] { active_camera->move_around(MovementDirection::UPWARD); });
     associate_action_to_key(GLFW_KEY_C, true, [this] { active_camera->move_around(MovementDirection::DOWNWARD); });
 }
-
-EventHandler::~EventHandler() { }

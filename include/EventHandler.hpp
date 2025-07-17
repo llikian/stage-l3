@@ -91,14 +91,19 @@ public:
     static float get_delta();
 
     /**
-     * @return Whether wireframe mode is enabled.
+     * @return Whether the mouse's cursor is visible.
      */
-    static bool is_wireframe_on();
+    static bool is_cursor_visible();
 
     /**
      * @return ///< Whether face culling is enabled.
      */
-    static bool is_culling_enabled();
+    static bool is_face_culling_enabled();
+
+    /**
+     * @return Whether wireframe mode is enabled.
+     */
+    static bool is_wireframe_enabled();
 
 private:
     /**
@@ -106,7 +111,7 @@ private:
      */
     explicit EventHandler();
 
-    ~EventHandler();
+    ~EventHandler() = default;
 
     std::unordered_map<int, Action> key_actions;   ///< Stores the action associated with each key.
     std::queue<int> pressed_keys;                  ///< Queue of presses of non repeatable keys.
@@ -119,7 +124,7 @@ private:
 
     Camera* active_camera; ///< A pointer to the active camera.
 
-    bool is_cursor_visible;       ///< Whether the mouse's cursor is visible.
-    bool is_face_culling_enabled; ///< Whether face culling is enabled.
-    bool is_wireframe_enabled;    ///< Whether wireframe mode is enabled.
+    bool b_is_cursor_visible;       ///< Whether the mouse's cursor is visible.
+    bool b_is_face_culling_enabled; ///< Whether face culling is enabled.
+    bool b_is_wireframe_enabled;    ///< Whether wireframe mode is enabled.
 };
