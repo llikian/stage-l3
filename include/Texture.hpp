@@ -12,6 +12,18 @@
 #include "maths/vec3.hpp"
 
 /**
+ * @brief Gets the format, channels amount and type corresponding to an OpenGL internal format enum.
+ * @param internal_format The OpenGL internal format.
+ * @param format The base format corresponding to the internal format.
+ * @param channels_amount The amount of chanels corresponding to the internal format.
+ * @param type The type corresponding to the internal format.
+ */
+void get_internal_format_parameters(int internal_format,
+                                    unsigned int& format,
+                                    unsigned int& channels_amount,
+                                    unsigned int& type);
+
+/**
  * @class Texture
  * @brief Creates a texture and assigns an image's data to it. Can then be bound.
  */
@@ -58,10 +70,9 @@ public:
      * @param width The texture's width.
      * @param height The texture's height.
      * @param data The texture's image data.
-     * @param format The image data's format.
-     * @param srgb Whether to set the internal format to SRGB.
+     * @param internal_format The image data's internal format.
      */
-    void create(unsigned int width, unsigned int height, const unsigned char* data, unsigned int format, bool srgb);
+    void create(unsigned int width, unsigned int height, const void* data, int internal_format);
 
     /**
      * @brief Creates a texture by loading an image and assigning its data to a new texture.

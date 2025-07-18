@@ -13,6 +13,155 @@
 #include "debug.hpp"
 #endif
 
+void get_internal_format_parameters(int internal_format, unsigned int& format, unsigned int& channels_amount,  unsigned int& type) {
+    switch(internal_format) {
+        case GL_RGB:
+        case GL_RGB8:
+        case GL_RGB16:
+        case GL_RGB8_SNORM:
+        case GL_RGB16_SNORM:
+        case GL_RGB8UI:
+        case GL_RGB16UI:
+        case GL_RGB32UI:
+        case GL_RGB8I:
+        case GL_RGB16I:
+        case GL_RGB32I:
+        case GL_RGB16F:
+        case GL_RGB32F:
+        case GL_SRGB:
+        case GL_SRGB8:
+            format = GL_RGB;
+            channels_amount = 3;
+            break;
+        case GL_RGBA:
+        case GL_RGBA8:
+        case GL_RGBA16:
+        case GL_RGBA8_SNORM:
+        case GL_RGBA16_SNORM:
+        case GL_RGBA8UI:
+        case GL_RGBA16UI:
+        case GL_RGBA32UI:
+        case GL_RGBA8I:
+        case GL_RGBA16I:
+        case GL_RGBA32I:
+        case GL_RGBA16F:
+        case GL_RGBA32F:
+        case GL_SRGB_ALPHA:
+        case GL_SRGB8_ALPHA8:
+            format = GL_RGBA;
+            channels_amount = 4;
+            break;
+        case GL_RG:
+        case GL_RG8:
+        case GL_RG16:
+        case GL_RG8_SNORM:
+        case GL_RG16_SNORM:
+        case GL_RG8UI:
+        case GL_RG16UI:
+        case GL_RG32UI:
+        case GL_RG8I:
+        case GL_RG16I:
+        case GL_RG32I:
+        case GL_RG16F:
+        case GL_RG32F:
+            format = GL_RG;
+            channels_amount = 2;
+            break;
+        case GL_RED:
+        case GL_R8:
+        case GL_R16:
+        case GL_R8_SNORM:
+        case GL_R16_SNORM:
+        case GL_R8UI:
+        case GL_R16UI:
+        case GL_R32UI:
+        case GL_R8I:
+        case GL_R16I:
+        case GL_R32I:
+        case GL_R16F:
+        case GL_R32F:
+            format = GL_RED;
+            channels_amount = 1;
+            break;
+        default:
+            std::cout << "[WARNING] Texture wasn't created: Format unknown.\n";
+            return;
+    }
+
+    switch(internal_format) {
+        case GL_RGBA:
+        case GL_RGBA8:
+        case GL_RGBA16:
+        case GL_RGB:
+        case GL_RGB8:
+        case GL_RGB16:
+        case GL_RG:
+        case GL_RG8:
+        case GL_RG16:
+        case GL_RED:
+        case GL_R8:
+        case GL_R16:
+        // TODO : Check if assuming unsigned char data for srgb is wrong
+        case GL_SRGB:
+        case GL_SRGB8:
+        case GL_SRGB_ALPHA:
+        case GL_SRGB8_ALPHA8:
+            type = GL_UNSIGNED_BYTE;
+            break;
+        case GL_RGBA8_SNORM:
+        case GL_RGBA16_SNORM:
+        case GL_RGB8_SNORM:
+        case GL_RGB16_SNORM:
+        case GL_RG8_SNORM:
+        case GL_RG16_SNORM:
+        case GL_R8_SNORM:
+        case GL_R16_SNORM:
+            type = GL_SIGNED_NORMALIZED;
+            break;
+        case GL_RGBA8UI:
+        case GL_RGBA16UI:
+        case GL_RGBA32UI:
+        case GL_RGB8UI:
+        case GL_RGB16UI:
+        case GL_RGB32UI:
+        case GL_RG8UI:
+        case GL_RG16UI:
+        case GL_RG32UI:
+        case GL_R8UI:
+        case GL_R16UI:
+        case GL_R32UI:
+            type = GL_UNSIGNED_INT;
+            break;
+        case GL_RGBA8I:
+        case GL_RGBA16I:
+        case GL_RGBA32I:
+        case GL_RGB8I:
+        case GL_RGB16I:
+        case GL_RGB32I:
+        case GL_RG8I:
+        case GL_RG16I:
+        case GL_RG32I:
+        case GL_R8I:
+        case GL_R16I:
+        case GL_R32I:
+            type = GL_INT;
+            break;
+        case GL_RGBA16F:
+        case GL_RGBA32F:
+        case GL_RGB16F:
+        case GL_RGB32F:
+        case GL_RG16F:
+        case GL_RG32F:
+        case GL_R16F:
+        case GL_R32F:
+            type = GL_FLOAT;
+            break;
+        default:
+            std::cout << "[WARNING] Texture wasn't created: Format unknown.\n";
+            break;
+    }
+}
+
 Texture::Texture() : id(0), b_has_transparency(false) { }
 
 Texture::Texture(const Texture& texture) : id(texture.id), b_has_transparency(texture.has_transparency()) { }
@@ -41,44 +190,25 @@ void Texture::free() {
 
 void Texture::create(unsigned int width,
                      unsigned int height,
-                     const unsigned char* data,
-                     unsigned int format,
-                     bool srgb) {
+                     const void* data,
+                     int internal_format) {
     init();
     bind();
 
-    int internal_format;
+    unsigned int format;
     unsigned int channels_amount;
-    switch(format) {
-        case GL_RGB:
-            internal_format = srgb ? GL_SRGB8 : GL_RGB8;
-            channels_amount = 3;
-            break;
-        case GL_RGBA:
-            internal_format = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-            channels_amount = 4;
-            break;
-        case GL_RED:
-            internal_format = GL_R8;
-            channels_amount = 1;
-            break;
-        case GL_RG:
-            internal_format = GL_RG8;
-            channels_amount = 2;
-            break;
-        default:
-            std::cout << "[WARNING] Texture wasn't created: Format unknown.\n";
-            return;
-    }
+    unsigned int type;
+    get_internal_format_parameters(internal_format, format, channels_amount, type);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, type, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     b_has_transparency = false;
-    if(data != nullptr && channels_amount == 4) {
+    if(data != nullptr && channels_amount == 4 && type == GL_UNSIGNED_BYTE) {
+        const unsigned char* typed_data = static_cast<const unsigned char*>(data);
         for(unsigned int j = 0 ; j < height ; ++j) {
             for(unsigned int i = 0 ; i < width ; ++i) {
-                if(data[4 * (j * width + i) + 3] < 255) {
+                if(typed_data[4 * (j * width + i) + 3] < 255) {
                     b_has_transparency = true;
                     return;
                 }
@@ -88,12 +218,11 @@ void Texture::create(unsigned int width,
 }
 
 void Texture::create(const std::string& path, bool flip_vertically, bool srgb) {
-    Image image(path, flip_vertically);
-    create(image.get_width(), image.get_height(), image.get_data(), image.get_color_format(), srgb);
+    create(Image(path, flip_vertically), srgb);
 }
 
 void Texture::create(const Image& image, bool srgb) {
-    create(image.get_width(), image.get_height(), image.get_data(), image.get_color_format(), srgb);
+    create(image.get_width(), image.get_height(), image.get_data(), image.get_internal_format(srgb));
 }
 
 void Texture::create(const vec3& color) {
@@ -102,12 +231,12 @@ void Texture::create(const vec3& color) {
         static_cast<unsigned char>(color.y * 255.0f),
         static_cast<unsigned char>(color.z * 255.0f)
     };
-    create(1, 1, c, GL_RGB, false);
+    create(1, 1, c, GL_RGB);
 }
 
 void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
     unsigned char color[3]{ r, g, b };
-    create(1, 1, color, GL_RGB, false);
+    create(1, 1, color, GL_RGB);
 }
 
 void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view, bool srgb) {

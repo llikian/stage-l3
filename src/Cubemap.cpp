@@ -18,7 +18,7 @@ Cubemap::Cubemap(const std::initializer_list<std::filesystem::path>& paths) {
 
         unsigned int width = image.get_width();
         unsigned int height = image.get_height();
-        unsigned int format = image.get_color_format();
+        unsigned int format = image.get_internal_format(false);
         const unsigned char* data = image.get_data();
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         ++i;

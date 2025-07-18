@@ -46,9 +46,10 @@ public:
     unsigned int get_channels_amount() const;
 
     /**
-     * @return The OpenGL color format corresponding to the image's amount of channels.
+     * @return The OpenGL internal format corresponding to the image's amount of channels.
+     * @param srgb Whether to set the internal format to SRGB.
      */
-    unsigned int get_color_format() const;
+    unsigned int get_internal_format(bool srgb) const;
 
 private:
     unsigned char* data;          ///< The data of the image.
