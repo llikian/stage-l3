@@ -93,5 +93,4 @@ void main() {
 
     vec3 ambient = 0.01f * base_color.rgb;
     frag_color.rgb = ambient + brdf(base_color.rgb, metallic, roughness);
-    frag_color.rgb = pow(frag_color.rgb, vec3(1.0f / 2.2f)); // Gamma Correction
 }

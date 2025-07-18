@@ -18,10 +18,12 @@
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "mesh/primitives.hpp"
+#include "utility/LifetimeLogger.hpp"
 #include "utility/Random.hpp"
 
 Application::Application()
-    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f), framebuffer(Window::get_width(), Window::get_height()),
+    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
+      framebuffer(Window::get_width(), Window::get_height()),
       cubemap({
           "data/environments/town/px.png",
           "data/environments/town/nx.png",
@@ -30,12 +32,8 @@ Application::Application()
           "data/environments/town/pz.png",
           "data/environments/town/nz.png"
       }),
-      is_spying_enabled(false),
-      spy_camera_position(30.0f), spy_camera_target(0.0f),
-      spy_camera(spy_camera_position, spy_camera_target, camera.get_fov(), camera.get_near_distance(),
-                 2.0f * camera.get_far_distance()),
-      spy_framebuffer(Window::get_width(), Window::get_height()),
-      are_axes_drawn(false) {
+      are_axes_drawn(false),
+light_intensity(1.0f) {
     /* ---- Event Handler ---- */
     EventHandler::set_active_camera(&camera);
     EventHandler::get().associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -102,7 +100,6 @@ Application::Application()
     AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
                            vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
-    AssetManager::add_two_meshes("frustum faces", "frustum lines", create_frustum_meshes, camera);
 
     /* Textures */
     AssetManager::add_texture("default", vec3(1.0f));
@@ -130,7 +127,6 @@ void Application::run() {
     light->transform.set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec4& light_color = light->color;
-    light_intensity = 1.0f;
 
     /* Models */ {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
@@ -238,19 +234,6 @@ void Application::run() {
             }
         }
 
-        /* Flat Shader */ {
-            const Shader& shader = AssetManager::get_shader("flat");
-            shader.use();
-
-            if(is_spying_enabled) {
-                shader.set_uniform("u_mvp", frustum.view_projection * spy_camera.get_model_matrix().scale(1024.0f));
-                shader.set_uniform("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
-                glLineWidth(3.0f);
-                AssetManager::get_mesh("camera pyramid").draw();
-                glLineWidth(1.0f);
-            }
-        }
-
         /* Lambert Shader */ {
             const Shader& shader = AssetManager::get_shader("lambert");
             shader.use();
@@ -267,22 +250,10 @@ void Application::run() {
 
         scene_graph.draw(frustum.view_projection, frustum);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        Framebuffer::bind_default();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        /* Post Processing Shader */ {
-            const Shader& shader = AssetManager::get_shader("post processing");
-            shader.use();
-            shader.set_uniform("u_texture", 0);
-            shader.set_uniform("u_texture_resolution", framebuffer.get_resolution());
-            shader.set_uniform("u_resolution", Window::get_resolution());
-            framebuffer.bind_texture(0);
 
-            if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-            AssetManager::get_mesh("screen").draw();
-            if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
-        }
-
-        if(is_spying_enabled) { draw_spy_window(); }
+        draw_post_processing();
 
         draw_imgui_debug_window();
         draw_imgui_object_ediot_window();
@@ -293,7 +264,20 @@ void Application::run() {
     }
 }
 
-void Application::draw_background() {
+void Application::draw_post_processing() const {
+    const Shader& shader = AssetManager::get_shader("post processing");
+    shader.use();
+    shader.set_uniform("u_texture", 0);
+    shader.set_uniform("u_texture_resolution", framebuffer.get_resolution());
+    shader.set_uniform("u_resolution", Window::get_resolution());
+    framebuffer.bind_texture(0);
+
+    if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+    AssetManager::get_mesh("screen").draw();
+    if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+}
+
+void Application::draw_background() const {
     const Shader& shader = AssetManager::get_shader("background");
     shader.use();
 
@@ -305,71 +289,6 @@ void Application::draw_background() {
     if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
     AssetManager::get_mesh("screen").draw();
     if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
-}
-
-void Application::draw_spy_window() {
-    spy_framebuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    mat4 spy_view_projection = spy_camera.get_view_projection_matrix();
-    mat4 mvp = spy_view_projection * camera.get_model_matrix();
-
-    scene_graph.draw(spy_view_projection, frustum);
-
-    /* Lines */ {
-        const Shader& shader = AssetManager::get_shader("flat");
-        shader.use();
-
-        glLineWidth(5.0f);
-        shader.set_uniform("u_mvp", mvp);
-        shader.set_uniform("u_color", vec4(1.0f));
-        AssetManager::get_mesh("frustum lines").draw();
-        glLineWidth(1.0f);
-    }
-
-    /* Faces */ {
-        static const vec4 faces_color(0.0f, 0.0f, 1.0f, 0.2f);
-        const Shader& shader = AssetManager::get_shader("flat");
-        shader.use();
-
-        if(EventHandler::is_face_culling_enabled()) { glDisable(GL_CULL_FACE); }
-        shader.set_uniform("u_mvp", mvp);
-        shader.set_uniform("u_color", faces_color);
-        AssetManager::get_mesh("frustum faces").draw();
-        if(EventHandler::is_face_culling_enabled()) { glEnable(GL_CULL_FACE); }
-    }
-
-    /* ImGui Spy Window */ {
-        static ImVec2 win_pos(0.0f, 0.0f);
-        static ImVec2 win_size(0.0f, 0.0f);
-
-        ImGui::Begin("Spy", nullptr, ImGuiWindowFlags_NoResize
-                                     | ImGuiWindowFlags_NoMove
-                                     | ImGuiWindowFlags_NoTitleBar);
-
-        win_pos.x = 0.7f * Window::get_width();
-        win_pos.y = Window::get_height() / 2.0f;
-        ImGui::SetWindowPos(win_pos);
-
-        win_size.x = Window::get_width() - win_pos.x;
-        win_size.y = Window::get_height() - win_pos.y;
-        ImGui::SetWindowSize(win_size);
-
-        ImVec2 available_size = ImGui::GetContentRegionAvail();
-        ImVec2 cursor_position = ImGui::GetCursorScreenPos();
-        glViewport(0, 0, available_size.x, available_size.y);
-
-        ImGui::GetWindowDrawList()->AddImage(
-            spy_framebuffer.get_texture_id(),
-            cursor_position,
-            ImVec2(cursor_position.x + available_size.x, cursor_position.y + available_size.y),
-            ImVec2(0.0f, 1.0f),
-            ImVec2(1.0f, 0.0f)
-        );
-
-        glViewport(0, 0, Window::get_width(), Window::get_height());
-
-        ImGui::End();
-    }
 }
 
 void Application::draw_imgui_debug_window() {
@@ -397,22 +316,6 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("Camera:");
     ImGui::SliderFloat("Sensitivity", &camera.sensitivity, 0.05f, 1.0f);
     ImGui::SliderFloat("Movement Speed", &camera.movement_speed, 1.0f, 100.0f);
-
-    ImGui::NewLine();
-    ImGui::Checkbox("Is Spying Camera Enabled", &is_spying_enabled);
-    if(is_spying_enabled) {
-        if(ImGui::DragFloat3("Spy Camera Position", &spy_camera_position.x)) {
-            spy_camera.set_position(spy_camera_position);
-            spy_camera.look_at_point(spy_camera_target);
-        }
-
-        if(ImGui::DragFloat3("Spy Camera Target", &spy_camera_target.x)) {
-            spy_camera.look_at_point(spy_camera_target);
-        }
-
-        if(ImGui::Button("Move Spy to Camera")) { spy_camera.set_position(camera.get_position()); }
-        if(ImGui::Button("Make Spy Look at Camera")) { spy_camera.look_at_point(camera.get_position()); }
-    }
 
     ImGui::NewLine();
     scene_graph.add_imgui_node_tree();

@@ -36,14 +36,14 @@ public:
 
 private:
     /**
-     * @brief Draws the background.
+     * @brief Draws the framebuffer's texture on the screen and applies post processing shader.
      */
-    void draw_background();
+    void draw_post_processing() const;
 
     /**
-     * @brief Renders the scene from the spy window.
+     * @brief Draws the background.
      */
-    void draw_spy_window();
+    void draw_background() const;
 
     /**
      * @brief Draws the imgui debug window.
@@ -61,13 +61,7 @@ private:
 
     Cubemap cubemap;
 
-    /* Frustum Culling */
-    Frustum frustum;             ///< The frustum used for culling.
-    bool is_spying_enabled;      ///< Whether the spying window is drawn.
-    vec3 spy_camera_position;    ///< The spy camera's position.
-    vec3 spy_camera_target;      ///< Where the spy camera is looking at.
-    Camera spy_camera;           ///< The camera used to test frustum culling.
-    Framebuffer spy_framebuffer; ///< Framebuffer used to render the spy window.
+    Frustum frustum; ///< The frustum used for culling.
 
     bool are_axes_drawn; ///< Whether the axes are drawn.
 
