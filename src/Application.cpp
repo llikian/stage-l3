@@ -33,7 +33,8 @@ Application::Application()
           "data/environments/town/nz.png"
       }),
       are_axes_drawn(false),
-light_intensity(1.0f) {
+      light_intensity(1.0f),
+      uniform_test_conditions{true, true, true} {
     /* ---- Event Handler ---- */
     EventHandler::set_active_camera(&camera);
     EventHandler::get().associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -213,11 +214,14 @@ void Application::run() {
             shader.use();
 
             shader.set_uniform("u_camera_position", camera_position);
-            shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
-            shader.set_uniform("u_light_position", light_position);
-            shader.set_uniform("u_light_intensity", light_intensity);
+            shader.set_uniform("u_light.color", light_color.x, light_color.y, light_color.z);
+            shader.set_uniform("u_light.position", light_position);
+            shader.set_uniform("u_light.intensity", light_intensity);
             shader.set_uniform("u_material.base_color_map", 0);
             shader.set_uniform("u_material.metallic_roughness_map", 1);
+            shader.set_uniform_if_exists("u_test1", uniform_test_conditions[0]);
+            shader.set_uniform_if_exists("u_test2", uniform_test_conditions[1]);
+            shader.set_uniform_if_exists("u_test3", uniform_test_conditions[2]);
             // shader.set_uniform("u_cubemap", 2);
             // cubemap.bind(2);
         }
@@ -269,6 +273,9 @@ void Application::draw_post_processing() const {
     shader.set_uniform("u_texture", 0);
     shader.set_uniform("u_texture_resolution", framebuffer.get_resolution());
     shader.set_uniform_if_exists("u_resolution", Window::get_resolution());
+    shader.set_uniform_if_exists("u_test1", uniform_test_conditions[0]);
+    shader.set_uniform_if_exists("u_test2", uniform_test_conditions[1]);
+    shader.set_uniform_if_exists("u_test3", uniform_test_conditions[2]);
     framebuffer.bind_texture(0);
 
     if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
@@ -310,6 +317,9 @@ void Application::draw_imgui_debug_window() {
 
     ImGui::NewLine();
     ImGui::DragFloat("Light Intensity", &light_intensity, 0.25f, 1.0f, 100.0f);
+    ImGui::Checkbox("Uniform Test Condition 1", &uniform_test_conditions[0]);
+    ImGui::Checkbox("Uniform Test Condition 2", &uniform_test_conditions[1]);
+    ImGui::Checkbox("Uniform Test Condition 3", &uniform_test_conditions[2]);
 
     ImGui::NewLine();
     ImGui::Text("Camera:");

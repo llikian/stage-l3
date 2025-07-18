@@ -7,6 +7,10 @@
 
 out vec4 frag_color;
 
+uniform bool u_test1;
+uniform bool u_test2;
+uniform bool u_test3;
+
 uniform sampler2D u_texture;
 uniform vec2 u_texture_resolution;
 uniform vec2 u_resolution;
@@ -31,11 +35,16 @@ vec3 sepia(vec3 color) {
                 (color.r * 0.272f) + (color.g * 0.534f) + (color.b * 0.131f));
 }
 
+vec3 ACES_tone_mapping(vec3 color) {
+    return clamp((color * (2.51f * color + 0.03f)) / (color * (2.43f * color + 0.59f) + 0.14f), 0.0f, 1.0f);
+}
+
 void main() {
     vec4 tex = texture(u_texture, get_uv());
 //    vec4 tex = texture(u_texture, get_uv_pixelated(8));
     vec3 color = tex.rgb;
 
+    color = ACES_tone_mapping(color); // Tone mapping
     color = pow(color, vec3(1.0f / 2.2f)); // Gamma Correction
 
     frag_color = vec4(color, tex.a);

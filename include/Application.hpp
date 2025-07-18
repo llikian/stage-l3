@@ -66,4 +66,6 @@ private:
     bool are_axes_drawn; ///< Whether the axes are drawn.
 
     float light_intensity;
+
+    bool uniform_test_conditions[3];
 };
