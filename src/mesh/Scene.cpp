@@ -252,9 +252,8 @@ void Scene::load(const std::filesystem::path& path) {
 
             AttributeInfo* attributes = new AttributeInfo[c_primitive.attributes_count];
 
-            constexpr unsigned int ATTRIBUTES_AMOUNT = static_cast<unsigned char>(Attribute::AMOUNT);
             // Used to push the vertex attributes int he right order. (i.e. position then normal then tex_coords...)
-            std::vector<unsigned int> attributes_indices(ATTRIBUTES_AMOUNT, ATTRIBUTES_AMOUNT);
+            std::vector<unsigned int> attributes_indices(ATTRIBUTE_AMOUNT, ATTRIBUTE_AMOUNT);
 
             for(unsigned int k = 0 ; k < c_primitive.attributes_count ; ++k) {
                 AttributeInfo& attribute = attributes[k];
@@ -262,7 +261,7 @@ void Scene::load(const std::filesystem::path& path) {
 
                 if(!(attribute.type == AttributeType::NONE || attribute.data.empty())) {
                     mesh.enable_attribute(attribute.attribute, attribute.type);
-                    attributes_indices[static_cast<unsigned char>(attribute.attribute)] = k;
+                    attributes_indices[attribute.attribute] = k;
 
 #ifdef DEBUG_LOG_GLTF_READ_INFO
                     std::cout << '\t' << attribute_to_string(attribute.attribute)
@@ -274,10 +273,10 @@ void Scene::load(const std::filesystem::path& path) {
 
             // Remove the vertex attributes that aren't enabled
             unsigned int valid_attributes_count = 0;
-            unsigned int next_index = ATTRIBUTES_AMOUNT - 1;
-            for(unsigned int k = 0 ; k < ATTRIBUTES_AMOUNT ; ++k) {
-                if(attributes_indices[k] == ATTRIBUTES_AMOUNT) {
-                    while(attributes_indices[next_index] == ATTRIBUTES_AMOUNT) { next_index--; }
+            unsigned int next_index = ATTRIBUTE_AMOUNT - 1;
+            for(unsigned int k = 0 ; k < ATTRIBUTE_AMOUNT ; ++k) {
+                if(attributes_indices[k] == ATTRIBUTE_AMOUNT) {
+                    while(attributes_indices[next_index] == ATTRIBUTE_AMOUNT) { next_index--; }
                     if(next_index < k) { break; }
                     std::swap(attributes_indices[k], attributes_indices[next_index--]);
                 } else {
@@ -297,6 +296,10 @@ void Scene::load(const std::filesystem::path& path) {
             mesh.bind_buffers();
 
             delete[] attributes;
+
+#ifdef DEBUG_LOG_GLTF_READ_INFO
+            std::cout << '\n';
+#endif
         }
     }
 
@@ -310,16 +313,16 @@ void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute&
 
     switch(c_attribute.type) {
         case cgltf_attribute_type_position:
-            attribute_info.attribute = Attribute::POSITION;
+            attribute_info.attribute = ATTRIBUTE_POSITION;
             break;
         case cgltf_attribute_type_normal:
-            attribute_info.attribute = Attribute::NORMAL;
+            attribute_info.attribute = ATTRIBUTE_NORMAL;
             break;
         case cgltf_attribute_type_texcoord:
-            attribute_info.attribute = Attribute::TEX_COORDS;
+            attribute_info.attribute = ATTRIBUTE_TEX_COORDS;
             break;
         case cgltf_attribute_type_color:
-            attribute_info.attribute = Attribute::COLOR;
+            attribute_info.attribute = ATTRIBUTE_COLOR;
             break;
         default:
             std::cout << "\tUnhandled or invalid attribute: '"

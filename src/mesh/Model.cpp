@@ -209,8 +209,8 @@ void Model::add_mesh(const std::vector<vec3>& positions,
     Mesh& mesh = meshes.emplace_back(Primitive::TRIANGLES);
 
     // TODO: Actually enable only the necessary attributes.
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     std::unordered_map<llvec3, long long, vector3_hash<long long>> unique_attribute_triplets;
 

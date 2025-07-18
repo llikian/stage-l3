@@ -9,15 +9,14 @@
 #include "maths/vec3.hpp"
 #include "maths/vec4.hpp"
 
-enum class Attribute : unsigned char {
-    POSITION,
-    NORMAL,
-    TEX_COORDS,
-    COLOR,
+enum Attribute : unsigned char {
+    ATTRIBUTE_POSITION,
+    ATTRIBUTE_NORMAL,
+    ATTRIBUTE_TEX_COORDS,
+    ATTRIBUTE_COLOR,
+    ATTRIBUTE_POINT_SIZE,
 
-    POINT_SIZE,
-
-    AMOUNT
+    ATTRIBUTE_AMOUNT
 };
 
 enum class AttributeType : unsigned char {
@@ -48,22 +47,22 @@ inline AttributeType get_attribute_type_from_value(const vec4&) { return Attribu
 
 inline AttributeType get_default_attribute_type(Attribute attribute) {
     switch(attribute) {
-        case Attribute::POSITION: return AttributeType::VEC3;
-        case Attribute::NORMAL: return AttributeType::VEC3;
-        case Attribute::TEX_COORDS: return AttributeType::VEC2;
-        case Attribute::COLOR: return AttributeType::VEC3;
-        case Attribute::POINT_SIZE: return AttributeType::FLOAT;
+        case ATTRIBUTE_POSITION: return AttributeType::VEC3;
+        case ATTRIBUTE_NORMAL: return AttributeType::VEC3;
+        case ATTRIBUTE_TEX_COORDS: return AttributeType::VEC2;
+        case ATTRIBUTE_COLOR: return AttributeType::VEC3;
+        case ATTRIBUTE_POINT_SIZE: return AttributeType::FLOAT;
         default: return AttributeType::NONE;
     }
 }
 
 inline std::string attribute_to_string(Attribute attribute) {
     switch(attribute) {
-        case Attribute::POSITION: return "POSITION";
-        case Attribute::NORMAL: return "NORMAL";
-        case Attribute::TEX_COORDS: return "TEX_COORDS";
-        case Attribute::COLOR: return "COLOR";
-        case Attribute::POINT_SIZE: return "POINT_SIZE";
+        case ATTRIBUTE_POSITION: return "POSITION";
+        case ATTRIBUTE_NORMAL: return "NORMAL";
+        case ATTRIBUTE_TEX_COORDS: return "TEX_COORDS";
+        case ATTRIBUTE_COLOR: return "COLOR";
+        case ATTRIBUTE_POINT_SIZE: return "POINT_SIZE";
         default: return "INVALID";
     }
 }

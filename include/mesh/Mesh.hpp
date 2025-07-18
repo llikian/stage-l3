@@ -92,16 +92,16 @@ public:
     void disable_attribute(Attribute attribute);
 
     template <typename... Args>
-    void add_vertex(Args&&... attributes) {
-        if(sizeof...(attributes) != active_attributes_count) {
+    void add_vertex(Args&&... attribute_values) {
+        if(sizeof...(attribute_values) != active_attributes_count) {
             throw std::runtime_error("Trying to pass "
-                                     + std::to_string(sizeof...(attributes))
+                                     + std::to_string(sizeof...(attribute_values))
                                      + " arguments to add_vertex but the mesh has "
                                      + std::to_string(active_attributes_count)
                                      + " active attributes.");
         }
 
-        add_vertex_helper(0, std::forward<Args>(attributes)...);
+        add_vertex_helper(0, std::forward<Args>(attribute_values)...);
     }
 
     void add_line(unsigned int start, unsigned int end);
@@ -125,19 +125,10 @@ private:
     unsigned int get_attribute_offset(Attribute attribute) const;
 
     template <typename Type, typename... Args>
-    void add_vertex_helper(unsigned int attribute_id, Type&& first_attribute, Args&&... attributes) {
-        while(get_attribute_type(static_cast<Attribute>(attribute_id)) == AttributeType::NONE) { ++attribute_id; }
+    void add_vertex_helper(unsigned int attribute_id, Type&& value, Args&&... attribute_values) {
+        while(attributes[attribute_id] == AttributeType::NONE) { ++attribute_id; }
 
-        push_attribute_value(static_cast<Attribute>(attribute_id), std::forward<Type>(first_attribute));
-
-        add_vertex_helper(++attribute_id, std::forward<Args>(attributes)...);
-    }
-
-    static void add_vertex_helper(unsigned int) { }
-
-    template <typename Type>
-    void push_attribute_value(Attribute attribute, Type&& value) {
-        AttributeType type = get_attribute_type(attribute);
+        AttributeType type = attributes[attribute_id];
         AttributeType value_type = get_attribute_type_from_value(value);
 
         if(type != value_type) {
@@ -149,13 +140,15 @@ private:
         }
 
         push_value(std::forward<Type>(value));
+
+        add_vertex_helper(++attribute_id, std::forward<Args>(attribute_values)...);
     }
 
-    AttributeType& get_attribute_type_ref(Attribute attribute);
+    static void add_vertex_helper(unsigned int) { }
 
     Primitive primitive;
 
-    AttributeType attributes[static_cast<unsigned char>(Attribute::AMOUNT)];
+    AttributeType attributes[ATTRIBUTE_AMOUNT];
     unsigned int stride;                  ///< Stride in amount of floats (not bytes).
     unsigned int active_attributes_count; ///< Amount of active attributes.
 

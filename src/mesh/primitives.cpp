@@ -14,8 +14,8 @@
 
 void create_sphere_mesh(Mesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     mesh.set_primitive(Primitive::TRIANGLES);
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     const float theta_step = PI_F / horizontal_slices; // theta in [-PI/2 ; PI/2]
     const float phi_step = TAU_F / vertical_slices;    // phi in [0 ; 2PI]
@@ -62,8 +62,8 @@ void create_sphere_mesh(Mesh& mesh, unsigned int horizontal_slices, unsigned int
 
 void create_cube_mesh(Mesh& mesh) {
     mesh.set_primitive(Primitive::TRIANGLES);
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     static const vec3 positions[8]{
         vec3(1.0f, 1.0f, 1.0f),   // 0: TOP - RIGHT - FRONT
@@ -156,8 +156,8 @@ void create_wireframe_cube_mesh(Mesh& mesh) {
 
 void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
     mesh.set_primitive(Primitive::TRIANGLES);
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     const vec3 BA(A - B);
     const vec3 BC(C - B);
@@ -175,8 +175,8 @@ void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
 
 void create_triangle_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
     mesh.set_primitive(Primitive::TRIANGLES);
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     const vec3 normal(normalize(cross(A - B, C - B)));
 
@@ -199,7 +199,7 @@ void create_screen_mesh(Mesh& mesh) {
 
 void create_axes_mesh(Mesh& mesh, float length) {
     mesh.set_primitive(Primitive::LINES);
-    mesh.enable_attribute(Attribute::COLOR);
+    mesh.enable_attribute(ATTRIBUTE_COLOR);
 
     const vec3 origin(0.0f, 0.0f, 0.0f);
     const vec3 axes[3]{
@@ -396,8 +396,8 @@ void create_icosphere_mesh(Mesh& mesh, unsigned int subdivisions) {
     }
 
     mesh.set_primitive(Primitive::TRIANGLES);
-    mesh.enable_attribute(Attribute::NORMAL);
-    mesh.enable_attribute(Attribute::TEX_COORDS);
+    mesh.enable_attribute(ATTRIBUTE_NORMAL);
+    mesh.enable_attribute(ATTRIBUTE_TEX_COORDS);
 
     for(const vec3& vertex : vertices) {
         vec3 project_on_sphere = normalize(vertex);
@@ -406,7 +406,9 @@ void create_icosphere_mesh(Mesh& mesh, unsigned int subdivisions) {
         mesh.add_vertex(project_on_sphere, project_on_sphere, tex_coords);
     }
 
-    for(int i = 0 ; i + 2 < indices.size() ; i += 3) { mesh.add_triangle(indices[i], indices[i + 1], indices[i + 2]); }
+    for(unsigned int i = 0 ; i + 2 < indices.size() ; i += 3) {
+        mesh.add_triangle(indices[i], indices[i + 1], indices[i + 2]);
+    }
 
     mesh.bind_buffers();
 }

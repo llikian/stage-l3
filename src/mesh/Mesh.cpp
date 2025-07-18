@@ -12,7 +12,7 @@
 Mesh::Mesh(Primitive primitive)
     : primitive(primitive), stride(0), active_attributes_count(0), VAO(0), VBO(0), EBO(0) {
     for(AttributeType& attribute : attributes) { attribute = AttributeType::NONE; }
-    enable_attribute(Attribute::POSITION);
+    enable_attribute(ATTRIBUTE_POSITION);
 }
 
 Mesh::~Mesh() {
@@ -53,7 +53,7 @@ Primitive Mesh::get_primitive() const {
 }
 
 AttributeType Mesh::get_attribute_type(Attribute attribute) const {
-    return attributes[static_cast<unsigned char>(attribute)];
+    return attributes[attribute];
 }
 
 bool Mesh::has_attribute(Attribute attribute) const {
@@ -69,12 +69,12 @@ size_t Mesh::get_indices_amount() const {
 }
 
 AttributeType Mesh::get_attribute_type(Attribute attribute) {
-    return attributes[static_cast<unsigned char>(attribute)];
+    return attributes[attribute];
 }
 
 void Mesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
-    if(has_attribute(Attribute::POSITION)) {
-        const unsigned int offset = get_attribute_offset(Attribute::POSITION);
+    if(has_attribute(ATTRIBUTE_POSITION)) {
+        const unsigned int offset = get_attribute_offset(ATTRIBUTE_POSITION);
         for(unsigned int i = offset ; i < data.size() ; i += stride) {
             minimum.x = std::min(minimum.x, data[i]);
             minimum.y = std::min(minimum.y, data[i + 1]);
@@ -104,16 +104,16 @@ void Mesh::delete_buffers() {
 void Mesh::apply_model_matrix(const mat4& model) {
     mat3 normals_model = transpose_inverse(model);
 
-    const unsigned int pos_offset = get_attribute_offset(Attribute::POSITION);
-    const unsigned int normal_offset = get_attribute_offset(Attribute::NORMAL);
+    const unsigned int pos_offset = get_attribute_offset(ATTRIBUTE_POSITION);
+    const unsigned int normal_offset = get_attribute_offset(ATTRIBUTE_NORMAL);
 
     for(unsigned int i = 0 ; i < data.size() ; i += stride) {
-        if(has_attribute(Attribute::POSITION)) {
+        if(has_attribute(ATTRIBUTE_POSITION)) {
             vec3* pos = reinterpret_cast<vec3*>(&data[pos_offset + i]);
             *pos = model * vec4(pos->x, pos->y, pos->z, 1.0f);
         }
 
-        if(has_attribute(Attribute::NORMAL)) {
+        if(has_attribute(ATTRIBUTE_NORMAL)) {
             vec3* normal = reinterpret_cast<vec3*>(&data[normal_offset + i]);
             *normal = normalize(normals_model * (*normal));
         }
@@ -125,18 +125,16 @@ void Mesh::apply_model_matrix(const mat4& model) {
 void Mesh::enable_attribute(Attribute attribute, AttributeType type) {
     if(type == AttributeType::NONE) { type = get_default_attribute_type(attribute); }
 
-    AttributeType& old_type = get_attribute_type_ref(attribute);
-    unsigned int stride_difference = get_attribute_type_count(type) - get_attribute_type_count(old_type);
+    unsigned int stride_difference = get_attribute_type_count(type) - get_attribute_type_count(attributes[attribute]);
     stride += stride_difference;
     active_attributes_count += stride_difference > 0 ? 1 : -1;
-    old_type = type;
+    attributes[attribute] = type;
 }
 
 void Mesh::disable_attribute(Attribute attribute) {
-    AttributeType& type = get_attribute_type_ref(attribute);
-    stride -= get_attribute_type_count(type);
+    stride -= get_attribute_type_count(attributes[attribute]);
     active_attributes_count--;
-    type = AttributeType::NONE;
+    attributes[attribute] = AttributeType::NONE;
 }
 
 void Mesh::add_line(unsigned int start, unsigned int end) {
@@ -182,12 +180,12 @@ void Mesh::bind_buffers() {
     float stride_in_bytes = stride * sizeof(float);
     unsigned int offset = 0;
 
-    for(unsigned int i = 0 ; i < static_cast<unsigned char>(Attribute::AMOUNT) ; ++i) {
-        AttributeType type = get_attribute_type(static_cast<Attribute>(i));
+    for(unsigned int attr = 0 ; attr < ATTRIBUTE_AMOUNT ; ++attr) {
+        AttributeType type = attributes[attr];
         if(type != AttributeType::NONE) {
             unsigned int size = get_attribute_type_count(type);
-            glVertexAttribPointer(i, size, GL_FLOAT, false, stride_in_bytes, reinterpret_cast<void*>(offset));
-            glEnableVertexAttribArray(i);
+            glVertexAttribPointer(attr, size, GL_FLOAT, false, stride_in_bytes, reinterpret_cast<void*>(offset));
+            glEnableVertexAttribArray(attr);
             offset += size * sizeof(float);
         }
     }
@@ -231,17 +229,11 @@ void Mesh::push_indices_buffer(const std::vector<unsigned int>& indices) {
 }
 
 unsigned int Mesh::get_attribute_offset(Attribute attribute) const {
-    const unsigned int attribute_id = static_cast<unsigned char>(attribute);
     unsigned int offset = 0;
 
-    for(unsigned int i = 0 ; i < attribute_id ; ++i) {
-        Attribute attr = static_cast<Attribute>(i);
-        offset += get_attribute_type_count(get_attribute_type(attr));
+    for(unsigned char attr = 0 ; attr < attribute ; ++attr) {
+        offset += get_attribute_type_count(attributes[attr]);
     }
 
     return offset;
-}
-
-AttributeType& Mesh::get_attribute_type_ref(Attribute attribute) {
-    return attributes[static_cast<unsigned char>(attribute)];
 }
