@@ -93,6 +93,14 @@ public:
 
     template <typename... Args>
     void add_vertex(Args&&... attributes) {
+        if(sizeof...(attributes) != active_attributes_count) {
+            throw std::runtime_error("Trying to pass "
+                                     + std::to_string(sizeof...(attributes))
+                                     + " arguments to add_vertex but the mesh has "
+                                     + std::to_string(active_attributes_count)
+                                     + " active attributes.");
+        }
+
         add_vertex_helper(0, std::forward<Args>(attributes)...);
     }
 
@@ -118,9 +126,7 @@ private:
 
     template <typename Type, typename... Args>
     void add_vertex_helper(unsigned int attribute_id, Type&& first_attribute, Args&&... attributes) {
-        while(get_attribute_type(static_cast<Attribute>(attribute_id)) == AttributeType::NONE) {
-            ++attribute_id;
-        }
+        while(get_attribute_type(static_cast<Attribute>(attribute_id)) == AttributeType::NONE) { ++attribute_id; }
 
         push_attribute_value(static_cast<Attribute>(attribute_id), std::forward<Type>(first_attribute));
 
@@ -150,7 +156,8 @@ private:
     Primitive primitive;
 
     AttributeType attributes[static_cast<unsigned char>(Attribute::AMOUNT)];
-    unsigned int stride; ///< Stride in amount of floats (not bytes).
+    unsigned int stride;                  ///< Stride in amount of floats (not bytes).
+    unsigned int active_attributes_count; ///< Amount of active attributes.
 
     std::vector<float> data;
     std::vector<unsigned int> indices;

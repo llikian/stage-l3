@@ -5,11 +5,12 @@
 
 #include "mesh/Mesh.hpp"
 
+#include <cmath>
 #include "maths/geometry.hpp"
 #include "maths/mat3.hpp"
 
 Mesh::Mesh(Primitive primitive)
-    : primitive(primitive), stride(0), VAO(0), VBO(0), EBO(0) {
+    : primitive(primitive), stride(0), active_attributes_count(0), VAO(0), VBO(0), EBO(0) {
     for(AttributeType& attribute : attributes) { attribute = AttributeType::NONE; }
     enable_attribute(Attribute::POSITION);
 }
@@ -125,13 +126,16 @@ void Mesh::enable_attribute(Attribute attribute, AttributeType type) {
     if(type == AttributeType::NONE) { type = get_default_attribute_type(attribute); }
 
     AttributeType& old_type = get_attribute_type_ref(attribute);
-    stride += get_attribute_type_count(type) - get_attribute_type_count(old_type);
+    unsigned int stride_difference = get_attribute_type_count(type) - get_attribute_type_count(old_type);
+    stride += stride_difference;
+    active_attributes_count += stride_difference > 0 ? 1 : -1;
     old_type = type;
 }
 
 void Mesh::disable_attribute(Attribute attribute) {
     AttributeType& type = get_attribute_type_ref(attribute);
     stride -= get_attribute_type_count(type);
+    active_attributes_count--;
     type = AttributeType::NONE;
 }
 
