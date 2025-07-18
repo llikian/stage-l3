@@ -32,7 +32,7 @@ void create_wireframe_cube_mesh(Mesh& mesh);
  * @brief Creates a mesh representing a quad as follow:
  * \verbatim
  * A---D
- * | / |
+ * | \ |
  * B---C
  * \endverbatim
  * To be clear this is just for visualisation's sake, the four points don't need to form a square,
@@ -44,6 +44,28 @@ void create_wireframe_cube_mesh(Mesh& mesh);
  * @param C The lower right point of the quad.
  */
 void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C);
+
+/**
+ * @brief Creates a mesh representing a triangle as follow:
+ * \verbatim
+ * A
+ * | \
+ * B---C
+ * \endverbatim
+ * To be clear this is just for visualisation's sake, the three points don't need to form a right
+ * triangle.
+ * @param mesh The mesh to create the triangle in.
+ * @param A The upper point of the triangle.
+ * @param B The lower left point of the triangle.
+ * @param C The lower right point of the triangle.
+ */
+void create_triangle_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C);
+
+/**
+ * @brief Creates a mesh representing a full screen.
+ * @param mesh The mesh to create the screen in.
+ */
+void create_screen_mesh(Mesh& mesh);
 
 /**
  * @brief Creates a mesh representing the 3 unit axes in their corrosponding colors:\n

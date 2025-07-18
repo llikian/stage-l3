@@ -176,9 +176,10 @@ void Scene::load(const std::filesystem::path& path) {
             MRMaterial*& material = meshes[i][j].material;
 
             if(c_primitive.material != nullptr) {
+                const cgltf_material* c_material = c_primitive.material;
+
                 if(c_primitive.material->has_pbr_metallic_roughness) {
                     std::cout << "\tHas metallic roughness.\n";
-                    const cgltf_material* c_material = c_primitive.material;
                     const auto& [base_color_texture,
                         metallic_roughness_texture,
                         base_color_factor,

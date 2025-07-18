@@ -5,8 +5,6 @@
 
 #version 460 core
 
-in vec2 v_tex_coords;
-
 out vec4 frag_color;
 
 uniform sampler2D u_texture;
@@ -14,12 +12,12 @@ uniform vec2 u_texture_resolution;
 uniform vec2 u_resolution;
 
 vec2 get_uv() {
-    vec2 uv = v_tex_coords * u_resolution / u_texture_resolution;
+    vec2 uv = gl_FragCoord.xy / u_texture_resolution;
     return clamp(uv, 0.0f, 1.0f);
 }
 
 vec2 get_uv_pixelated(int pixel_size) {
-    vec2 uv = pixel_size / u_texture_resolution * floor(v_tex_coords * u_resolution / pixel_size);
+    vec2 uv = pixel_size / u_texture_resolution * floor(gl_FragCoord.xy / pixel_size);
     return clamp(uv, 0.0f, 1.0f);
 }
 

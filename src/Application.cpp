@@ -83,7 +83,7 @@ light_intensity(1.0f) {
                                  "shaders/terrain/terrain.frag"
                              });
     AssetManager::add_shader("post processing", {
-                                 "shaders/vertex/position_and_texcoords_no_mvp.vert",
+                                 "shaders/vertex/position_only-no_mvp.vert",
                                  "shaders/fragment/post_processing.frag"
                              });
 
@@ -95,8 +95,7 @@ light_intensity(1.0f) {
     AssetManager::add_mesh("icosphere 2", create_icosphere_mesh, 2);
     AssetManager::add_mesh("cube", create_cube_mesh);
     AssetManager::add_mesh("wireframe cube", create_wireframe_cube_mesh);
-    AssetManager::add_mesh("screen", create_quad_mesh,
-                           vec3(-1.0f, 1.0f, 1.0f), vec3(-1.0f, -1.0f, 1.0f), vec3(1.0f, -1.0f, 1.0f));
+    AssetManager::add_mesh("screen", create_screen_mesh);
     AssetManager::add_mesh("axes", create_axes_mesh, 0.5f);
     AssetManager::add_mesh("camera pyramid", create_pyramid_mesh,
                            vec3(1.0f, 1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f), vec3(-1.0f, -1.0f, -1.0f), 1.0f);
@@ -269,7 +268,7 @@ void Application::draw_post_processing() const {
     shader.use();
     shader.set_uniform("u_texture", 0);
     shader.set_uniform("u_texture_resolution", framebuffer.get_resolution());
-    shader.set_uniform("u_resolution", Window::get_resolution());
+    shader.set_uniform_if_exists("u_resolution", Window::get_resolution());
     framebuffer.bind_texture(0);
 
     if(EventHandler::is_wireframe_enabled()) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }

@@ -173,6 +173,30 @@ void create_quad_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
     mesh.bind_buffers();
 }
 
+void create_triangle_mesh(Mesh& mesh, const vec3& A, const vec3& B, const vec3& C) {
+    mesh.set_primitive(Primitive::TRIANGLES);
+    mesh.enable_attribute(Attribute::NORMAL);
+    mesh.enable_attribute(Attribute::TEX_COORDS);
+
+    const vec3 normal(normalize(cross(A - B, C - B)));
+
+    mesh.add_vertex(A, normal, vec2(0.0f, 1.0f));
+    mesh.add_vertex(B, normal, vec2(0.0f, 0.0f));
+    mesh.add_vertex(C, normal, vec2(1.0f, 0.0f));
+
+    mesh.bind_buffers();
+}
+
+void create_screen_mesh(Mesh& mesh) {
+    mesh.set_primitive(Primitive::TRIANGLES);
+
+    mesh.add_vertex(vec3(-1.0f, 3.0f, 1.0f));
+    mesh.add_vertex(vec3(-1.0f, -1.0f, 1.0f));
+    mesh.add_vertex(vec3(3.0f, -1.0f, 1.0f));
+
+    mesh.bind_buffers();
+}
+
 void create_axes_mesh(Mesh& mesh, float length) {
     mesh.set_primitive(Primitive::LINES);
     mesh.enable_attribute(Attribute::COLOR);
