@@ -133,16 +133,6 @@ void Application::run() {
         const Shader& shader = AssetManager::get_shader("blinn-phong");
 
         /* Models */
-        // Model& sponza = AssetManager::add_model("sponza", "data/obj/sponza/sponza.obj");
-        // sponza.apply_model_matrix(scale(0.05f));
-        // ModelEntity* sponza_entity = root->add_child<ModelEntity>("sponza", shader, sponza);
-        // sponza_entity->create_aabb();
-        // sponza_entity->transform.set_local_position(-200.0f, -40.0f, 0.0f);
-
-        // Model& vokselia = AssetManager::add_model("vokselia", "data/obj/vokselia/vokselia_spawn.obj");
-        // vokselia.apply_model_matrix(scale(100.0f));
-        // root->add_child<ModelEntity>("vokselia", shader, vokselia)->create_aabb();
-
         // Model& bmw = AssetManager::add_model("bmw", "data/obj/bmw/bmw.obj");
         // bmw.apply_model_matrix(scale(0.05f));
         // root->add_child<ModelEntity>("bmw", shader, bmw)->create_aabb();
