@@ -6,8 +6,8 @@
 #pragma once
 
 #include <vector>
+#include "assets/Shader.hpp"
 #include "culling/Frustum.hpp"
-#include "Shader.hpp"
 
 /**
  * @class Terrain

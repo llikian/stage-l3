@@ -8,7 +8,7 @@
 #include <functional>
 #include <queue>
 #include <unordered_map>
-#include "Camera.hpp"
+#include "assets/Camera.hpp"
 #include "maths/vec2.hpp"
 #include "Window.hpp"
 

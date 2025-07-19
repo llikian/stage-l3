@@ -3,10 +3,10 @@
  * @brief Implementation of the Window class
  **************************************************************************************************/
 
-#include "Window.hpp"
+#include "core/Window.hpp"
 
-#include <glad/glad.h>
 #include <unordered_set>
+#include "glad/glad.h"
 
 static void glfw_error_callback(int code, const char* message) {
     std::cerr << "GLFW Error '" << code << "' : " << message << '\n';

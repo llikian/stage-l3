@@ -3,11 +3,11 @@
  * @brief Implementation of the EventHandler class
  **************************************************************************************************/
 
-#include "EventHandler.hpp"
+#include "core/EventHandler.hpp"
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "callbacks.hpp"
+#include "core/callbacks.hpp"
+#include "glad/glad.h"
 
 void EventHandler::poll_and_handle_events() {
     glfwPollEvents();

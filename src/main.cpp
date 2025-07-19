@@ -6,9 +6,9 @@
 #include <iostream>
 #include <stdexcept>
 #include "Application.hpp"
-#include "AssetManager.hpp"
-#include "EventHandler.hpp"
-#include "Window.hpp"
+#include "assets/AssetManager.hpp"
+#include "core/EventHandler.hpp"
+#include "core/Window.hpp"
 
 int main() {
     try {

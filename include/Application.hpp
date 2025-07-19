@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "Camera.hpp"
-#include "Cubemap.hpp"
+#include "assets/Camera.hpp"
+#include "assets/Cubemap.hpp"
+#include "assets/Shader.hpp"
+#include "core/Framebuffer.hpp"
+#include "core/SceneGraph.hpp"
 #include "culling/Frustum.hpp"
-#include "Framebuffer.hpp"
 #include "mesh/MRMaterial.hpp"
-#include "SceneGraph.hpp"
-#include "Shader.hpp"
 
 /**
  * @class Application

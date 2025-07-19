@@ -8,7 +8,7 @@
 #include <fstream>
 #include <ranges>
 
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "maths/geometry.hpp"
 #include "utility/hash.hpp"
 

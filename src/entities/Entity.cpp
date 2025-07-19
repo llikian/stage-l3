@@ -5,10 +5,10 @@
 
 #include "entities/Entity.hpp"
 
-#include <glad/glad.h>
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "debug.hpp"
 #include "entities/DrawableEntity.hpp"
+#include "glad/glad.h"
 #include "imgui.h"
 
 Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_visible(true) { }

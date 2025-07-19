@@ -3,15 +3,12 @@
  * @brief Implementation of the Shader class
  **************************************************************************************************/
 
-#include "Shader.hpp"
+#include "assets/Shader.hpp"
 
 #include <fstream>
-#include <glad/glad.h>
 #include <sstream>
-
-#ifdef DEBUG
 #include "debug.hpp"
-#endif
+#include "glad/glad.h"
 
 Shader::Shader() : id(0) { }
 

@@ -4,8 +4,9 @@
  **************************************************************************************************/
 
 #pragma once
+
+#include "assets/Texture.hpp"
 #include "maths/vec4.hpp"
-#include "Texture.hpp"
 
 /**
  * @class MRMaterial

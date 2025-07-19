@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "Camera.hpp"
+#include "assets/Camera.hpp"
 #include "Mesh.hpp"
 
 /**

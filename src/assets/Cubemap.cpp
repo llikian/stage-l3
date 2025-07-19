@@ -3,10 +3,10 @@
  * @brief Implementation of the Cubemap class
  **************************************************************************************************/
 
-#include "Cubemap.hpp"
+#include "assets/Cubemap.hpp"
 
+#include "assets/Image.hpp"
 #include "glad/glad.h"
-#include "Image.hpp"
 
 Cubemap::Cubemap(const std::initializer_list<std::filesystem::path>& paths) {
     glGenTextures(1, &id);

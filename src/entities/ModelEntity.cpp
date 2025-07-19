@@ -5,7 +5,7 @@
 
 #include "entities/ModelEntity.hpp"
 
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "glad/glad.h"
 #include "imgui.h"
 

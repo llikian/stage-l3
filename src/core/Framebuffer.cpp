@@ -3,7 +3,7 @@
  * @brief Implementation of the Framebuffer class
  **************************************************************************************************/
 
-#include "Framebuffer.hpp"
+#include "core/Framebuffer.hpp"
 
 Framebuffer::Framebuffer(unsigned int width, unsigned int height) : FBO(0), RBO(0), width(width), height(height) {
     glGenFramebuffers(1, &FBO);

@@ -3,7 +3,7 @@
  * @brief Implementation of the AssetManager class
  **************************************************************************************************/
 
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 
 #include <ranges>
 #include "mesh/primitives.hpp"

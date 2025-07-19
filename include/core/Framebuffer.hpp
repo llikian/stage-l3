@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include "assets/Texture.hpp"
 #include "glad/glad.h"
 #include "maths/vec2.hpp"
-#include "Texture.hpp"
 
 /**
  * @class Framebuffer

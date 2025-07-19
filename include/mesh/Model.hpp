@@ -7,10 +7,10 @@
 
 #include <filesystem>
 #include <vector>
+#include "assets/Shader.hpp"
 #include "Material.hpp"
 #include "maths/vec3.hpp"
 #include "Mesh.hpp"
-#include "Shader.hpp"
 
 /**
  * @class Model

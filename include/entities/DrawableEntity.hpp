@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include "assets/Shader.hpp"
 #include "culling/AABB.hpp"
 #include "Entity.hpp"
-#include "Shader.hpp"
 
 /**
  * @class DrawableEntity

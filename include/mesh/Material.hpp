@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "Shader.hpp"
-#include "Texture.hpp"
+#include "assets/Shader.hpp"
+#include "assets/Texture.hpp"
 
 // TODO: Write and use different shaders depending on which material attributes are active
 

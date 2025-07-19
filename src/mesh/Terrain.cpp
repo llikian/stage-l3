@@ -5,7 +5,7 @@
 
 #include "mesh/Terrain.hpp"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 Terrain::Terrain(const Shader& shader, float chunk_size, unsigned int chunks_on_line)
     : shader(shader), chunk_size(chunk_size), chunks_on_line(chunks_on_line) {

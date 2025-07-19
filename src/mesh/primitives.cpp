@@ -8,9 +8,9 @@
 #include <cmath>
 #include <functional>
 
+#include "core/Window.hpp"
 #include "maths/constants.hpp"
 #include "maths/geometry.hpp"
-#include "Window.hpp"
 
 void create_sphere_mesh(Mesh& mesh, unsigned int horizontal_slices, unsigned int vertical_slices) {
     mesh.set_primitive(Primitive::TRIANGLES);

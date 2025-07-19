@@ -3,7 +3,7 @@
  * @brief Implementation of the Image class
  **************************************************************************************************/
 
-#include "Image.hpp"
+#include "assets/Image.hpp"
 
 #include <iostream>
 

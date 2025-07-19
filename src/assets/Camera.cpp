@@ -3,16 +3,16 @@
  * @brief Implementation of the Camera class
  **************************************************************************************************/
 
-#include "Camera.hpp"
+#include "assets/Camera.hpp"
 
 #include <cmath>
 #include <numbers>
 
-#include "EventHandler.hpp"
+#include "core/EventHandler.hpp"
+#include "core/Window.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
 #include "maths/trigonometry.hpp"
-#include "Window.hpp"
 
 #define PIf (std::numbers::pi_v<float>)
 

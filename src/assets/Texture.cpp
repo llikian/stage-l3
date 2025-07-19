@@ -3,15 +3,12 @@
  * @brief Implementation of the Texture class
  **************************************************************************************************/
 
-#include "Texture.hpp"
+#include "assets/Texture.hpp"
 
-#include <glad/glad.h>
+#include "assets/AssetManager.hpp"
+#include "glad/glad.h"
 
-#include "AssetManager.hpp"
-
-#ifdef DEBUG
 #include "debug.hpp"
-#endif
 
 void get_internal_format_parameters(int internal_format, unsigned int& format, unsigned int& channels_amount,  unsigned int& type) {
     switch(internal_format) {

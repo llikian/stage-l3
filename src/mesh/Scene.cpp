@@ -7,7 +7,7 @@
 
 #include <ranges>
 
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "debug.hpp"
 #include "maths/functions.hpp"
 #include "utility/LifetimeLogger.hpp"

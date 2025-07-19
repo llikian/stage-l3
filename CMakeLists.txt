@@ -20,18 +20,22 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(SOURCES
         src/main.cpp
 
-        src/AssetManager.cpp
         src/Application.cpp
-        src/callbacks.cpp
-        src/Camera.cpp
-        src/Cubemap.cpp
-        src/EventHandler.cpp
-        src/Framebuffer.cpp
-        src/Image.cpp
-        src/SceneGraph.cpp
-        src/Shader.cpp
-        src/Texture.cpp
-        src/Window.cpp
+
+        # Assets Module
+        src/assets/AssetManager.cpp
+        src/assets/Camera.cpp
+        src/assets/Cubemap.cpp
+        src/assets/Image.cpp
+        src/assets/Shader.cpp
+        src/assets/Texture.cpp
+
+        # Core Module
+        src/core/callbacks.cpp
+        src/core/EventHandler.cpp
+        src/core/Framebuffer.cpp
+        src/core/SceneGraph.cpp
+        src/core/Window.cpp
 
         # Culling Module
         src/culling/AABB.cpp

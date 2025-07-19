@@ -6,11 +6,11 @@
 #include "Application.hpp"
 
 #include <cmath>
-#include <glad/glad.h>
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
+#include "core/EventHandler.hpp"
 #include "debug.hpp"
 #include "entities/entities.hpp"
-#include "EventHandler.hpp"
+#include "glad/glad.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"

@@ -5,7 +5,7 @@
 
 #include "entities/DrawableEntity.hpp"
 
-#include "AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "debug.hpp"
 
 DrawableEntity::DrawableEntity(const std::string& name, const Shader& shader)
