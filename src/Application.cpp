@@ -14,6 +14,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "maths/constants.hpp"
 #include "maths/functions.hpp"
 #include "maths/geometry.hpp"
 #include "maths/transforms.hpp"
@@ -22,7 +23,7 @@
 #include "utility/Random.hpp"
 
 Application::Application()
-    : camera(vec3(0.0f, 10.0f, 0.0f), M_PI_2f, 0.1f, 1024.0f),
+    : camera(vec3(0.0f, 10.0f, 0.0f), PI_HALF_F, 0.1f, 1024.0f),
       framebuffer(Window::get_width(), Window::get_height()),
       cubemap({
           "data/environments/town/px.png",

@@ -149,10 +149,10 @@ void Scene::load(const std::filesystem::path& path) {
     cgltf_options options{};
     cgltf_data* data;
 
-    cgltf_result result = cgltf_parse_file(&options, path.c_str(), &data);
+    cgltf_result result = cgltf_parse_file(&options, path.string().c_str(), &data);
     check_cgltf_result(result, "Failed to read gltf file '" + path.string() + "': ");
 
-    result = cgltf_load_buffers(&options, data, path.c_str());
+    result = cgltf_load_buffers(&options, data, path.string().c_str());
     check_cgltf_result(result, "Failed to load buffers");
 
     result = cgltf_validate(data);

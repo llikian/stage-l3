@@ -94,8 +94,8 @@ mat4 translate_z(float scalar) {
 
 mat4 rotate(float angle, vec3 axis) {
     angle = degrees_to_radians(angle);
-    float cosine = cosf(angle);
-    float sine = sinf(angle);
+    float cosine = std::cos(angle);
+    float sine = std::sin(angle);
 
     if(float len = length(axis) ; len != 0.0f) { axis /= len; }
     vec3 temp = (1.0f - cosine) * axis;
@@ -110,8 +110,8 @@ mat4 rotate(float angle, vec3 axis) {
 mat4 rotate_x(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     return mat4(
         1.0f, 0.0f, 0.0f,
@@ -123,8 +123,8 @@ mat4 rotate_x(float angle) {
 mat4 rotate_y(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     return mat4(
         cosine, 0.0f, sine,
@@ -136,8 +136,8 @@ mat4 rotate_y(float angle) {
 mat4 rotate_z(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     return mat4(
         cosine, -sine, 0.0f,
@@ -232,8 +232,8 @@ mat4 look_at(const vec3& eye, const vec3& target, const vec3& up) {
 
 mat4 perspective(float fov, float aspect, float near, float far) {
     return mat4(
-        1.0f / (aspect * tanf(0.5f * fov)), 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f / tanf(0.5f * fov), 0.0f, 0.0f,
+        1.0f / (aspect * std::tan(0.5f * fov)), 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f / std::tan(0.5f * fov), 0.0f, 0.0f,
         0.0f, 0.0f, -(far + near) / (far - near), -(2.0f * far * near) / (far - near),
         0.0f, 0.0f, -1.0f, 0.0f
     );

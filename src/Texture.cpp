@@ -217,7 +217,7 @@ void Texture::create(unsigned int width,
     }
 }
 
-void Texture::create(const std::string& path, bool flip_vertically, bool srgb) {
+void Texture::create(const std::filesystem::path& path, bool flip_vertically, bool srgb) {
     create(Image(path, flip_vertically), srgb);
 }
 

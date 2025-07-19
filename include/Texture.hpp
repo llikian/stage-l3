@@ -83,7 +83,7 @@ public:
      * @param flip_vertically Whether to flip the image on vertically.
      * @param srgb Whether to set the internal format to SRGB.
      */
-    void create(const std::string& path, bool flip_vertically, bool srgb);
+    void create(const std::filesystem::path& path, bool flip_vertically, bool srgb);
 
     /**
      * @brief Creates a texture by assigning an image's data to a new texture.

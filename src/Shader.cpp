@@ -52,7 +52,7 @@ void Shader::create(const std::initializer_list<std::filesystem::path>& paths_li
 
         for(const std::filesystem::path& path : paths_list) {
             if(path.extension() == ".frag") {
-                name += path.stem();
+                name += path.stem().string();
                 break;
             }
         }
@@ -93,7 +93,7 @@ void Shader::create(const std::initializer_list<std::filesystem::path>& paths_li
 }
 
 unsigned int Shader::compile_shader(const std::filesystem::path& path) {
-    std::string extension = path.extension();
+    std::string extension = path.extension().string();
     std::string shader_type_name;
     unsigned int shader_type;
 

@@ -18,7 +18,7 @@ Shader& AssetManager::add_shader(const std::string& name,
 
 Texture& AssetManager::add_texture(const std::filesystem::path& path, bool flip_vertically, bool srgb) {
     AssetManager& asset_manager = get();
-    auto iterator = asset_manager.textures.find(path);
+    auto iterator = asset_manager.textures.find(path.string());
 
     if(iterator == asset_manager.textures.end()) {
         Texture texture;

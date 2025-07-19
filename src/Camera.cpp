@@ -177,8 +177,8 @@ void Camera::update_projection_matrix() {
 
 void Camera::look_at_point(const vec3& target) {
     vec3 dir = normalize(target - position);
-    pitch = asinf(dir.y);
-    yaw = atan2f(dir.z, dir.x);
+    pitch = std::asin(dir.y);
+    yaw = std::atan2(dir.z, dir.x);
     update_vectors_and_view_matrix();
 }
 

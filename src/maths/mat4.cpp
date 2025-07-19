@@ -148,8 +148,8 @@ mat4& mat4::translate_z(float scalar) {
 mat4& mat4::rotate_x(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     float column[4]{ values[1][0], values[1][1], values[1][2], values[1][3] };
 
@@ -169,8 +169,8 @@ mat4& mat4::rotate_x(float angle) {
 mat4& mat4::rotate_y(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     float column[4]{ values[0][0], values[0][1], values[0][2], values[0][3] };
 
@@ -190,8 +190,8 @@ mat4& mat4::rotate_y(float angle) {
 mat4& mat4::rotate_z(float angle) {
     angle = degrees_to_radians(angle);
 
-    const float cosine = cosf(angle);
-    const float sine = sinf(angle);
+    const float cosine = std::cos(angle);
+    const float sine = std::sin(angle);
 
     float column[4]{ values[0][0], values[0][1], values[0][2], values[0][3] };
 

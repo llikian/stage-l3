@@ -10,12 +10,12 @@
 #include "glad/glad.h"
 #include "stb_image.h"
 
-Image::Image(const std::string& path, bool flip_vertically) {
+Image::Image(const std::filesystem::path& path, bool flip_vertically) {
     stbi_set_flip_vertically_on_load(flip_vertically);
 
     int w, h, c;
-    data = stbi_load(path.c_str(), &w, &h, &c, 0);
-    if(data == nullptr) { throw std::runtime_error("Couldn't load image '" + path + '\''); }
+    data = stbi_load(path.string().c_str(), &w, &h, &c, 0);
+    if(data == nullptr) { throw std::runtime_error("Couldn't load image '" + path.string() + '\''); }
 
     width = w;
     height = h;

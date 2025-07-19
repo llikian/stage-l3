@@ -4,7 +4,9 @@ project(stage-l3)
 
 # Find packages
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
+if (UNIX)
+    find_package(glfw3 REQUIRED)
+endif (UNIX)
 
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
@@ -96,20 +98,45 @@ set(INCLUDES
         lib/stb
 )
 
-set(LIBRARIES
-        glfw
-        dl
-        pthread
-        X11
-        Xxf86vm
-        Xrandr
-        Xi
+if (WIN32)
+    set(INCLUDES
+            ${INCLUDES}
+            lib/glfw/include
+    )
+endif (WIN32)
+
+set(LIBRARY_DIRS
+
 )
+
+if (WIN32)
+    set(LIBRARY_DIRS
+            ${LIBRARY_DIRS}
+            lib/glfw/lib
+    )
+endif (WIN32)
+
+set(LIBRARIES
+        glfw3
+)
+
+if (UNIX)
+    set(LIBRARIES
+            ${LIBRARIES}
+            dl
+            pthread
+            X11
+            Xxf86vm
+            Xrandr
+            Xi
+    )
+endif (UNIX)
 
 # Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
+target_link_directories(${PROJECT_NAME} PUBLIC ${LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
 
 # Creates a macro called 'DEBUG' when program is launched in debug mode
