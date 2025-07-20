@@ -4,6 +4,7 @@ project(stage-l3)
 
 # Find packages
 find_package(OpenGL REQUIRED)
+
 if (UNIX)
     find_package(glfw3 REQUIRED)
 endif (UNIX)
@@ -91,7 +92,8 @@ set(SOURCES
         lib/stb/stb_image.cpp
 )
 
-set(INCLUDES
+# Include Directories
+set(INCLUDE_DIRS
         include
 
         # Libraries
@@ -103,30 +105,29 @@ set(INCLUDES
 )
 
 if (WIN32)
-    set(INCLUDES
-            ${INCLUDES}
+    set(INCLUDE_DIRS ${INCLUDE_DIRS}
             lib/glfw/include
     )
 endif (WIN32)
 
+# Library Directories
 set(LIBRARY_DIRS
 
 )
 
 if (WIN32)
-    set(LIBRARY_DIRS
-            ${LIBRARY_DIRS}
+    set(LIBRARY_DIRS ${LIBRARY_DIRS}
             lib/glfw/lib
     )
 endif (WIN32)
 
+# Libraries
 set(LIBRARIES
         glfw3
 )
 
 if (UNIX)
-    set(LIBRARIES
-            ${LIBRARIES}
+    set(LIBRARIES ${LIBRARIES}
             dl
             pthread
             X11
@@ -139,7 +140,7 @@ endif (UNIX)
 # Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIRS})
 target_link_directories(${PROJECT_NAME} PUBLIC ${LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
 
