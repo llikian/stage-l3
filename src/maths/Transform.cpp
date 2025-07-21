@@ -5,6 +5,8 @@
 
 #include "maths/Transform.hpp"
 
+#include <cmath>
+
 #include "maths/geometry.hpp"
 
 Transform::Transform()
@@ -58,6 +60,55 @@ void Transform::set_local_scale(float x, float y, float z) {
     local_scale.x = x;
     local_scale.y = y;
     local_scale.z = z;
+    is_dirty = true;
+}
+
+void Transform::set_local_model(const float model[16]) {
+    local_position.x = model[12];
+    local_position.y = model[13];
+    local_position.z = model[14];
+
+    vec3 right(model[0], model[1], model[2]);
+    vec3 up(model[4], model[5], model[6]);
+    vec3 front(model[8], model[9], model[10]);
+
+    local_scale.x = length(right);
+    local_scale.y = length(up);
+    local_scale.z = length(front);
+
+    right /= local_scale.x;
+    up /= local_scale.y;
+    front /= local_scale.z;
+
+    float trace = right.x + up.y + front.z;
+    if(trace > 0.0f) {
+        float s = std::sqrt(trace + 1.0f) * 2.0f;
+        local_orientation.x = (up.z - front.y) / s;
+        local_orientation.y = (front.x - right.z) / s;
+        local_orientation.z = (right.y - up.x) / s;
+        local_orientation.w = 0.25f * s;
+    } else if((right.x > up.y) && (right.x > front.z)) {
+        float s = std::sqrt(1.0f + right.x - up.y - front.z) * 2.0f;
+        local_orientation.x = 0.25f * s;
+        local_orientation.y = (up.x + right.y) / s;
+        local_orientation.z = (front.x + right.z) / s;
+        local_orientation.w = (up.z - front.y) / s;
+    } else if(up.y > front.z) {
+        float s = std::sqrt(1.0f + up.y - right.x - front.z) * 2.0f;
+        local_orientation.x = (up.x + right.y) / s;
+        local_orientation.y = 0.25f * s;
+        local_orientation.z = (front.y + up.z) / s;
+        local_orientation.w = (front.x - right.z) / s;
+    } else {
+        float s = std::sqrt(1.0f + front.z - right.x - up.y) * 2.0f;
+        local_orientation.x = (front.x + right.z) / s;
+        local_orientation.y = (front.y + up.z) / s;
+        local_orientation.z = 0.25f * s;
+        local_orientation.w = (right.y - up.x) / s;
+    }
+
+    local_orientation.normalize();
+
     is_dirty = true;
 }
 

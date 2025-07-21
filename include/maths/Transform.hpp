@@ -78,6 +78,13 @@ public:
     void set_local_scale(float x, float y, float z);
 
     /**
+     * @brief Decompose a row-major model matrix's values into the local model's parameters (position,
+     * orientation and scale).
+     * @param model The row-major model matrix's values.
+     */
+    void set_local_model(const float model[16]);
+
+    /**
      * @brief Sets the is_dirty flag to true, meaning the local model needs to be recalculated.
      */
     void set_local_model_to_dirty();
