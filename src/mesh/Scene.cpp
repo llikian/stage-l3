@@ -315,10 +315,38 @@ void Scene::add_node(const cgltf_node* c_node,
             mesh_entity->material = primitive.material;
         }
     } else {
-        entity = entity->add_child<Entity>(c_node->name != nullptr ? c_node->name : "Node");
+        entity = entity->add_child<Entity>(c_node->name != nullptr
+                                               ? c_node->name
+                                               : "Node " + std::to_string(entity->children.size()));
     }
 
-    entity->transform.set_local_model(c_node->matrix);
+    bool transformed = false;
+
+    if(c_node->has_translation) {
+        entity->transform.set_local_position(c_node->translation[0],
+                                             c_node->translation[1],
+                                             c_node->translation[2]);
+        transformed = true;
+    }
+
+    if(c_node->has_rotation) {
+        entity->transform.set_local_orientation(c_node->rotation[0],
+                                                c_node->rotation[1],
+                                                c_node->rotation[2],
+                                                c_node->rotation[3]);
+        transformed = true;
+    }
+
+    if(c_node->has_scale) {
+        entity->transform.set_local_scale(c_node->scale[0],
+                                          c_node->scale[1],
+                                          c_node->scale[2]);
+        transformed = true;
+    }
+
+    if(!transformed && c_node->has_matrix) {
+        entity->transform.set_local_model(c_node->matrix);
+    }
 
     for(unsigned int i = 0 ; i < c_node->children_count ; ++i) {
         add_node(c_node->children[i], entity, mesh_indices);
