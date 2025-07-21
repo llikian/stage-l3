@@ -105,10 +105,10 @@ public:
      * @param value The new value of the uniform.
      */
     template <typename... Value>
-    void set_uniform(const std::string& uniform, Value... value) const {
+    void set_uniform(const std::string& uniform, Value&&... value) const {
         std::unordered_map<std::string, int>::const_iterator uniform_iterator = uniform_locations.find(uniform);
         if(uniform_iterator != uniform_locations.end()) {
-            set_uniform(uniform_iterator->second, value...);
+            set_uniform(uniform_iterator->second, std::forward<Value>(value)...);
         } else {
             std::cout << "[WARNING] Unknown uniform '" << uniform << "' in 'set_uniform' call for shader '" << name <<
                 "'.\n";
