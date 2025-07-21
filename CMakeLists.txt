@@ -123,11 +123,12 @@ endif (WIN32)
 
 # Libraries
 set(LIBRARIES
-        glfw3
+
 )
 
 if (UNIX)
     set(LIBRARIES ${LIBRARIES}
+            glfw
             dl
             pthread
             X11
@@ -136,6 +137,12 @@ if (UNIX)
             Xi
     )
 endif (UNIX)
+
+if (WIN32)
+    set(LIBRARIES ${LIBRARIES}
+            glfw3
+    )
+endif (WIN32)
 
 # Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
