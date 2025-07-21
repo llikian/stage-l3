@@ -1,20 +1,20 @@
 /***************************************************************************************************
- * @file  Material.cpp
- * @brief Implementation of the Material struct
+ * @file  PhongMaterial.cpp
+ * @brief Implementation of the PhongMaterial struct
  **************************************************************************************************/
 
-#include "mesh/Material.hpp"
+#include "materials/PhongMaterial.hpp"
 
-#include "debug.hpp"
+#include "imgui.h"
 
-Material::Material(const std::string& name)
-    : name(name),
+PhongMaterial::PhongMaterial(const std::string& name)
+    : Material(name),
       ambient(1.0f),
       diffuse(1.0f),
       specular(1.0f),
       specular_exponent(10.0f) { }
 
-void Material::update_shader_uniforms(const Shader& shader) {
+void PhongMaterial::update_shader_uniforms(const Shader& shader) {
     shader.set_uniform("u_ambient", ambient);
     shader.set_uniform("u_diffuse", diffuse);
     shader.set_uniform("u_specular", specular);
@@ -24,6 +24,14 @@ void Material::update_shader_uniforms(const Shader& shader) {
     diffuse_map.bind(0);
 }
 
-bool Material::has_transparency() const {
+bool PhongMaterial::has_transparency() const {
     return diffuse_map.has_transparency();
+}
+
+void PhongMaterial::add_to_object_editor() {
+    ImGui::Text("Material: %s", name.c_str());
+    ImGui::ColorEdit3("Ambient Color", &ambient.x);
+    ImGui::ColorEdit3("Diffuse Color", &diffuse.x);
+    ImGui::ColorEdit3("Specular Color", &specular.x);
+    ImGui::DragFloat("Specular Exponent", &specular_exponent);
 }

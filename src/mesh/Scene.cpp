@@ -9,12 +9,14 @@
 
 #include "assets/AssetManager.hpp"
 #include "debug.hpp"
+#include "entities/MeshEntity.hpp"
+#include "entities/SceneEntity.hpp"
 #include "maths/functions.hpp"
 #include "utility/LifetimeLogger.hpp"
 
-MeshInfo::MeshInfo() : material(nullptr) { }
+PrimitiveInfo::PrimitiveInfo() : material(nullptr), shader(nullptr) { }
 
-MeshInfo::~MeshInfo() {
+PrimitiveInfo::~PrimitiveInfo() {
     if(material != nullptr) {
         material->base_color_map.free();
         material->metallic_roughness_map.free();
@@ -22,64 +24,84 @@ MeshInfo::~MeshInfo() {
     delete material;
 }
 
+bool PrimitiveInfo::has_transparency() const {
+    return material != nullptr && material->has_transparency();
+}
+
+MeshInfo::MeshInfo() : primitives(nullptr), primitive_count(0) { }
+
+MeshInfo::~MeshInfo() {
+    delete[] primitives;
+}
+
 Scene::Scene(const std::filesystem::path& path)
-    : meshes(nullptr), meshes_count(0), primitives_count(nullptr) {
+    : meshes(nullptr), meshes_count(0) {
     load(path);
 }
 
 Scene::~Scene() {
-    if(meshes != nullptr) {
-        for(unsigned int i = 0 ; i < meshes_count ; ++i) { delete[] meshes[i]; }
+    delete[] meshes;
+}
+
+void Scene::add_children(SceneEntity* entity) const {
+    Entity** mesh_entities = new Entity*[meshes_count];
+    for(unsigned int i = 0 ; i < meshes_count ; ++i) {
+        mesh_entities[i] = entity->add_child<Entity>(meshes[i].name);
     }
 
-    delete[] meshes;
-    delete[] primitives_count;
+    for(unsigned int i = 0 ; i < meshes_count ; ++i) {
+        for(unsigned int j = 0 ; j < meshes[i].primitive_count ; ++j) {
+            PrimitiveInfo& primitive = meshes[i].primitives[j];
+            mesh_entities[i]->add_child<MeshEntity>(primitive.name, *primitive.shader, primitive.mesh)
+                            ->material = primitive.material;
+        }
+    }
+
+    delete[] mesh_entities;
 }
 
 void Scene::draw(const mat4& view_projection_matrix, const Transform& transform) const {
-    for(const auto& [mesh_id, primitive_id] : indices_order) {
-        const MRMaterial* material = meshes[mesh_id][primitive_id].material;
-        const Shader& shader = material == nullptr
-                                   ? AssetManager::get_relevant_shader_from_mesh(meshes[mesh_id][primitive_id].mesh)
-                                   : AssetManager::get_shader("metallic-roughness");
-        shader.use();
-
-        const mat4& global_model = transform.get_global_model_const_reference();
-        shader.set_uniform_if_exists("u_model", global_model);
-
-        int u_mvp_location = shader.get_uniform_location("u_mvp");
-        if(u_mvp_location != -1) {
-            Shader::set_uniform(u_mvp_location, view_projection_matrix * global_model);
-        }
-
-        int u_normals_model_matrix_location = shader.get_uniform_location("u_normals_model_matrix");
-        if(u_normals_model_matrix_location != -1) {
-            Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
-        }
-
-        shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
-
-        if(material != nullptr) { // mettalic roughness
-            material->base_color_map.bind(0);
-            material->metallic_roughness_map.bind(1);
-
-            shader.set_uniform_if_exists("u_material.base_color", material->base_color);
-            shader.set_uniform_if_exists("u_material.metallic", material->metallic);
-            shader.set_uniform_if_exists("u_material.roughness", material->roughness);
-            shader.set_uniform_if_exists("u_material.reflectance", material->reflectance);
-        } else { // blinn phong
-            shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
-            shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
-            shader.set_uniform_if_exists("u_specular", vec3(1.0f));
-            shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
-            int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
-            if(u_diffuse_map_location != -1) {
-                AssetManager::get_texture("default").bind(0);
-            }
-        }
-
-        meshes[mesh_id][primitive_id].mesh.draw();
-    }
+    // for(const auto& [mesh_id, primitive_id] : indices_order) {
+    //     const MRMaterial* material = meshes[mesh_id].primitives[primitive_id].material;
+    //     const Shader& shader = *meshes[mesh_id].primitives[primitive_id].shader;
+    //     shader.use();
+    //
+    //     const mat4& global_model = transform.get_global_model_const_reference();
+    //     shader.set_uniform_if_exists("u_model", global_model);
+    //
+    //     int u_mvp_location = shader.get_uniform_location("u_mvp");
+    //     if(u_mvp_location != -1) {
+    //         Shader::set_uniform(u_mvp_location, view_projection_matrix * global_model);
+    //     }
+    //
+    //     int u_normals_model_matrix_location = shader.get_uniform_location("u_normals_model_matrix");
+    //     if(u_normals_model_matrix_location != -1) {
+    //         Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
+    //     }
+    //
+    //     shader.set_uniform_if_exists("u_color", vec4(1.0f, 0.0f, 1.0f, 1.0f));
+    //
+    //     if(material != nullptr) { // mettalic roughness
+    //         material->base_color_map.bind(0);
+    //         material->metallic_roughness_map.bind(1);
+    //
+    //         shader.set_uniform_if_exists("u_material.base_color", material->base_color);
+    //         shader.set_uniform_if_exists("u_material.metallic", material->metallic);
+    //         shader.set_uniform_if_exists("u_material.roughness", material->roughness);
+    //         shader.set_uniform_if_exists("u_material.reflectance", material->reflectance);
+    //     } else { // blinn phong
+    //         shader.set_uniform_if_exists("u_ambient", vec3(1.0f));
+    //         shader.set_uniform_if_exists("u_diffuse", vec3(1.0f));
+    //         shader.set_uniform_if_exists("u_specular", vec3(1.0f));
+    //         shader.set_uniform_if_exists("u_specular_exponent", 10.0f);
+    //         int u_diffuse_map_location = shader.get_uniform_location("u_diffuse_map");
+    //         if(u_diffuse_map_location != -1) {
+    //             AssetManager::get_texture("default").bind(0);
+    //         }
+    //     }
+    //
+    //     meshes[mesh_id].primitives[primitive_id].mesh.draw();
+    // }
 }
 
 void Scene::check_cgltf_result(cgltf_result result, const std::string& error_message) {
@@ -158,22 +180,26 @@ void Scene::load(const std::filesystem::path& path) {
     result = cgltf_validate(data);
     check_cgltf_result(result, "Failed to validate data.");
 
-    meshes = new MeshInfo*[data->meshes_count];
+    meshes = new MeshInfo[data->meshes_count];
     meshes_count = data->meshes_count;
-    primitives_count = new unsigned int[data->meshes_count];
 
-    std::vector<vector2<unsigned int>> transparent_indices_order;
+    unsigned int material_count = 0;
 
     for(unsigned int i = 0 ; i < data->meshes_count ; ++i) {
         const cgltf_mesh& c_mesh = data->meshes[i];
 
-        meshes[i] = new MeshInfo[c_mesh.primitives_count];
-        primitives_count[i] = c_mesh.primitives_count;
+        meshes[i].name = c_mesh.name != nullptr
+                             ? c_mesh.name
+                             : "Mesh " + std::to_string(material_count++);
+        meshes[i].primitives = new PrimitiveInfo[c_mesh.primitives_count];
+        meshes[i].primitive_count = c_mesh.primitives_count;
+        unsigned int non_transparent_index = 0;
+        unsigned int transparent_index = c_mesh.primitives_count - 1;
 
         for(unsigned int j = 0 ; j < c_mesh.primitives_count ; ++j) {
             const cgltf_primitive& c_primitive = c_mesh.primitives[j];
 
-            MRMaterial*& material = meshes[i][j].material;
+            MRMaterial* material = nullptr;
 
             if(c_primitive.material != nullptr) {
                 const cgltf_material* c_material = c_primitive.material;
@@ -186,7 +212,10 @@ void Scene::load(const std::filesystem::path& path) {
                         metallic_factor,
                         roughness_factor] = c_material->pbr_metallic_roughness;
 
-                    material = new MRMaterial;
+                    material = new MRMaterial(c_material->name != nullptr
+                                                  ? c_material->name
+                                                  : "Material " + std::to_string(material_count++));
+
                     material->base_color.x = base_color_factor[0];
                     material->base_color.y = base_color_factor[1];
                     material->base_color.z = base_color_factor[2];
@@ -214,13 +243,12 @@ void Scene::load(const std::filesystem::path& path) {
                 if(c_primitive.material->has_pbr_specular_glossiness) { std::cout << "\tHas specular glossiness.\n"; }
             }
 
-            if(material != nullptr && material->has_transparency()) {
-                transparent_indices_order.emplace_back(i, j);
-            } else {
-                indices_order.emplace_back(i, j);
-            }
+            unsigned int primitive_index = material != nullptr && material->has_transparency()
+                                               ? transparent_index--
+                                               : non_transparent_index++;
+            meshes[i].primitives[primitive_index].material = material;
 
-            Mesh& mesh = meshes[i][j].mesh;
+            Mesh& mesh = meshes[i].primitives[primitive_index].mesh;
 
             switch(c_primitive.type) {
                 case cgltf_primitive_type_points:
@@ -294,6 +322,12 @@ void Scene::load(const std::filesystem::path& path) {
             }
 
             mesh.bind_buffers();
+            meshes[i].primitives[primitive_index].name = c_mesh.name != nullptr
+                                                             ? c_mesh.name
+                                                             : "Primitive " + std::to_string(j);
+            meshes[i].primitives[primitive_index].shader = meshes[i].primitives[primitive_index].material == nullptr
+                                                               ? &AssetManager::get_relevant_shader_from_mesh(mesh)
+                                                               : &AssetManager::get_shader("metallic-roughness");
 
             delete[] attributes;
 
@@ -304,8 +338,6 @@ void Scene::load(const std::filesystem::path& path) {
     }
 
     cgltf_free(data);
-
-    for(const vector2<unsigned int>& index : transparent_indices_order) { indices_order.push_back(index); }
 }
 
 void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute& c_attribute) {

@@ -24,12 +24,9 @@ void MeshEntity::update_uniforms(const mat4& view_projection_matrix) const {
 void MeshEntity::add_to_object_editor() {
     DrawableEntity::add_to_object_editor();
 
+    ImGui::NewLine();
     if(material != nullptr) {
-        ImGui::Text("Material: %s", material->name.c_str());
-        ImGui::ColorEdit3("Ambient Color", &material->ambient.x);
-        ImGui::ColorEdit3("Diffuse Color", &material->diffuse.x);
-        ImGui::ColorEdit3("Specular Color", &material->specular.x);
-        ImGui::DragFloat("Specular Exponent", &material->specular_exponent);
+        material->add_to_object_editor();
     } else {
         ImGui::Text("Mesh doesn't have a material.");
     }

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "DrawableEntity.hpp"
-#include "mesh/Material.hpp"
+#include "materials/PhongMaterial.hpp"
 #include "mesh/Mesh.hpp"
 
 /**

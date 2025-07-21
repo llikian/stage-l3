@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <vector>
 #include "assets/Shader.hpp"
-#include "Material.hpp"
+#include "materials/PhongMaterial.hpp"
 #include "maths/vec3.hpp"
 #include "Mesh.hpp"
 
@@ -66,5 +66,5 @@ private:
                   std::vector<llvec3>& vertex_indices);
 
     std::vector<Mesh> meshes;  ///< The meshes composing the model.
-    std::vector<Material> materials; ///< The model's materials.
+    std::vector<PhongMaterial> materials; ///< The model's materials.
 };

@@ -21,12 +21,12 @@ void ModelEntity::draw(const mat4& view_projection_matrix) const {
 void ModelEntity::add_to_object_editor() {
     DrawableEntity::add_to_object_editor();
 
-    static Material* selected = nullptr;
+    static PhongMaterial* selected = nullptr;
 
     ImGui::BeginTable("Materials", 1, ImGuiTableFlags_Borders);
     ImGui::TableSetupColumn("Materials");
     ImGui::TableHeadersRow();
-    for(Material& material : model.materials) {
+    for(PhongMaterial& material : model.materials) {
         ImGui::TableNextColumn();
         if(ImGui::Selectable(material.name.c_str(), &material == selected)) { selected = &material; }
     }

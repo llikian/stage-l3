@@ -6,10 +6,13 @@
 #pragma once
 
 #include <filesystem>
+#include "assets/Shader.hpp"
 #include "cgltf.h"
+#include "materials/MRMaterial.hpp"
 #include "maths/Transform.hpp"
 #include "mesh/Mesh.hpp"
-#include "mesh/MRMaterial.hpp"
+
+class SceneEntity;
 
 struct AttributeInfo {
     Attribute attribute;
@@ -18,12 +21,25 @@ struct AttributeInfo {
     std::vector<float> data;
 };
 
-struct MeshInfo {
-    MeshInfo();
+struct PrimitiveInfo {
+    PrimitiveInfo();
+    ~PrimitiveInfo();
 
-    ~MeshInfo();
+    bool has_transparency() const;
+
+    std::string name;
     Mesh mesh;
     MRMaterial* material;
+    const Shader* shader;
+};
+
+struct MeshInfo {
+    MeshInfo();
+    ~MeshInfo();
+
+    std::string name;
+    PrimitiveInfo* primitives;
+    unsigned int primitive_count;
 };
 
 /**
@@ -35,6 +51,8 @@ public:
     explicit Scene(const std::filesystem::path& path);
     ~Scene();
 
+    void add_children(SceneEntity* entity) const;
+
     void draw(const mat4& view_projection_matrix, const Transform& transform) const;
 
     static void check_cgltf_result(cgltf_result result, const std::string& error_message);
@@ -43,11 +61,8 @@ public:
     static std::string cgltf_type_to_string(cgltf_type type);
 
 private:
-    MeshInfo** meshes;
+    MeshInfo* meshes;
     unsigned int meshes_count;
-    unsigned int* primitives_count;
-
-    std::vector<vector2<unsigned int>> indices_order;
 
     void load(const std::filesystem::path& path);
     static void read_attribute(AttributeInfo& attribute_info, const cgltf_attribute& c_attribute);

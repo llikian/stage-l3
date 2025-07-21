@@ -51,6 +51,11 @@ set(SOURCES
         src/entities/SceneEntity.cpp
         src/entities/TerrainEntity.cpp
 
+        # Materials Module
+        src/materials/Material.cpp
+        src/materials/MRMaterial.cpp
+        src/materials/PhongMaterial.cpp
+
         # Maths Module
         src/maths/functions.cpp
         src/maths/geometry.cpp
@@ -64,9 +69,7 @@ set(SOURCES
         # Mesh Module
         src/mesh/Attribute.cpp
         src/mesh/Mesh.cpp
-        src/mesh/Material.cpp
         src/mesh/Model.cpp
-        src/mesh/MRMaterial.cpp
         src/mesh/primitives.cpp
         src/mesh/Scene.cpp
         src/mesh/Terrain.cpp

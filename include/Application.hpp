@@ -11,7 +11,7 @@
 #include "core/Framebuffer.hpp"
 #include "core/SceneGraph.hpp"
 #include "culling/Frustum.hpp"
-#include "mesh/MRMaterial.hpp"
+#include "materials/MRMaterial.hpp"
 
 /**
  * @class Application
