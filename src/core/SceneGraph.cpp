@@ -70,10 +70,12 @@ void SceneGraph::add_entity_to_imgui_node_tree(Entity* entity) {
     }
     label += ' ' + entity->name;
 
+    ImGui::PushID(entity);
     if(ImGui::TreeNodeEx(label.c_str(), flags)) {
         if(ImGui::IsItemClicked()) { selected_entity = entity; }
 
         for(Entity* child : entity->children) { add_entity_to_imgui_node_tree(child); }
         ImGui::TreePop();
     }
+    ImGui::PopID();
 }

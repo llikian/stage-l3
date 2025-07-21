@@ -7,11 +7,9 @@
 
 #include "assets/Camera.hpp"
 #include "assets/Cubemap.hpp"
-#include "assets/Shader.hpp"
 #include "core/Framebuffer.hpp"
 #include "core/SceneGraph.hpp"
 #include "culling/Frustum.hpp"
-#include "materials/MRMaterial.hpp"
 
 /**
  * @class Application

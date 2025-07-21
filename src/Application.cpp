@@ -165,6 +165,7 @@ void Application::run() {
 
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(0.2f);
+    // root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")->transform.set_local_scale(0.2f);
 
     // SceneEntity* spheres = root->add_child<SceneEntity>("spheres", "data/gltf/spheres/MetalRoughSpheres.gltf");
     // spheres->transform.set_local_orientation_euler(vec3(90.0f, 0.0f, 180.0f));

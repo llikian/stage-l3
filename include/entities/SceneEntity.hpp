@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "DrawableEntity.hpp"
+#include "Entity.hpp"
 #include "mesh/Scene.hpp"
 
 /**

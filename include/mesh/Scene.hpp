@@ -8,6 +8,7 @@
 #include <filesystem>
 #include "assets/Shader.hpp"
 #include "cgltf.h"
+#include "entities/Entity.hpp"
 #include "materials/MRMaterial.hpp"
 #include "maths/Transform.hpp"
 #include "mesh/Mesh.hpp"
@@ -48,12 +49,10 @@ struct MeshInfo {
  */
 class Scene {
 public:
-    explicit Scene(const std::filesystem::path& path);
+    Scene(const std::filesystem::path& path, SceneEntity* entity);
     ~Scene();
 
     void add_children(SceneEntity* entity) const;
-
-    void draw(const mat4& view_projection_matrix, const Transform& transform) const;
 
     static void check_cgltf_result(cgltf_result result, const std::string& error_message);
     static std::string cgltf_primitive_type_to_string(cgltf_primitive_type primitive_type);
@@ -64,6 +63,9 @@ private:
     MeshInfo* meshes;
     unsigned int meshes_count;
 
-    void load(const std::filesystem::path& path);
+    void load(const std::filesystem::path& path, SceneEntity* entity);
+    void add_node(const cgltf_node* c_node,
+                  Entity* entity,
+                  const std::unordered_map<const cgltf_mesh*, unsigned int>& mesh_indices);
     static void read_attribute(AttributeInfo& attribute_info, const cgltf_attribute& c_attribute);
 };
