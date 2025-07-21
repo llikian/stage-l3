@@ -193,7 +193,7 @@ void Scene::load(const std::filesystem::path& path) {
                              : "Mesh " + std::to_string(material_count++);
         meshes[i].primitives = new PrimitiveInfo[c_mesh.primitives_count];
         meshes[i].primitive_count = c_mesh.primitives_count;
-        unsigned int non_transparent_index = 0;
+        unsigned int opaque_index = 0;
         unsigned int transparent_index = c_mesh.primitives_count - 1;
 
         for(unsigned int j = 0 ; j < c_mesh.primitives_count ; ++j) {
@@ -245,7 +245,7 @@ void Scene::load(const std::filesystem::path& path) {
 
             unsigned int primitive_index = material != nullptr && material->has_transparency()
                                                ? transparent_index--
-                                               : non_transparent_index++;
+                                               : opaque_index++;
             meshes[i].primitives[primitive_index].material = material;
 
             Mesh& mesh = meshes[i].primitives[primitive_index].mesh;
