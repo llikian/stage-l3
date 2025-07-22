@@ -60,9 +60,20 @@ public:
     void set_visibility(bool is_visible);
 
     /**
+     * @brief Sets the is_selected flag to a specific value.
+     * @param is_selected Whether the entity or one of its ancestors is selected.
+     */
+    void set_is_selected(bool is_selected);
+
+    /**
      * @return Whether the entity is visible.
      */
     bool get_visibility() const;
+
+    /**
+     * @return Whether the entity or one of its ancestors is selected.
+     */
+    bool is_selected() const;
 
     /**
      * @brief Toggles the visibility for this entity and sets all of its children's visibility to
@@ -86,7 +97,7 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      * @param frustum The view frustum.
      */
-    virtual void draw(const mat4& view_projection_matrix, const Frustum& frustum) const;
+    virtual void draw(const mat4& view_projection_matrix, const Frustum& frustum);
 
     /**
      * @brief Add this entity to the object editor. Allows to modify these fields in the entity:\n
@@ -109,5 +120,6 @@ public:
     Transform transform;         ///< The entity's transform.
 
 protected:
-    bool is_visible; ///< Whether the entity is visible.
+    bool b_is_visible;  ///< Whether the entity is visible.
+    bool b_is_selected; ///< Whether the entity or one of its ancestors is selected.
 };

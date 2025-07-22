@@ -11,14 +11,14 @@ MeshEntity::MeshEntity(const std::string& name, const Shader& shader, Mesh& mesh
     : DrawableEntity(name, shader), mesh(mesh), material(nullptr) { }
 
 void MeshEntity::draw(const mat4& view_projection_matrix) const {
-    shader.use();
+    shader->use();
     update_uniforms(view_projection_matrix);
     mesh.draw();
 }
 
 void MeshEntity::update_uniforms(const mat4& view_projection_matrix) const {
     DrawableEntity::update_uniforms(view_projection_matrix);
-    if(material != nullptr) { material->update_shader_uniforms(shader); }
+    if(material != nullptr) { material->update_shader_uniforms(*shader); }
 }
 
 void MeshEntity::add_to_object_editor() {

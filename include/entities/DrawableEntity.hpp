@@ -32,7 +32,7 @@ public:
      * @param view_projection_matrix The projection matrix multiplied by the view matrix.
      * @param frustum The view frustum.
      */
-    void draw(const mat4& view_projection_matrix, const Frustum& frustum) const override;
+    void draw(const mat4& view_projection_matrix, const Frustum& frustum) override;
 
     /**
      * @brief Updates uniforms then draws the entity.
@@ -60,7 +60,7 @@ public:
      */
     constexpr EntityType get_type() const override { return ENTITY_TYPE_DRAWABLE; }
 
-    const Shader& shader; ///< A pointer to the shader used when rendering.
+    const Shader* shader; ///< A pointer to the shader used when rendering.
     AABB* aabb;           ///< The bounding volume of the entity.
 
     static inline unsigned int total_drawable_entities = 0;

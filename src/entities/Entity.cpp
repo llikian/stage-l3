@@ -11,24 +11,33 @@
 #include "glad/glad.h"
 #include "imgui.h"
 
-Entity::Entity(const std::string& name) : name(name), parent(nullptr), is_visible(true) { }
+Entity::Entity(const std::string& name) : name(name), parent(nullptr), b_is_visible(true), b_is_selected(false) { }
 
 Entity::~Entity() {
     for(const Entity* child : children) { delete child; }
 }
 
 void Entity::set_visibility(bool is_visible) {
-    this->is_visible = is_visible;
+    this->b_is_visible = is_visible;
     for(Entity* child : children) { child->set_visibility(is_visible); }
+}
+
+void Entity::set_is_selected(bool is_selected) {
+    this->b_is_selected = is_selected;
+    for(Entity* child : children) { child->set_is_selected(is_selected); }
 }
 
 bool Entity::get_visibility() const {
-    return is_visible;
+    return b_is_visible;
+}
+
+bool Entity::is_selected() const {
+    return b_is_selected;
 }
 
 void Entity::toggle_visibility() {
-    is_visible = !is_visible;
-    for(Entity* child : children) { child->set_visibility(is_visible); }
+    b_is_visible = !b_is_visible;
+    for(Entity* child : children) { child->set_visibility(b_is_visible); }
 }
 
 void Entity::update_transform_and_children() {
@@ -49,15 +58,20 @@ void Entity::force_update_transform_and_children() {
     for(Entity* child : children) { child->force_update_transform_and_children(); }
 }
 
-void Entity::draw(const mat4& view_projection_matrix, const Frustum& frustum) const {
+void Entity::draw(const mat4& view_projection_matrix, const Frustum& frustum) {
     for(Entity* child : children) { child->draw(view_projection_matrix, frustum); }
 }
 
 void Entity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
-    if(ImGui::Checkbox("Is Object Visible", &is_visible)) {
-        for(Entity* child : children) { child->set_visibility(is_visible); }
+    if(ImGui::Button("UNSELECT")) {
+        set_is_selected(false);
+        return;
+    }
+
+    if(ImGui::Checkbox("Is Object Visible", &b_is_visible)) {
+        for(Entity* child : children) { child->set_visibility(b_is_visible); }
     }
 
     bool is_dirty = ImGui::DragFloat3("Local Position", &transform.get_local_position_reference().x);
