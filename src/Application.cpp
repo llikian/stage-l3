@@ -35,7 +35,7 @@ Application::Application()
       }),
       are_axes_drawn(false),
       light_intensity(1.0f),
-      uniform_test_conditions{true, true, true} {
+      uniform_test_conditions{ true, true, true } {
     /* ---- Event Handler ---- */
     EventHandler::set_active_camera(&camera);
     EventHandler::get().associate_action_to_key(GLFW_KEY_Q, false, [this] { are_axes_drawn = !are_axes_drawn; });
@@ -76,7 +76,13 @@ Application::Application()
                              });
     AssetManager::add_shader("metallic-roughness", {
                                  "shaders/vertex/tangent.vert",
-                                 "shaders/fragment/metallic_roughness.frag"
+                                 "shaders/metallic-roughness/metallic_roughness.frag",
+                                 "shaders/metallic-roughness/get_directions_tangent.frag"
+                             });
+    AssetManager::add_shader("metallic-roughness no tangent", {
+                                 "shaders/vertex/default.vert",
+                                 "shaders/metallic-roughness/metallic_roughness.frag",
+                                 "shaders/metallic-roughness/get_directions_no_tangent.frag"
                              });
     AssetManager::add_shader("terrain", {
                                  "shaders/terrain/terrain.vert",
@@ -165,7 +171,9 @@ void Application::run() {
 
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(20.0f);
-    // root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")->transform.set_local_scale(0.2f);
+    root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")
+        ->transform.set_local_scale(0.2f);
+    // root->add_child<SceneEntity>("test", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/NormalTangentTest/glTF/NormalTangentTest.gltf")->transform.set_local_scale(20.0f);
 
     // SceneEntity* spheres = root->add_child<SceneEntity>("spheres", "data/gltf/spheres/MetalRoughSpheres.gltf");
     // spheres->transform.set_local_orientation_euler(vec3(90.0f, 0.0f, 180.0f));
@@ -201,8 +209,11 @@ void Application::run() {
             shader.set_uniform("u_light_position", light_position);
         }
 
-        /* Metallic-Roughness Shader */ {
-            const Shader& shader = AssetManager::get_shader("metallic-roughness");
+        /* Metallic-Roughness Shaders */
+        for(const Shader& shader : {
+                AssetManager::get_shader("metallic-roughness"),
+                AssetManager::get_shader("metallic-roughness no tangent")
+            }) {
             shader.use();
 
             shader.set_uniform("u_camera_position", camera_position);

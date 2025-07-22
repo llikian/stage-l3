@@ -263,9 +263,11 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
             }
 
             // Remove the vertex attributes that aren't enabled
-            for(unsigned int k = 0 ; k < attributes_indices.size() ; ++k) {
-                if(attributes[attributes_indices[k]].type == AttributeType::NONE) {
+            for(unsigned int k = 0 ; k < attributes_indices.size() ;) {
+                if(attributes_indices[k] == ATTRIBUTE_AMOUNT) {
                     attributes_indices.erase(attributes_indices.begin() + k);
+                } else {
+                    ++k;
                 }
             }
 
@@ -282,9 +284,15 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
                                                               ? c_mesh.name
                                                               : "Primitive ")
                                                          + std::to_string(j);
-            meshes[i].primitives[primitive_index].shader = meshes[i].primitives[primitive_index].material == nullptr
-                                                               ? &AssetManager::get_relevant_shader_from_mesh(mesh)
-                                                               : &AssetManager::get_shader("metallic-roughness");
+
+            if(meshes[i].primitives[primitive_index].material == nullptr) {
+                meshes[i].primitives[primitive_index].shader = &AssetManager::get_relevant_shader_from_mesh(mesh);
+            } else if(meshes[i].primitives[primitive_index].mesh.has_attribute(ATTRIBUTE_TANGENT)) {
+                meshes[i].primitives[primitive_index].shader = AssetManager::get_shader_ptr("metallic-roughness");
+            } else {
+                meshes[i].primitives[primitive_index].shader =
+                    AssetManager::get_shader_ptr("metallic-roughness no tangent");
+            }
 
             delete[] attributes;
 
