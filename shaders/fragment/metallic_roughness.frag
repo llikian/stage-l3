@@ -5,18 +5,17 @@
 
 #version 460 core
 
-in vec3 v_position;
-in vec3 v_normal;
 in vec2 v_tex_coords;
+in vec3 v_tangent_light_position;
+in vec3 v_tangent_view_position;
+in vec3 v_tangent_position;
 
 out vec4 frag_color;
 
 const float PI = 3.141592653589793f;
 const float INV_PI = 0.318309886183790f;
 
-uniform bool u_test;
-
-uniform vec3 u_camera_position;
+uniform bool u_test1;
 
 //uniform samplerCube u_cubemap;
 
@@ -35,6 +34,7 @@ struct Material {
     float roughness;
     sampler2D metallic_roughness_map;
     float reflectance;
+    sampler2D normal_map;
 };
 
 uniform Material u_material;
@@ -64,10 +64,10 @@ float diffuse_lambert() {
 }
 
 vec3 brdf(vec3 base_color, float metallic, float roughness) {
-    vec3 normal = normalize(v_normal);
+    vec3 normal = normalize(texture(u_material.normal_map, v_tex_coords).rgb * 2.0f - 1.0f);
 
-    vec3 light_direction = normalize(u_light.position - v_position);
-    vec3 view_direction = normalize(u_camera_position - v_position);
+    vec3 light_direction = normalize(v_tangent_light_position - v_tangent_position);
+    vec3 view_direction = normalize(v_tangent_view_position - v_tangent_position);
     vec3 halfway_direction = normalize(view_direction + light_direction);
 
     float normal_dot_light = max(dot(normal, light_direction), 0.0f);

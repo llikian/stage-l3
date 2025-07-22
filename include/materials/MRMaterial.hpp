@@ -38,4 +38,5 @@ struct MRMaterial : Material {
     float roughness; ///< Perceived smoothness (1.0) or roughness (0.0).
     Texture metallic_roughness_map; ///< The green channel is a roughness map / The blue channel is a metallic map.
     float reflectance; ///< Fresnel reflectance at normal incidence angle (When view direction == normal).
+    Texture normal_map;
 };

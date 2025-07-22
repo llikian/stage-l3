@@ -195,6 +195,12 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
                     if(c_material->has_ior) {
                         material->reflectance = (c_material->ior.ior - 1.0f) / (c_material->ior.ior + 1.0f) / 0.4f;
                     }
+
+                    if(c_material->normal_texture.texture != nullptr) {
+                        material->normal_map.create(parent_path, c_material->normal_texture, false);
+                    } else {
+                        material->normal_map.create(vec3(1.0f, 0.5f, 0.5f));
+                    }
                 }
 
                 if(c_primitive.material->has_pbr_specular_glossiness) { std::cout << "\tHas specular glossiness.\n"; }
@@ -365,6 +371,9 @@ void Scene::read_attribute(AttributeInfo& attribute_info, const cgltf_attribute&
             break;
         case cgltf_attribute_type_color:
             attribute_info.attribute = ATTRIBUTE_COLOR;
+            break;
+        case cgltf_attribute_type_tangent:
+            attribute_info.attribute = ATTRIBUTE_TANGENT;
             break;
         default:
             std::cout << "\tUnhandled or invalid attribute: '"

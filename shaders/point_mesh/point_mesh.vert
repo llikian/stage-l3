@@ -7,7 +7,7 @@
 
 layout (location = 0) in vec3 a_position;
 layout (location = 3) in vec3 a_color;
-layout (location = 4) in float a_point_size;
+layout (location = 5) in float a_point_size;
 
 out vec3 v_color;
 

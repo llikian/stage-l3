@@ -18,6 +18,7 @@ MRMaterial::MRMaterial(const std::string& name)
 void MRMaterial::update_shader_uniforms(const Shader& shader) {
     base_color_map.bind(0);
     metallic_roughness_map.bind(1);
+    normal_map.bind(2);
 
     shader.set_uniform_if_exists("u_material.base_color", base_color);
     shader.set_uniform_if_exists("u_material.metallic", metallic);
@@ -33,6 +34,8 @@ void MRMaterial::add_to_object_editor() {
     ImGui::Image(base_color_map.get_id(), ImVec2(128.0f, 128.0f));
     ImGui::SameLine();
     ImGui::Image(metallic_roughness_map.get_id(), ImVec2(128.0f, 128.0f));
+    ImGui::SameLine();
+    ImGui::Image(normal_map.get_id(), ImVec2(128.0f, 128.0f));
     ImGui::ColorEdit4("base_color", &base_color.x);
     ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f);
     ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f);

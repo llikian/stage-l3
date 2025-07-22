@@ -75,7 +75,7 @@ Application::Application()
                                  "shaders/fragment/blinn_phong.frag"
                              });
     AssetManager::add_shader("metallic-roughness", {
-                                 "shaders/vertex/default.vert",
+                                 "shaders/vertex/tangent.vert",
                                  "shaders/fragment/metallic_roughness.frag"
                              });
     AssetManager::add_shader("terrain", {
@@ -165,7 +165,7 @@ void Application::run() {
 
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(20.0f);
-    root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")->transform.set_local_scale(0.2f);
+    // root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")->transform.set_local_scale(0.2f);
 
     // SceneEntity* spheres = root->add_child<SceneEntity>("spheres", "data/gltf/spheres/MetalRoughSpheres.gltf");
     // spheres->transform.set_local_orientation_euler(vec3(90.0f, 0.0f, 180.0f));
@@ -211,6 +211,7 @@ void Application::run() {
             shader.set_uniform("u_light.intensity", light_intensity);
             shader.set_uniform("u_material.base_color_map", 0);
             shader.set_uniform("u_material.metallic_roughness_map", 1);
+            shader.set_uniform("u_material.normal_map", 2);
             shader.set_uniform_if_exists("u_test1", uniform_test_conditions[0]);
             shader.set_uniform_if_exists("u_test2", uniform_test_conditions[1]);
             shader.set_uniform_if_exists("u_test3", uniform_test_conditions[2]);
