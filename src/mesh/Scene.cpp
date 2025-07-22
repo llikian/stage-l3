@@ -257,18 +257,11 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
             }
 
             // Remove the vertex attributes that aren't enabled
-            unsigned int valid_attributes_count = 0;
-            unsigned int next_index = ATTRIBUTE_AMOUNT - 1;
-            for(unsigned int k = 0 ; k < ATTRIBUTE_AMOUNT ; ++k) {
-                if(attributes_indices[k] == ATTRIBUTE_AMOUNT) {
-                    while(attributes_indices[next_index] == ATTRIBUTE_AMOUNT) { next_index--; }
-                    if(next_index < k) { break; }
-                    std::swap(attributes_indices[k], attributes_indices[next_index--]);
-                } else {
-                    ++valid_attributes_count;
+            for(unsigned int k = 0 ; k < attributes_indices.size() ; ++k) {
+                if(attributes[attributes_indices[k]].type == AttributeType::NONE) {
+                    attributes_indices.erase(attributes_indices.begin() + k);
                 }
             }
-            attributes_indices.resize(valid_attributes_count);
 
             unsigned int vertices_count = c_primitive.attributes[0].data->count;
             for(unsigned int k = 0 ; k < vertices_count ; ++k) {
