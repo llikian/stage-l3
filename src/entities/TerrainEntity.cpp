@@ -20,8 +20,8 @@ void TerrainEntity::draw(const mat4& view_projection_matrix) const {
 void TerrainEntity::add_to_object_editor() {
     ImGui::Text("Selected Entity: '%s'", name.c_str());
 
-    if(ImGui::Checkbox("Is Object Visible", &is_visible)) {
-        for(Entity* child : children) { child->set_visibility(is_visible); }
+    if(ImGui::Checkbox("Is Object Visible", &b_is_visible)) {
+        for(Entity* child : children) { child->set_visibility(b_is_visible); }
     }
 }
 

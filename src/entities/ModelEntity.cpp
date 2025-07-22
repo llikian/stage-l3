@@ -13,9 +13,9 @@ ModelEntity::ModelEntity(const std::string& name, const Shader& shader, Model& m
     : DrawableEntity(name, shader), model(model) { }
 
 void ModelEntity::draw(const mat4& view_projection_matrix) const {
-    shader.use();
+    shader->use();
     update_uniforms(view_projection_matrix);
-    model.draw(shader);
+    model.draw(*shader);
 }
 
 void ModelEntity::add_to_object_editor() {

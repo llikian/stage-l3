@@ -296,7 +296,11 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
     }
 
     if(data->nodes != nullptr) {
-        add_node(&data->nodes[0], entity, mesh_indices);
+        for(unsigned int i = 0 ; i < data->nodes_count ; ++i) {
+            if(data->nodes[i].parent == nullptr) {
+                add_node(&data->nodes[i], entity, mesh_indices);
+            }
+        }
     }
 
     cgltf_free(data);
