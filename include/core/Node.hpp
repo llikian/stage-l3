@@ -15,9 +15,9 @@ constexpr unsigned int MAX_NODE_DATA_COUNT = 4;
 struct Node {
     enum class Type : unsigned char {
         SIMPLE,           // NO DATA
-        MESH,             // 0: MESH, 1: SHADER, (2: MATERIAL)
-        FLAT_SHADED_MESH, // 0: MESH, 1: SHADER, 2: COLOR
-        MODEL,            // 0: MESH, 1: SHADER
+        MESH,             // 0: MESH, 1: SHADER, 2: AABB, (3: MATERIAL)
+        FLAT_SHADED_MESH, // 0: MESH, 1: SHADER, 2: AABB, 3: COLOR
+        MODEL,            // 0: MESH, 1: SHADER, 2: AABB
         SCENE,            // 0: SCENE
         TERRAIN,          // 0: TERRAIN
     };
@@ -31,6 +31,7 @@ struct Node {
     Node(const std::string& name, int parent, unsigned int transform_index, Type type);
 
     void add_data(DataType type, unsigned int index);
+    void set_data(unsigned int index, DataType data_type, unsigned int data_index);
 
     Type type;        ///< The type of the node.
     std::string name; ///< The name of the node.

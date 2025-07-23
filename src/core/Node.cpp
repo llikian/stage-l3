@@ -28,3 +28,8 @@ void Node::add_data(DataType type, unsigned int index) {
 
     throw std::runtime_error("Exceeded MAX_NODE_DATA_COUNT.");
 }
+
+void Node::set_data(unsigned int index, DataType data_type, unsigned int data_index) {
+    data[index].type = data_type;
+    data[index].index = data_index;
+}

@@ -37,7 +37,7 @@ struct SceneGraph {
     SceneGraph();
     ~SceneGraph();
 
-    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index = 0) const;
+    void draw(const mat4& view_projection, const Frustum& frustum);
 
     void update_transform_and_children(unsigned int node_index = 0);
     void force_update_transform_and_children(unsigned int node_index = 0);
@@ -73,7 +73,12 @@ struct SceneGraph {
     std::vector<Scene> scenes;
     std::vector<Terrain> terrains;
 
+    bool are_AABBs_drawn;
+    unsigned int total_drawable_objects;
+    unsigned int total_culled_objects;
+
 private:
+    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) ;
     void draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const;
 
     void add_node_to_imgui_node_tree(unsigned int node_index);

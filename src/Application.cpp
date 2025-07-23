@@ -129,7 +129,7 @@ void Application::run() {
                                                                vec4(1.0f));
     scene_graph.transforms[light].set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = scene_graph.transforms[light].get_local_position_reference();
-    const vec4& light_color = scene_graph.colors[scene_graph[light].data[2].index];
+    const vec4& light_color = scene_graph.colors[scene_graph[light].data[3].index];
 
     /* Other Entities */
     unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
@@ -265,10 +265,10 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("delta: %fs", EventHandler::get_delta());
 
     ImGui::NewLine();
-    // TODO
-    // ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
-    // ImGui::Text("Total Not Hidden Entities: %d", DrawableEntity::total_not_hidden_entities);
-    // ImGui::Text("Total Drawn Entities: %d", DrawableEntity::total_drawn_entities);
+    ImGui::Checkbox("Draw AABBs ?", &scene_graph.are_AABBs_drawn);
+    ImGui::Text("Total Nodes Count: %lu", scene_graph.nodes.size());
+    ImGui::Text("Total Drawable Objects: %d", scene_graph.total_drawable_objects);
+    ImGui::Text("Total Culled Objects: %d", scene_graph.total_culled_objects);
 
     ImGui::NewLine();
     ImGui::DragFloat("Light Intensity", &light_intensity, 0.25f, 1.0f, 100.0f);

@@ -7,10 +7,11 @@
 
 #include "assets/AssetManager.hpp"
 #include "core/Node.hpp"
+#include "debug.hpp"
 #include "imgui.h"
 
 SceneGraph::SceneGraph()
-    : flat_shader_index(-1), selected_node(-1) {
+    : flat_shader_index(-1), are_AABBs_drawn(false), selected_node(-1) {
     add_simple_node("Scene Graph", -1);
 }
 
@@ -20,35 +21,11 @@ SceneGraph::~SceneGraph() {
     }
 }
 
-void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) const {
-    const Node& node = nodes[node_index];
+void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum) {
+    total_drawable_objects = 0;
+    total_culled_objects = 0;
 
-    if(node.is_visible) {
-        const Shader* shader = nullptr;
-        switch(node.type) {
-            case Node::Type::MESH:
-            case Node::Type::FLAT_SHADED_MESH:
-            case Node::Type::MODEL:
-            case Node::Type::TERRAIN:
-                shader = shaders[node.data[1].index];
-
-                draw(view_projection, shader, node_index);
-
-                if(node.is_selected) {
-                    shader = flat_shader_index == -1
-                                 ? AssetManager::get_shader_ptr("flat")
-                                 : shaders[flat_shader_index];
-                    shader->use();
-                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
-                    draw(view_projection, shader, node_index);
-                }
-
-                break;
-            default: break;
-        }
-    }
-
-    for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
+    draw(view_projection, frustum, 0);
 }
 
 void SceneGraph::update_transform_and_children(unsigned int node_index) {
@@ -77,7 +54,7 @@ Node& SceneGraph::operator[](unsigned int node_index) { return nodes[node_index]
 
 unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {
     unsigned int index = nodes.size();
-    if(parent != -1) { nodes[parent].children.push_back(index); }
+    if(parent < nodes.size()) { nodes[parent].children.push_back(index); }
     nodes.emplace_back(name, parent, index, Node::Type::SIMPLE);
     transforms.emplace_back();
 
@@ -98,6 +75,12 @@ unsigned int SceneGraph::add_mesh_node(const std::string& name,
 
     shaders.push_back(shader);
     nodes[index].add_data(DataType::SHADER, shaders.size() - 1); // 1
+
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
+    AABBs.emplace_back(min, max);
+    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
 
     return index;
 }
@@ -120,8 +103,14 @@ unsigned int SceneGraph::add_flat_shaded_mesh_node(const std::string& name,
     }
     nodes[index].add_data(DataType::SHADER, flat_shader_index); // 1
 
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
+    AABBs.emplace_back(min, max);
+    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
+
     colors.push_back(color);
-    nodes[index].add_data(DataType::COLOR, colors.size() - 1); // 2
+    nodes[index].add_data(DataType::COLOR, colors.size() - 1); // 3
 
     return index;
 }
@@ -140,6 +129,12 @@ unsigned int SceneGraph::add_model_node(const std::string& name,
 
     shaders.push_back(shader);
     nodes[index].add_data(DataType::SHADER, shaders.size() - 1); // 1
+
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    models.back()->get_min_max_axis_aligned_coordinates(min, max);
+    AABBs.emplace_back(min, max);
+    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
 
     return index;
 }
@@ -183,9 +178,7 @@ void SceneGraph::add_imgui_node_tree() {
 }
 
 void SceneGraph::add_object_editor_to_imgui_window() {
-    if(selected_node == -1) {
-        ImGui::Text("No Entity is Selected");
-    } else {
+    if(selected_node < nodes.size()) {
         Node& node = nodes[selected_node];
         Transform& transform = transforms[selected_node];
 
@@ -230,6 +223,8 @@ void SceneGraph::add_object_editor_to_imgui_window() {
                     break;
             }
         }
+    } else {
+        ImGui::Text("No Entity is Selected");
     }
 }
 
@@ -245,6 +240,63 @@ void SceneGraph::set_is_selected(unsigned int node_index, bool is_selected) {
     for(unsigned int index : nodes[node_index].children) {
         set_is_selected(index, is_selected);
     }
+}
+
+void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) {
+    const Node& node = nodes[node_index];
+
+    if(node.is_visible) {
+        const Shader* shader = nullptr;
+        const AABB* aabb = nullptr;
+
+        switch(node.type) {
+            case Node::Type::MESH:
+            case Node::Type::FLAT_SHADED_MESH:
+            case Node::Type::MODEL:
+                aabb = &AABBs[node.data[2].index];
+                if(!aabb->is_in_frustum(frustum.view_projection * transforms[node_index].get_global_model())) {
+                    total_culled_objects++;
+                    break;
+                }
+                [[fallthrough]];
+            case Node::Type::TERRAIN:
+                shader = shaders[node.data[1].index];
+
+                draw(view_projection, shader, node_index);
+
+                if(node.is_selected) {
+                    if(flat_shader_index == -1) {
+                        shaders.push_back(AssetManager::get_shader_ptr("flat"));
+                        flat_shader_index = shaders.size() - 1;
+                    }
+
+                    shader = shaders[flat_shader_index];
+                    shader->use();
+                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
+                    draw(view_projection, shader, node_index);
+                }
+
+                if(are_AABBs_drawn && aabb != nullptr) {
+                    if(flat_shader_index == -1) {
+                        shaders.push_back(AssetManager::get_shader_ptr("flat"));
+                        flat_shader_index = shaders.size() - 1;
+                    }
+
+                    shader = shaders[flat_shader_index];
+                    shader->use();
+                    shader->set_uniform("u_mvp", view_projection
+                                                 * aabb->get_global_model_matrix(transforms[node_index]));
+                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    glLineWidth(3.0f);
+                    AssetManager::get_mesh("wireframe cube").draw();
+                    glLineWidth(1.0f);
+                }
+                break;
+            default: break;
+        }
+    }
+
+    for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
 }
 
 void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const {
@@ -267,10 +319,13 @@ void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigne
 
     switch(node.type) {
         case Node::Type::MESH:
-        case Node::Type::FLAT_SHADED_MESH:
-            if(node.data[2].type == DataType::MATERIAL) {
-                materials[node.data[2].index]->update_shader_uniforms(*shader);
+            if(node.data[3].type == DataType::MATERIAL) {
+                materials[node.data[3].index]->update_shader_uniforms(*shader);
             }
+            meshes[node.data[0].index]->draw();
+            break;
+        case Node::Type::FLAT_SHADED_MESH:
+            shader->set_uniform("u_color", colors[node.data[3].index]);
             meshes[node.data[0].index]->draw();
             break;
         case Node::Type::MODEL:
@@ -311,7 +366,7 @@ void SceneGraph::add_node_to_imgui_node_tree(unsigned int node_index) {
             label += " S";
             break;
         default:
-            label += '?';
+            label += " ?";
             break;
     }
     label += ' ' + node.name;
@@ -319,7 +374,7 @@ void SceneGraph::add_node_to_imgui_node_tree(unsigned int node_index) {
     ImGui::PushID(&node);
     if(ImGui::TreeNodeEx(label.c_str(), flags)) {
         if(ImGui::IsItemClicked()) {
-            if(selected_node != -1) { set_is_selected(selected_node, false); }
+            if(selected_node < nodes.size()) { set_is_selected(selected_node, false); }
             selected_node = node_index;
             set_is_selected(selected_node, true);
         }
@@ -327,7 +382,7 @@ void SceneGraph::add_node_to_imgui_node_tree(unsigned int node_index) {
         for(unsigned int index : node.children) { add_node_to_imgui_node_tree(index); }
         ImGui::TreePop();
     } else if(ImGui::IsItemClicked()) {
-        if(selected_node != -1) { set_is_selected(selected_node, false); }
+        if(selected_node < nodes.size()) { set_is_selected(selected_node, false); }
         selected_node = node_index;
         set_is_selected(selected_node, true);
     }
