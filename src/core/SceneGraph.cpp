@@ -54,7 +54,9 @@ void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsig
         switch(node.type) {
             case Node::Type::MESH:
             case Node::Type::FLAT_SHADED_MESH:
-                if(node.data[2].type == DataType::MATERIAL) { materials[node.data[2].index]->update_shader_uniforms(*shader); }
+                if(node.data[2].type == DataType::MATERIAL) {
+                    materials[node.data[2].index]->update_shader_uniforms(*shader);
+                }
                 meshes[node.data[0].index]->draw();
                 break;
             case Node::Type::MODEL:
@@ -172,7 +174,22 @@ unsigned int SceneGraph::add_scene_node(const std::string& name,
     transforms.emplace_back();
 
     scenes.emplace_back(path, this, index);
-    nodes[index].add_data(DataType::SCENE, scenes.size() - 1); // 1
+    nodes[index].add_data(DataType::SCENE, scenes.size() - 1); // 0
+
+    return index;
+}
+
+unsigned int SceneGraph::add_terrain_node(const std::string& name,
+                                          unsigned int parent,
+                                          float chunk_size,
+                                          unsigned int chunks_on_line) {
+    unsigned int index = nodes.size();
+    nodes[parent].children.push_back(index);
+    nodes.emplace_back(name, parent, index, Node::Type::TERRAIN);
+    transforms.emplace_back();
+
+    terrains.emplace_back(AssetManager::get_shader("terrain"), chunk_size, chunks_on_line);
+    nodes[index].add_data(DataType::TERRAIN, terrains.size() - 1); // 0
 
     return index;
 }

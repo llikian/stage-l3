@@ -51,7 +51,7 @@ struct SceneGraph {
     unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const vec4& color);
     unsigned int add_model_node(ADD_NODE_PARAMETERS, const Model* model, const Shader* shader);
     unsigned int add_scene_node(ADD_NODE_PARAMETERS, const std::filesystem::path& path);
-    // unsigned int add_terrain_node(const std::string& name, unsigned int parent); // TODO
+    unsigned int add_terrain_node(ADD_NODE_PARAMETERS, float chunk_size, unsigned int chunks_on_line);
 
     unsigned int add_material(Material* material);
 
