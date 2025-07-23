@@ -135,39 +135,9 @@ void Application::run() {
     const vec3& light_position = light->transform.get_local_position_reference();
     const vec4& light_color = light->color;
 
-    /* Models */ {
-        const Shader& shader = AssetManager::get_shader("blinn-phong");
-
-        /* Models */
-        // Model& bmw = AssetManager::add_model("bmw", "data/obj/bmw/bmw.obj");
-        // bmw.apply_model_matrix(scale(0.05f));
-        // root->add_child<ModelEntity>("bmw", shader, bmw)->create_aabb();
-    }
-
     /* Other Entities */
     TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
     terrain->set_visibility(false);
-
-#ifdef DEBUG_ENABLE_FRUSTUM_TESTS
-    Entity* test_AABBs_root = root->add_child<Entity>("Test Cubes");
-    /* Frustum Culling Tests */ {
-        const Shader& shader = AssetManager::get_shader("flat");
-        Mesh& cube = AssetManager::get_mesh("cube");
-        Mesh& sphere = AssetManager::get_mesh("sphere 16 32");
-
-        for(unsigned int i = 0 ; i < 10'000 ; ++i) {
-            auto entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Cube " + std::to_string(i), shader, cube);
-            entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
-            entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
-            entity->create_aabb();
-
-            entity = test_AABBs_root->add_child<FlatShadedMeshEntity>("Sphere " + std::to_string(i), shader, sphere);
-            entity->transform.set_local_position(Random::get_vec3(-1000.0f, 1000.0f));
-            entity->transform.set_local_scale(Random::get_vec3(1.0f, 10.0f));
-            entity->create_aabb();
-        }
-    }
-#endif
 
     // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
     root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(20.0f);
