@@ -5,7 +5,6 @@
 
 #include "core/SceneGraph.hpp"
 
-#include <stack>
 #include "assets/AssetManager.hpp"
 #include "core/Node.hpp"
 #include "imgui.h"
@@ -32,21 +31,23 @@ void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsig
             case Node::Type::MODEL:
             case Node::Type::TERRAIN:
                 shader = shaders[node.data[1].index];
+
+                draw(view_projection, shader, node_index);
+
+                if(node.is_selected) {
+                    shader = flat_shader_index == -1
+                                 ? AssetManager::get_shader_ptr("flat")
+                                 : shaders[flat_shader_index];
+                    shader->use();
+                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
+                    draw(view_projection, shader, node_index);
+                }
+
                 break;
             default: break;
         }
-
-        if(shader != nullptr) {
-            draw(view_projection, shader, node_index);
-
-            if(node.is_selected) {
-                shader = flat_shader_index == -1 ? AssetManager::get_shader_ptr("flat") : shaders[flat_shader_index];
-                shader->use();
-                shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
-                draw(view_projection, shader, node_index);
-            }
-        }
     }
+
     for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
 }
 
@@ -119,8 +120,8 @@ unsigned int SceneGraph::add_flat_shaded_mesh_node(const std::string& name,
     }
     nodes[index].add_data(DataType::SHADER, flat_shader_index); // 1
 
-    vector4s.push_back(color);
-    nodes[index].add_data(DataType::VEC3, vector4s.size() - 1); // 2
+    colors.push_back(color);
+    nodes[index].add_data(DataType::COLOR, colors.size() - 1); // 2
 
     return index;
 }
@@ -181,7 +182,7 @@ void SceneGraph::add_imgui_node_tree() {
     add_node_to_imgui_node_tree(0);
 }
 
-void SceneGraph::add_selected_entity_editor_to_imgui_window() {
+void SceneGraph::add_object_editor_to_imgui_window() {
     if(selected_node == -1) {
         ImGui::Text("No Entity is Selected");
     } else {
@@ -205,6 +206,30 @@ void SceneGraph::add_selected_entity_editor_to_imgui_window() {
         is_dirty = is_dirty || ImGui::DragFloat3("Local Scale", &transform.get_local_scale_reference().x, 0.1f, 0.1f);
 
         if(is_dirty) { transform.set_local_model_to_dirty(); }
+
+        ImGui::NewLine();
+        for(const Node::Data& data : node.data) {
+            switch(data.type) {
+                case DataType::NONE:
+                case DataType::SHADER:
+                case DataType::AABB:
+                case DataType::MESH:
+                case DataType::MODEL:
+                case DataType::SCENE:
+                case DataType::TERRAIN:
+                    break;
+                case DataType::COLOR:
+                    ImGui::PushID(&data);
+                    ImGui::ColorEdit4("Color", &colors[data.index].x);
+                    ImGui::PopID();
+                    break;
+                case DataType::MATERIAL:
+                    ImGui::PushID(&data);
+                    materials[data.index]->add_to_object_editor();
+                    ImGui::PopID();
+                    break;
+            }
+        }
     }
 }
 

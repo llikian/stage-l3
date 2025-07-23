@@ -130,7 +130,7 @@ void Application::run() {
                                                                vec4(1.0f));
     scene_graph.transforms[light].set_local_position(0.0f, 100.0f, 0.0f);
     const vec3& light_position = scene_graph.transforms[light].get_local_position_reference();
-    const vec4& light_color = scene_graph.vector4s[scene_graph[light].data[2].index];
+    const vec4& light_color = scene_graph.colors[scene_graph[light].data[2].index];
 
     /* Other Entities */
     unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");

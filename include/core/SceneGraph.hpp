@@ -21,9 +21,7 @@
 enum class DataType : unsigned char {
     NONE,
 
-    VEC2,
-    VEC3,
-    VEC4,
+    COLOR,
 
     SHADER,
     MATERIAL,
@@ -56,7 +54,7 @@ struct SceneGraph {
     unsigned int add_material(Material* material);
 
     void add_imgui_node_tree();
-    void add_selected_entity_editor_to_imgui_window();
+    void add_object_editor_to_imgui_window();
 
     void set_visibility(unsigned int node_index, bool is_visible);
     void set_is_selected(unsigned int node_index, bool is_selected);
@@ -66,9 +64,7 @@ struct SceneGraph {
 
     int flat_shader_index;
 
-    std::vector<vec2> vector2s;
-    std::vector<vec3> vector3s;
-    std::vector<vec4> vector4s;
+    std::vector<vec4> colors;
     std::vector<const Shader*> shaders;
     std::vector<Material*> materials;
     std::vector<AABB> AABBs;
