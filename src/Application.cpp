@@ -8,7 +8,6 @@
 #include <cmath>
 #include "assets/AssetManager.hpp"
 #include "core/EventHandler.hpp"
-#include "debug.hpp"
 #include "glad/glad.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -299,7 +298,7 @@ void Application::draw_imgui_object_ediot_window() {
     win_size.x = Window::get_width() - win_pos.x;
     ImGui::SetWindowSize(win_size);
 
-    scene_graph.add_selected_entity_editor_to_imgui_window();
+    scene_graph.add_object_editor_to_imgui_window();
 
     ImGui::End();
 }
