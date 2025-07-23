@@ -17,7 +17,7 @@ struct Node {
         SIMPLE,           // NO DATA
         MESH,             // 0: MESH, 1: SHADER, 2: AABB, (3: MATERIAL)
         FLAT_SHADED_MESH, // 0: MESH, 1: SHADER, 2: AABB, 3: COLOR
-        MODEL,            // 0: MESH, 1: SHADER, 2: AABB
+        MODEL,            // 0: MODEL, 1: SHADER, 2: AABB
         SCENE,            // 0: SCENE
         TERRAIN,          // 0: TERRAIN
     };
