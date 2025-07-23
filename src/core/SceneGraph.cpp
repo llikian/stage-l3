@@ -70,6 +70,28 @@ void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsig
     for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
 }
 
+void SceneGraph::update_transform_and_children(unsigned int node_index) {
+    if(transforms[node_index].is_local_model_dirty()) {
+        force_update_transform_and_children(node_index);
+    } else {
+        for(unsigned int child : nodes[node_index].children) {
+            update_transform_and_children(child);
+        }
+    }
+}
+
+void SceneGraph::force_update_transform_and_children(unsigned int node_index) {
+    if(nodes[node_index].parent != -1) {
+        transforms[node_index].update_global_model(transforms[nodes[node_index].parent].get_global_model());
+    } else {
+        transforms[node_index].update_global_model();
+    }
+
+    for(unsigned int child : nodes[node_index].children) {
+        force_update_transform_and_children(child);
+    }
+}
+
 Node& SceneGraph::operator[](unsigned int node_index) { return nodes[node_index]; }
 
 unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {

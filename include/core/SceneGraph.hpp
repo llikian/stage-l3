@@ -41,6 +41,9 @@ struct SceneGraph {
 
     void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index = 0) const;
 
+    void update_transform_and_children(unsigned int node_index = 0);
+    void force_update_transform_and_children(unsigned int node_index = 0);
+
     Node& operator[](unsigned int node_index);
 
     unsigned int add_simple_node(ADD_NODE_PARAMETERS);

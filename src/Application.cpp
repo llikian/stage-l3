@@ -136,6 +136,9 @@ void Application::run() {
     unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
     scene_graph.transforms[sponza].set_local_scale(20.0f);
 
+    unsigned int buggy = scene_graph.add_scene_node("buggy", 0, "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf");
+    scene_graph.transforms[buggy].set_local_scale(0.25f);
+
     /* Main Loop */
     while(!Window::should_close()) {
         EventHandler::poll_and_handle_events();
@@ -151,7 +154,7 @@ void Application::run() {
         vec3 camera_direction = camera.get_direction();
         frustum.view_projection = camera.get_view_projection_matrix();
 
-        // root->update_transform_and_children(); // TODO
+        scene_graph.update_transform_and_children();
 
         draw_background();
 
