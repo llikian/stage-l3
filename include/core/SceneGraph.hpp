@@ -78,6 +78,8 @@ struct SceneGraph {
     std::vector<Terrain> terrains;
 
 private:
+    void draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const;
+
     void add_node_to_imgui_node_tree(unsigned int node_index);
     unsigned int selected_node;
 };

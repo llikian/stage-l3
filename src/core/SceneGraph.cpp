@@ -24,51 +24,29 @@ SceneGraph::~SceneGraph() {
 void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) const {
     const Node& node = nodes[node_index];
 
-    const Shader* shader = nullptr;
-    switch(node.type) {
-        case Node::Type::MESH:
-        case Node::Type::FLAT_SHADED_MESH:
-        case Node::Type::MODEL:
-        case Node::Type::TERRAIN:
-            shader = shaders[node.data[1].index];
-            break;
-        default: break;
-    }
-
-    if(shader != nullptr) {
-        shader->use();
-
-        const mat4& global_model = transforms[node_index].get_global_model_const_reference();
-        shader->set_uniform_if_exists("u_model", global_model);
-
-        int u_mvp_location = shader->get_uniform_location("u_mvp");
-        if(u_mvp_location != -1) {
-            Shader::set_uniform(u_mvp_location, view_projection * global_model);
-        }
-
-        int u_normals_model_matrix_location = shader->get_uniform_location("u_normals_model_matrix");
-        if(u_normals_model_matrix_location != -1) {
-            Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
-        }
-
+    if(node.is_visible) {
+        const Shader* shader = nullptr;
         switch(node.type) {
             case Node::Type::MESH:
             case Node::Type::FLAT_SHADED_MESH:
-                if(node.data[2].type == DataType::MATERIAL) {
-                    materials[node.data[2].index]->update_shader_uniforms(*shader);
-                }
-                meshes[node.data[0].index]->draw();
-                break;
             case Node::Type::MODEL:
-                models[node.data[0].index]->draw(*shader);
-                break;
             case Node::Type::TERRAIN:
-                terrains[node.data[0].index].draw(view_projection);
+                shader = shaders[node.data[1].index];
                 break;
             default: break;
         }
-    }
 
+        if(shader != nullptr) {
+            draw(view_projection, shader, node_index);
+
+            if(node.is_selected) {
+                shader = flat_shader_index == -1 ? AssetManager::get_shader_ptr("flat") : shaders[flat_shader_index];
+                shader->use();
+                shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
+                draw(view_projection, shader, node_index);
+            }
+        }
+    }
     for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
 }
 
@@ -240,7 +218,43 @@ void SceneGraph::set_visibility(unsigned int node_index, bool is_visible) {
 void SceneGraph::set_is_selected(unsigned int node_index, bool is_selected) {
     nodes[node_index].is_selected = is_selected;
     for(unsigned int index : nodes[node_index].children) {
-        set_visibility(index, is_selected);
+        set_is_selected(index, is_selected);
+    }
+}
+
+void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const {
+    const Node& node = nodes[node_index];
+
+    shader->use();
+
+    const mat4& global_model = transforms[node_index].get_global_model_const_reference();
+    shader->set_uniform_if_exists("u_model", global_model);
+
+    int u_mvp_location = shader->get_uniform_location("u_mvp");
+    if(u_mvp_location != -1) {
+        Shader::set_uniform(u_mvp_location, view_projection * global_model);
+    }
+
+    int u_normals_model_matrix_location = shader->get_uniform_location("u_normals_model_matrix");
+    if(u_normals_model_matrix_location != -1) {
+        Shader::set_uniform(u_normals_model_matrix_location, transpose_inverse(global_model));
+    }
+
+    switch(node.type) {
+        case Node::Type::MESH:
+        case Node::Type::FLAT_SHADED_MESH:
+            if(node.data[2].type == DataType::MATERIAL) {
+                materials[node.data[2].index]->update_shader_uniforms(*shader);
+            }
+            meshes[node.data[0].index]->draw();
+            break;
+        case Node::Type::MODEL:
+            models[node.data[0].index]->draw(*shader);
+            break;
+        case Node::Type::TERRAIN:
+            terrains[node.data[0].index].draw(view_projection);
+            break;
+        default: break;
     }
 }
 
