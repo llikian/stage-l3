@@ -5,6 +5,7 @@
 
 #include "materials/PhongMaterial.hpp"
 
+#include "assets/AssetManager.hpp"
 #include "imgui.h"
 
 PhongMaterial::PhongMaterial(const std::string& name)
@@ -14,13 +15,12 @@ PhongMaterial::PhongMaterial(const std::string& name)
       specular(1.0f),
       specular_exponent(10.0f) { }
 
-void PhongMaterial::update_shader_uniforms(const Shader& shader) {
+void PhongMaterial::update_shader_uniforms(const Shader& shader) const {
     shader.set_uniform("u_ambient", ambient);
     shader.set_uniform("u_diffuse", diffuse);
     shader.set_uniform("u_specular", specular);
     shader.set_uniform("u_specular_exponent", specular_exponent);
 
-    if(diffuse_map.is_default_texture()) { diffuse_map.create(255, 255, 255); }
     diffuse_map.bind(0);
 }
 

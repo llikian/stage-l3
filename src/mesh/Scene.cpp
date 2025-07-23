@@ -7,9 +7,9 @@
 
 #include <ranges>
 #include "assets/AssetManager.hpp"
+#include "core/Node.hpp"
+#include "core/SceneGraph.hpp"
 #include "debug.hpp"
-#include "entities/MeshEntity.hpp"
-#include "entities/SceneEntity.hpp"
 #include "maths/functions.hpp"
 #include "utility/LifetimeLogger.hpp"
 
@@ -33,30 +33,13 @@ MeshInfo::~MeshInfo() {
     delete[] primitives;
 }
 
-Scene::Scene(const std::filesystem::path& path, SceneEntity* entity)
+Scene::Scene(const std::filesystem::path& path, SceneGraph* scene_graph, unsigned int parent)
     : meshes(nullptr), meshes_count(0) {
-    load(path, entity);
+    load(path, scene_graph, parent);
 }
 
-Scene::~Scene() {
+void Scene::free() {
     delete[] meshes;
-}
-
-void Scene::add_children(SceneEntity* entity) const {
-    Entity** mesh_entities = new Entity*[meshes_count];
-    for(unsigned int i = 0 ; i < meshes_count ; ++i) {
-        mesh_entities[i] = entity->add_child<Entity>(meshes[i].name);
-    }
-
-    for(unsigned int i = 0 ; i < meshes_count ; ++i) {
-        for(unsigned int j = 0 ; j < meshes[i].primitive_count ; ++j) {
-            PrimitiveInfo& primitive = meshes[i].primitives[j];
-            mesh_entities[i]->add_child<MeshEntity>(primitive.name, *primitive.shader, primitive.mesh)
-                            ->material = primitive.material;
-        }
-    }
-
-    delete[] mesh_entities;
 }
 
 void Scene::check_cgltf_result(cgltf_result result, const std::string& error_message) {
@@ -115,7 +98,7 @@ std::string Scene::cgltf_type_to_string(cgltf_type type) {
     }
 }
 
-void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
+void Scene::load(const std::filesystem::path& path, SceneGraph* scene_graph, unsigned int parent) {
 #ifdef DEBUG_LOG_GLTF_READ_INFO
     LifetimeLogger lifetime_logger("\tTook ");
     std::cout << "Reading scene from file '" << path.filename().string() << "':\n";
@@ -305,7 +288,7 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
     if(data->nodes != nullptr) {
         for(unsigned int i = 0 ; i < data->nodes_count ; ++i) {
             if(data->nodes[i].parent == nullptr) {
-                add_node(&data->nodes[i], entity, mesh_indices);
+                add_node(&data->nodes[i], scene_graph, parent, mesh_indices);
             }
         }
     }
@@ -314,53 +297,60 @@ void Scene::load(const std::filesystem::path& path, SceneEntity* entity) {
 }
 
 void Scene::add_node(const cgltf_node* c_node,
-                     Entity* entity,
+                     SceneGraph* scene_graph,
+                     unsigned int parent,
                      const std::unordered_map<const cgltf_mesh*, unsigned int>& mesh_indices) {
     if(c_node->mesh != nullptr) {
         const MeshInfo& mesh = meshes[mesh_indices.at(c_node->mesh)];
-        entity = entity->add_child<Entity>(c_node->name != nullptr ? c_node->name : mesh.name);
+        parent = scene_graph->add_simple_node(c_node->name != nullptr ? c_node->name : mesh.name, parent);
 
         for(unsigned int j = 0 ; j < mesh.primitive_count ; ++j) {
             PrimitiveInfo& primitive = mesh.primitives[j];
-            MeshEntity* mesh_entity = entity->add_child<MeshEntity>(primitive.name, *primitive.shader, primitive.mesh);
-            mesh_entity->material = primitive.material;
+            unsigned int mesh_node = scene_graph->add_mesh_node(primitive.name, parent, &primitive.mesh,
+                                                                primitive.shader);
+            if(primitive.material != nullptr) {
+                unsigned int material = scene_graph->add_material(primitive.material);
+                scene_graph->nodes[mesh_node].add_data(DataType::MATERIAL, material);
+            }
         }
     } else {
-        entity = entity->add_child<Entity>(c_node->name != nullptr
-                                               ? c_node->name
-                                               : "Node " + std::to_string(entity->children.size()));
+        parent = scene_graph->add_simple_node(c_node->name != nullptr
+                                                  ? c_node->name
+                                                  : "Node " + std::to_string(
+                                                        scene_graph->nodes[parent].children.size()),
+                                              parent);
     }
 
     bool transformed = false;
 
     if(c_node->has_translation) {
-        entity->transform.set_local_position(c_node->translation[0],
-                                             c_node->translation[1],
-                                             c_node->translation[2]);
+        scene_graph->transforms[parent].set_local_position(c_node->translation[0],
+                                                           c_node->translation[1],
+                                                           c_node->translation[2]);
         transformed = true;
     }
 
     if(c_node->has_rotation) {
-        entity->transform.set_local_orientation(c_node->rotation[0],
-                                                c_node->rotation[1],
-                                                c_node->rotation[2],
-                                                c_node->rotation[3]);
+        scene_graph->transforms[parent].set_local_orientation(c_node->rotation[0],
+                                                              c_node->rotation[1],
+                                                              c_node->rotation[2],
+                                                              c_node->rotation[3]);
         transformed = true;
     }
 
     if(c_node->has_scale) {
-        entity->transform.set_local_scale(c_node->scale[0],
-                                          c_node->scale[1],
-                                          c_node->scale[2]);
+        scene_graph->transforms[parent].set_local_scale(c_node->scale[0],
+                                                        c_node->scale[1],
+                                                        c_node->scale[2]);
         transformed = true;
     }
 
     if(!transformed && c_node->has_matrix) {
-        entity->transform.set_local_model(c_node->matrix);
+        scene_graph->transforms[parent].set_local_model(c_node->matrix);
     }
 
     for(unsigned int i = 0 ; i < c_node->children_count ; ++i) {
-        add_node(c_node->children[i], entity, mesh_indices);
+        add_node(c_node->children[i], scene_graph, parent, mesh_indices);
     }
 }
 

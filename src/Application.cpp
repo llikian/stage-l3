@@ -9,7 +9,6 @@
 #include "assets/AssetManager.hpp"
 #include "core/EventHandler.hpp"
 #include "debug.hpp"
-#include "entities/entities.hpp"
 #include "glad/glad.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -125,30 +124,17 @@ Application::~Application() {
 }
 
 void Application::run() {
-    Entity* root = &scene_graph.root;
-
     /* Light */
-    FlatShadedMeshEntity* light = root->add_child<FlatShadedMeshEntity>("Light",
-                                                                        AssetManager::get_shader("flat"),
-                                                                        AssetManager::get_mesh("icosphere 1"));
-    light->transform.set_local_position(0.0f, 100.0f, 0.0f);
-    const vec3& light_position = light->transform.get_local_position_reference();
-    const vec4& light_color = light->color;
+    unsigned int light = scene_graph.add_flat_shaded_mesh_node("Light", 0,
+                                                               &AssetManager::get_mesh("icosphere 1"),
+                                                               vec4(1.0f));
+    scene_graph.transforms[light].set_local_position(0.0f, 100.0f, 0.0f);
+    const vec3& light_position = scene_graph.transforms[light].get_local_position_reference();
+    const vec4& light_color = scene_graph.vector4s[scene_graph[light].data[2].index];
 
     /* Other Entities */
-    TerrainEntity* terrain = root->add_child<TerrainEntity>("terrain", AssetManager::get_shader("terrain"), 32.0f, 128);
-    terrain->set_visibility(false);
-
-    // root->add_child<SceneEntity>("avocado", "data/gltf/avocado/Avocado.gltf")->transform.set_local_scale(500.0f);
-    root->add_child<SceneEntity>("sponza", "data/gltf/sponza/Sponza.gltf")->transform.set_local_scale(20.0f);
-    root->add_child<SceneEntity>("buggy", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf")
-        ->transform.set_local_scale(0.2f);
-    // root->add_child<SceneEntity>("test", "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/NormalTangentTest/glTF/NormalTangentTest.gltf")->transform.set_local_scale(20.0f);
-
-    // SceneEntity* spheres = root->add_child<SceneEntity>("spheres", "data/gltf/spheres/MetalRoughSpheres.gltf");
-    // spheres->transform.set_local_orientation_euler(vec3(90.0f, 0.0f, 180.0f));
-    // spheres->transform.set_local_position(vec3(0.0f, 11.0f, -20.0f));
-    // light->transform.set_local_position(vec3(0.0f, 0.0f, 5.0f));
+    unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
+    scene_graph.transforms[sponza].set_local_scale(20.0f);
 
     /* Main Loop */
     while(!Window::should_close()) {
@@ -165,8 +151,7 @@ void Application::run() {
         vec3 camera_direction = camera.get_direction();
         frustum.view_projection = camera.get_view_projection_matrix();
 
-        // test_AABBs_root->transform.set_local_orientation(0.0f, 10.0f * EventHandler::get_time(), 0.0f);
-        root->update_transform_and_children();
+        // root->update_transform_and_children(); // TODO
 
         draw_background();
 
@@ -192,7 +177,7 @@ void Application::run() {
             shader.set_uniform("u_light.intensity", light_intensity);
             shader.set_uniform("u_material.base_color_map", 0);
             shader.set_uniform("u_material.metallic_roughness_map", 1);
-            shader.set_uniform("u_material.normal_map", 2);
+            shader.set_uniform_if_exists("u_material.normal_map", 2);
             shader.set_uniform_if_exists("u_test1", uniform_test_conditions[0]);
             shader.set_uniform_if_exists("u_test2", uniform_test_conditions[1]);
             shader.set_uniform_if_exists("u_test3", uniform_test_conditions[2]);
@@ -216,13 +201,6 @@ void Application::run() {
             shader.use();
             shader.set_uniform("u_light_color", light_color.x, light_color.y, light_color.z);
             shader.set_uniform("u_light_position", light_position);
-        }
-
-        /* Terrain Shader */
-        if(terrain->get_visibility()) {
-            const Shader& shader = AssetManager::get_shader("terrain");
-            shader.use();
-            shader.set_uniform("u_frustum_view_projection_matrix", frustum.view_projection);
         }
 
         scene_graph.draw(frustum.view_projection, frustum);
@@ -285,9 +263,10 @@ void Application::draw_imgui_debug_window() {
     ImGui::Text("delta: %fs", EventHandler::get_delta());
 
     ImGui::NewLine();
-    ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
-    ImGui::Text("Total Not Hidden Entities: %d", DrawableEntity::total_not_hidden_entities);
-    ImGui::Text("Total Drawn Entities: %d", DrawableEntity::total_drawn_entities);
+    // TODO
+    // ImGui::Text("Total Drawable Entities: %d", DrawableEntity::total_drawable_entities);
+    // ImGui::Text("Total Not Hidden Entities: %d", DrawableEntity::total_not_hidden_entities);
+    // ImGui::Text("Total Drawn Entities: %d", DrawableEntity::total_drawn_entities);
 
     ImGui::NewLine();
     ImGui::DragFloat("Light Intensity", &light_intensity, 0.25f, 1.0f, 100.0f);
@@ -306,7 +285,7 @@ void Application::draw_imgui_debug_window() {
     ImGui::End();
 }
 
-void Application::draw_imgui_object_ediot_window() const {
+void Application::draw_imgui_object_ediot_window() {
     static ImVec2 win_pos(0.0f, 0.0f);
     static ImVec2 win_size(0.0f, 0.0f);
 

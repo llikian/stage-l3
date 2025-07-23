@@ -30,7 +30,7 @@ public:
      * @brief Performs a draw call for each of the model's meshes with a certain shader.
      * @param shader The shader to perform the draw calls with.
      */
-    void draw(const Shader& shader);
+    void draw(const Shader& shader) const;
 
     /**
      * @brief Applies a model matrix to each mesh in the model.

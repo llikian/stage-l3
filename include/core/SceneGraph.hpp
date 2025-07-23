@@ -5,46 +5,76 @@
 
 #pragma once
 
-#include "entities/Entity.hpp"
+#include <functional>
+#include <vector>
 
-/**
- * @class SceneGraph
- * @brief A scene graph that holds the root of the graph and contains functionality for rendering it
- * with ImGui along with selecting an entity in the graph and modifying certain fields in an object
- * editor.
- */
-class SceneGraph {
-public:
-    /**
-     * @brief Default constructor.
-     */
+#include "culling/AABB.hpp"
+#include "maths/Transform.hpp"
+#include "mesh/Mesh.hpp"
+#include "mesh/Model.hpp"
+#include "mesh/Scene.hpp"
+#include "mesh/Terrain.hpp"
+#include "Node.hpp"
+
+#define ADD_NODE_PARAMETERS const std::string& name, unsigned int parent
+
+enum class DataType : unsigned char {
+    NONE,
+
+    VEC2,
+    VEC3,
+    VEC4,
+
+    SHADER,
+    MATERIAL,
+    AABB,
+
+    MESH,
+    MODEL,
+    SCENE,
+    TERRAIN,
+};
+
+struct SceneGraph {
     SceneGraph();
+    ~SceneGraph();
+
+    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index = 0) const;
+
+    Node& operator[](unsigned int node_index);
+
+    unsigned int add_simple_node(ADD_NODE_PARAMETERS);
+    unsigned int add_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const Shader* shader);
+    unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const vec4& color);
+    unsigned int add_model_node(ADD_NODE_PARAMETERS, const Model* model, const Shader* shader);
+    unsigned int add_scene_node(ADD_NODE_PARAMETERS, const std::filesystem::path& path);
+    // unsigned int add_terrain_node(const std::string& name, unsigned int parent); // TODO
+
+    unsigned int add_material(Material* material);
 
     void add_imgui_node_tree();
+    void add_selected_entity_editor_to_imgui_window();
 
-    /**
-     * @brief Add an object editor for the selected entity (if one is selected) to the current ImGui
-     * window.
-     * @warning Need to be called within an ImGui window, between a call to ImGui::Begin(...) and
-     * ImGui::End().
-     */
-    void add_selected_entity_editor_to_imgui_window() const;
+    void set_visibility(unsigned int node_index, bool is_visible);
+    void set_is_selected(unsigned int node_index, bool is_selected);
 
-    /**
-     * @brief Draw every drawable object within the scene graph.
-     * @param view_projection_matrix The projection matrix multiplied by the view matrix.
-     * @param frustum
-     */
-    void draw(const mat4& view_projection_matrix, const Frustum& frustum);
+    std::vector<Node> nodes; ///< The scene graph's nodes. The root is always at index 0.
+    std::vector<Transform> transforms;
 
-    Entity root; ///< The root of the scene graph.
+    int flat_shader_index;
+
+    std::vector<vec2> vector2s;
+    std::vector<vec3> vector3s;
+    std::vector<vec4> vector4s;
+    std::vector<const Shader*> shaders;
+    std::vector<Material*> materials;
+    std::vector<AABB> AABBs;
+    std::vector<const Mesh*> meshes;
+    std::vector<const Model*> models;
+    std::vector<Scene> scenes;
+    std::vector<Terrain> terrains;
 
 private:
-    /**
-     * @brief Add an entity to the ImGui node tree.
-     * @param entity The entity to add to the tree.
-     */
-    void add_entity_to_imgui_node_tree(Entity* entity);
-
-    Entity* selected_entity; ///< The currently selected entity.
+    void add_node_to_imgui_node_tree(unsigned int node_index);
+    unsigned int selected_node;
 };

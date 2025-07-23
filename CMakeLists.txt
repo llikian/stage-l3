@@ -36,20 +36,12 @@ set(SOURCES
         src/core/EventHandler.cpp
         src/core/Framebuffer.cpp
         src/core/SceneGraph.cpp
+        src/core/Node.cpp
         src/core/Window.cpp
 
         # Culling Module
         src/culling/AABB.cpp
         src/culling/Frustum.cpp
-
-        # Entities Module
-        src/entities/DrawableEntity.cpp
-        src/entities/Entity.cpp
-        src/entities/FlatShadedMeshEntity.cpp
-        src/entities/MeshEntity.cpp
-        src/entities/ModelEntity.cpp
-        src/entities/SceneEntity.cpp
-        src/entities/TerrainEntity.cpp
 
         # Materials Module
         src/materials/Material.cpp

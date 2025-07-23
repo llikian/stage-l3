@@ -25,7 +25,7 @@ struct Material {
      * @brief Updates a shader's uniforms' values with the material's data.
      * @param shader The shader whose uniforms need to be updated.
      */
-    virtual void update_shader_uniforms(const Shader& shader) = 0;
+    virtual void update_shader_uniforms(const Shader& shader) const = 0;
 
     /**
      * @return Whether any of the material's textures has transparency.

@@ -15,7 +15,7 @@ MRMaterial::MRMaterial(const std::string& name)
       reflectance(0.5f) // Index of Refraction = 1.5f, 4% reflectance
 { }
 
-void MRMaterial::update_shader_uniforms(const Shader& shader) {
+void MRMaterial::update_shader_uniforms(const Shader& shader) const {
     base_color_map.bind(0);
     metallic_roughness_map.bind(1);
     normal_map.bind(2);

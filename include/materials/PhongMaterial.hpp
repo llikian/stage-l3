@@ -24,7 +24,7 @@ struct PhongMaterial : Material {
      * @brief Updates a shader's uniforms' values with the material's data.
      * @param shader The shader whose uniforms need to be updated.
      */
-    void update_shader_uniforms(const Shader& shader) override;
+    void update_shader_uniforms(const Shader& shader) const override;
 
     /**
      * @return Whether any of the material's textures has transparency.
