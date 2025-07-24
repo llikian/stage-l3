@@ -243,8 +243,8 @@ void Texture::create(const std::filesystem::path& parent_path, const cgltf_textu
 
     std::filesystem::path path = parent_path / texture->image->uri;
     if(texture->image->uri != nullptr) {
-        if(AssetManager::has_texture(path)) {
-            *this = AssetManager::get_texture(path);
+        if(AssetManager::has_texture(path.string())) {
+            *this = AssetManager::get_texture(path.string());
             return;
         }
     } else {
@@ -369,7 +369,7 @@ void Texture::create(const std::filesystem::path& parent_path, const cgltf_textu
         }
     }
 
-    AssetManager::add_texture(path, *this);
+    AssetManager::add_texture(path.string(), *this);
 }
 
 void Texture::bind(unsigned int texture_unit) const {
