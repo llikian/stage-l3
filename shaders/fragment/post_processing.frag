@@ -40,8 +40,10 @@ vec3 ACES_tone_mapping(vec3 color) {
 }
 
 void main() {
-    vec4 tex = texture(u_texture, get_uv());
-//    vec4 tex = texture(u_texture, get_uv_pixelated(8));
+    vec2 uv = get_uv();
+//    vec2 uv = get_uv_pixelated(8);
+
+    vec4 tex = texture(u_texture, uv);
     vec3 color = tex.rgb;
 
     color = ACES_tone_mapping(color); // Tone mapping
