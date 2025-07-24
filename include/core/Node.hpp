@@ -8,41 +8,33 @@
 #include <string>
 #include <vector>
 
-enum class DataType : unsigned char;
-
-constexpr unsigned int MAX_NODE_DATA_COUNT = 4;
+constexpr unsigned int INVALID_INDEX = ~0u;
 
 struct Node {
     enum class Type : unsigned char {
         SIMPLE,           // NO DATA
-        MESH,             // 0: MESH, 1: SHADER, 2: AABB, (3: MATERIAL)
-        FLAT_SHADED_MESH, // 0: MESH, 1: SHADER, 2: AABB, 3: COLOR
-        MODEL,            // 0: MODEL, 1: SHADER, 2: AABB
-        SCENE,            // 0: SCENE
-        TERRAIN,          // 0: TERRAIN
+        MESH,             // MESH, SHADER, AABB, (MATERIAL)
+        FLAT_SHADED_MESH, // MESH, SHADER, AABB, COLOR
+        MODEL,            // MODEL, SHADER, AABB
+        SCENE,            // SCENE
+        TERRAIN,          // TERRAIN
     };
 
-    struct Data {
-        Data();
-        DataType type; ///< The type of data. DataType::NONE when there is no data.
-        int index;     ///< The index of the data. -1 when there is no data.
-    };
-
-    Node(const std::string& name, int parent, unsigned int transform_index, Type type);
-
-    void add_data(DataType type, unsigned int index);
-    void set_data(unsigned int index, DataType data_type, unsigned int data_index);
+    Node(const std::string& name, int parent, Type type);
 
     Type type;        ///< The type of the node.
     std::string name; ///< The name of the node.
 
-    int parent;                         ///< The index of the node's parent. -1 if it is the root.
+    unsigned int parent;                ///< The index of the node's parent. INVALID_INDEX if it is the root.
     std::vector<unsigned int> children; ///< The indices of the node's children.
 
-    unsigned int transform_index; ///< The index of the node's transform.
+    unsigned int drawable_index; ///< The index of node's drawable object. INVALID_INDEX if not drawable.
+    unsigned int shader_index;   ///< The index of the node's shader. INVALID_INDEX if no shader.
+    unsigned int AABB_index;     ///< The index of the node's AABB. INVALID_INDEX if no AABB.
+    unsigned int color_index;    ///< The index of the node's color. INVALID_INDEX if no color.
+    unsigned int material_index; ///< The index of the node's material. INVALID_INDEX if no material.
+    unsigned int scene_index;    ///< The index of the node's scene. INVALID_INDEX if no scene.
 
-    Data data[MAX_NODE_DATA_COUNT]; ///< The node's data information
-
-    bool is_visible;
-    bool is_selected;
+    bool is_visible;  ///< Whether the node is visible.
+    bool is_selected; ///< Whether the node is selected.
 };

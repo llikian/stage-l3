@@ -11,8 +11,8 @@
 #include "imgui.h"
 
 SceneGraph::SceneGraph()
-    : flat_shader_index(-1), are_AABBs_drawn(false), selected_node(-1) {
-    add_simple_node("Scene Graph", -1);
+    : flat_shader_index(INVALID_INDEX), are_AABBs_drawn(false), selected_node(INVALID_INDEX) {
+    add_simple_node("Scene Graph", INVALID_INDEX);
 }
 
 SceneGraph::~SceneGraph() {
@@ -23,6 +23,7 @@ SceneGraph::~SceneGraph() {
 
 void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum) {
     total_drawable_objects = 0;
+    total_visible_drawables = 0;
     total_culled_objects = 0;
 
     draw(view_projection, frustum, 0);
@@ -39,7 +40,7 @@ void SceneGraph::update_transform_and_children(unsigned int node_index) {
 }
 
 void SceneGraph::force_update_transform_and_children(unsigned int node_index) {
-    if(nodes[node_index].parent != -1) {
+    if(nodes[node_index].parent != INVALID_INDEX) {
         transforms[node_index].update_global_model(transforms[nodes[node_index].parent].get_global_model());
     } else {
         transforms[node_index].update_global_model();
@@ -53,9 +54,10 @@ void SceneGraph::force_update_transform_and_children(unsigned int node_index) {
 Node& SceneGraph::operator[](unsigned int node_index) { return nodes[node_index]; }
 
 unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::SIMPLE);
+    unsigned int index = nodes.size() - 1;
     if(parent < nodes.size()) { nodes[parent].children.push_back(index); }
-    nodes.emplace_back(name, parent, index, Node::Type::SIMPLE);
+
     transforms.emplace_back();
 
     return nodes.size() - 1;
@@ -65,22 +67,23 @@ unsigned int SceneGraph::add_mesh_node(const std::string& name,
                                        unsigned int parent,
                                        const Mesh* mesh,
                                        const Shader* shader) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::MESH);
+    unsigned int index = nodes.size() - 1;
     nodes[parent].children.push_back(index);
-    nodes.emplace_back(name, parent, index, Node::Type::MESH);
+
     transforms.emplace_back();
 
     meshes.push_back(mesh);
-    nodes[index].add_data(DataType::MESH, meshes.size() - 1); // 0
+    nodes[index].drawable_index = meshes.size() - 1;
 
     shaders.push_back(shader);
-    nodes[index].add_data(DataType::SHADER, shaders.size() - 1); // 1
+    nodes[index].shader_index = shaders.size() - 1;
 
     vec3 min(std::numeric_limits<float>::max());
     vec3 max(std::numeric_limits<float>::lowest());
     meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
     AABBs.emplace_back(min, max);
-    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
+    nodes[index].AABB_index = AABBs.size() - 1;
 
     return index;
 }
@@ -89,28 +92,29 @@ unsigned int SceneGraph::add_flat_shaded_mesh_node(const std::string& name,
                                                    unsigned int parent,
                                                    const Mesh* mesh,
                                                    const vec4& color) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::FLAT_SHADED_MESH);
+    unsigned int index = nodes.size() - 1;
     nodes[parent].children.push_back(index);
-    nodes.emplace_back(name, parent, index, Node::Type::FLAT_SHADED_MESH);
+
     transforms.emplace_back();
 
     meshes.push_back(mesh);
-    nodes[index].add_data(DataType::MESH, meshes.size() - 1); // 0
+    nodes[index].drawable_index = meshes.size() - 1;
 
-    if(flat_shader_index == -1) {
+    if(flat_shader_index == INVALID_INDEX) {
         shaders.push_back(AssetManager::get_shader_ptr("flat"));
         flat_shader_index = shaders.size() - 1;
     }
-    nodes[index].add_data(DataType::SHADER, flat_shader_index); // 1
+    nodes[index].shader_index = flat_shader_index;
 
     vec3 min(std::numeric_limits<float>::max());
     vec3 max(std::numeric_limits<float>::lowest());
     meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
     AABBs.emplace_back(min, max);
-    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
+    nodes[index].AABB_index = AABBs.size() - 1;
 
     colors.push_back(color);
-    nodes[index].add_data(DataType::COLOR, colors.size() - 1); // 3
+    nodes[index].color_index = colors.size() - 1;
 
     return index;
 }
@@ -119,22 +123,23 @@ unsigned int SceneGraph::add_model_node(const std::string& name,
                                         unsigned int parent,
                                         const Model* model,
                                         const Shader* shader) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::MODEL);
+    unsigned int index = nodes.size() - 1;
     nodes[parent].children.push_back(index);
-    nodes.emplace_back(name, parent, index, Node::Type::MODEL);
+
     transforms.emplace_back();
 
     models.push_back(model);
-    nodes[index].add_data(DataType::MODEL, models.size() - 1); // 0
+    nodes[index].drawable_index = models.size() - 1;
 
     shaders.push_back(shader);
-    nodes[index].add_data(DataType::SHADER, shaders.size() - 1); // 1
+    nodes[index].shader_index = shaders.size() - 1;
 
     vec3 min(std::numeric_limits<float>::max());
     vec3 max(std::numeric_limits<float>::lowest());
     models.back()->get_min_max_axis_aligned_coordinates(min, max);
     AABBs.emplace_back(min, max);
-    nodes[index].add_data(DataType::AABB, AABBs.size() - 1); // 2
+    nodes[index].AABB_index = AABBs.size() - 1;
 
     return index;
 }
@@ -142,13 +147,14 @@ unsigned int SceneGraph::add_model_node(const std::string& name,
 unsigned int SceneGraph::add_scene_node(const std::string& name,
                                         unsigned int parent,
                                         const std::filesystem::path& path) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::SCENE);
+    unsigned int index = nodes.size() - 1;
     nodes[parent].children.push_back(index);
-    nodes.emplace_back(name, parent, index, Node::Type::SCENE);
+
     transforms.emplace_back();
 
     scenes.emplace_back(path, this, index);
-    nodes[index].add_data(DataType::SCENE, scenes.size() - 1); // 0
+    nodes[index].scene_index = scenes.size() - 1;
 
     return index;
 }
@@ -157,13 +163,14 @@ unsigned int SceneGraph::add_terrain_node(const std::string& name,
                                           unsigned int parent,
                                           float chunk_size,
                                           unsigned int chunks_on_line) {
-    unsigned int index = nodes.size();
+    nodes.emplace_back(name, parent, Node::Type::TERRAIN);
+    unsigned int index = nodes.size() - 1;
     nodes[parent].children.push_back(index);
-    nodes.emplace_back(name, parent, index, Node::Type::TERRAIN);
+
     transforms.emplace_back();
 
     terrains.emplace_back(AssetManager::get_shader("terrain"), chunk_size, chunks_on_line);
-    nodes[index].add_data(DataType::TERRAIN, terrains.size() - 1); // 0
+    nodes[index].drawable_index = terrains.size() - 1;
 
     return index;
 }
@@ -182,9 +189,9 @@ void SceneGraph::add_object_editor_to_imgui_window() {
         Node& node = nodes[selected_node];
         Transform& transform = transforms[selected_node];
 
-        ImGui::Text("Selected Entity: '%s'", node.name.c_str());
+        ImGui::Text("Selected Node: '%s'", node.name.c_str());
 
-        if(ImGui::Button("UNSELECT")) { selected_node = -1; }
+        if(ImGui::Button("UNSELECT")) { selected_node = INVALID_INDEX; }
 
         if(ImGui::Checkbox("Is Object Visible", &node.is_visible)) { set_visibility(selected_node, node.is_visible); }
 
@@ -201,30 +208,10 @@ void SceneGraph::add_object_editor_to_imgui_window() {
         if(is_dirty) { transform.set_local_model_to_dirty(); }
 
         ImGui::NewLine();
-        for(const Node::Data& data : node.data) {
-            switch(data.type) {
-                case DataType::NONE:
-                case DataType::SHADER:
-                case DataType::AABB:
-                case DataType::MESH:
-                case DataType::MODEL:
-                case DataType::SCENE:
-                case DataType::TERRAIN:
-                    break;
-                case DataType::COLOR:
-                    ImGui::PushID(&data);
-                    ImGui::ColorEdit4("Color", &colors[data.index].x);
-                    ImGui::PopID();
-                    break;
-                case DataType::MATERIAL:
-                    ImGui::PushID(&data);
-                    materials[data.index]->add_to_object_editor();
-                    ImGui::PopID();
-                    break;
-            }
-        }
+        if(node.color_index != INVALID_INDEX) { ImGui::ColorEdit4("Color", &colors[node.color_index].x); }
+        if(node.material_index != INVALID_INDEX) { materials[node.material_index]->add_to_object_editor(); }
     } else {
-        ImGui::Text("No Entity is Selected");
+        ImGui::Text("No Node is Selected");
     }
 }
 
@@ -245,39 +232,24 @@ void SceneGraph::set_is_selected(unsigned int node_index, bool is_selected) {
 void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) {
     const Node& node = nodes[node_index];
 
-    if(node.is_visible) {
-        const Shader* shader = nullptr;
-        const AABB* aabb = nullptr;
+    if(node.drawable_index != INVALID_INDEX) {
+        ++total_drawable_objects;
 
-        switch(node.type) {
-            case Node::Type::MESH:
-            case Node::Type::FLAT_SHADED_MESH:
-            case Node::Type::MODEL:
-                aabb = &AABBs[node.data[2].index];
-                if(!aabb->is_in_frustum(frustum.view_projection * transforms[node_index].get_global_model())) {
-                    total_culled_objects++;
-                    break;
-                }
-                [[fallthrough]];
-            case Node::Type::TERRAIN:
-                shader = shaders[node.data[1].index];
+        if(node.is_visible) {
+            ++total_visible_drawables;
 
-                draw(view_projection, shader, node_index);
+            const AABB* aabb = node.AABB_index == INVALID_INDEX ? nullptr : &AABBs[node.AABB_index];
+            const Shader* shader = node.shader_index == INVALID_INDEX ? nullptr : shaders[node.shader_index];
 
-                if(node.is_selected) {
-                    if(flat_shader_index == -1) {
-                        shaders.push_back(AssetManager::get_shader_ptr("flat"));
-                        flat_shader_index = shaders.size() - 1;
-                    }
-
-                    shader = shaders[flat_shader_index];
-                    shader->use();
-                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
+            if(aabb != nullptr) {
+                if(aabb->is_in_frustum(frustum.view_projection * transforms[node_index].get_global_model())) {
                     draw(view_projection, shader, node_index);
+                } else {
+                    ++total_culled_objects;
                 }
 
-                if(are_AABBs_drawn && aabb != nullptr) {
-                    if(flat_shader_index == -1) {
+                if(are_AABBs_drawn) {
+                    if(flat_shader_index == INVALID_INDEX) {
                         shaders.push_back(AssetManager::get_shader_ptr("flat"));
                         flat_shader_index = shaders.size() - 1;
                     }
@@ -291,8 +263,21 @@ void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsig
                     AssetManager::get_mesh("wireframe cube").draw();
                     glLineWidth(1.0f);
                 }
-                break;
-            default: break;
+            } else {
+                draw(view_projection, shader, node_index);
+            }
+
+            if(node.is_selected) {
+                if(flat_shader_index == INVALID_INDEX) {
+                    shaders.push_back(AssetManager::get_shader_ptr("flat"));
+                    flat_shader_index = shaders.size() - 1;
+                }
+
+                shader = shaders[flat_shader_index];
+                shader->use();
+                shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
+                draw(view_projection, shader, node_index);
+            }
         }
     }
 
@@ -301,6 +286,16 @@ void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsig
 
 void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const {
     const Node& node = nodes[node_index];
+
+    if(node.type == Node::Type::TERRAIN) {
+        terrains[node.drawable_index].draw(view_projection);
+        return;
+    }
+
+    if(shader == nullptr) {
+        std::cout << "[WARNING] Node wasn't drawn as it didn't have any shader.\n";
+        return;
+    }
 
     shader->use();
 
@@ -319,20 +314,17 @@ void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigne
 
     switch(node.type) {
         case Node::Type::MESH:
-            if(node.data[3].type == DataType::MATERIAL) {
-                materials[node.data[3].index]->update_shader_uniforms(*shader);
+            if(node.material_index != INVALID_INDEX) {
+                materials[node.material_index]->update_shader_uniforms(*shader);
             }
-            meshes[node.data[0].index]->draw();
+            meshes[node.drawable_index]->draw();
             break;
         case Node::Type::FLAT_SHADED_MESH:
-            shader->set_uniform("u_color", colors[node.data[3].index]);
-            meshes[node.data[0].index]->draw();
+            shader->set_uniform("u_color", colors[node.color_index]);
+            meshes[node.drawable_index]->draw();
             break;
         case Node::Type::MODEL:
-            models[node.data[0].index]->draw(*shader);
-            break;
-        case Node::Type::TERRAIN:
-            terrains[node.data[0].index].draw(view_projection);
+            models[node.drawable_index]->draw(*shader);
             break;
         default: break;
     }
@@ -374,7 +366,7 @@ void SceneGraph::add_node_to_imgui_node_tree(unsigned int node_index) {
     ImGui::PushID(&node);
     if(ImGui::TreeNodeEx(label.c_str(), flags)) {
         if(ImGui::IsItemClicked()) {
-            if(selected_node < nodes.size()) { set_is_selected(selected_node, false); }
+            if(selected_node != INVALID_INDEX) { set_is_selected(selected_node, false); }
             selected_node = node_index;
             set_is_selected(selected_node, true);
         }
@@ -382,7 +374,7 @@ void SceneGraph::add_node_to_imgui_node_tree(unsigned int node_index) {
         for(unsigned int index : node.children) { add_node_to_imgui_node_tree(index); }
         ImGui::TreePop();
     } else if(ImGui::IsItemClicked()) {
-        if(selected_node < nodes.size()) { set_is_selected(selected_node, false); }
+        if(selected_node != INVALID_INDEX) { set_is_selected(selected_node, false); }
         selected_node = node_index;
         set_is_selected(selected_node, true);
     }

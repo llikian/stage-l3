@@ -309,15 +309,13 @@ void Scene::add_node(const cgltf_node* c_node,
             unsigned int mesh_node = scene_graph->add_mesh_node(primitive.name, parent, &primitive.mesh,
                                                                 primitive.shader);
             if(primitive.material != nullptr) {
-                unsigned int material = scene_graph->add_material(primitive.material);
-                scene_graph->nodes[mesh_node].add_data(DataType::MATERIAL, material);
+                scene_graph->nodes[mesh_node].material_index = scene_graph->add_material(primitive.material);
             }
         }
     } else {
         parent = scene_graph->add_simple_node(c_node->name != nullptr
                                                   ? c_node->name
-                                                  : "Node " + std::to_string(
-                                                        scene_graph->nodes[parent].children.size()),
+                                                  : "Node " + std::to_string(scene_graph->nodes[parent].children.size()),
                                               parent);
     }
 

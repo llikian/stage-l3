@@ -18,21 +18,6 @@
 
 #define ADD_NODE_PARAMETERS const std::string& name, unsigned int parent
 
-enum class DataType : unsigned char {
-    NONE,
-
-    COLOR,
-
-    SHADER,
-    MATERIAL,
-    AABB,
-
-    MESH,
-    MODEL,
-    SCENE,
-    TERRAIN,
-};
-
 struct SceneGraph {
     SceneGraph();
     ~SceneGraph();
@@ -62,19 +47,20 @@ struct SceneGraph {
     std::vector<Node> nodes; ///< The scene graph's nodes. The root is always at index 0.
     std::vector<Transform> transforms;
 
-    int flat_shader_index;
+    unsigned int flat_shader_index;
 
-    std::vector<vec4> colors;
-    std::vector<const Shader*> shaders;
-    std::vector<Material*> materials;
-    std::vector<AABB> AABBs;
     std::vector<const Mesh*> meshes;
     std::vector<const Model*> models;
-    std::vector<Scene> scenes;
     std::vector<Terrain> terrains;
+    std::vector<Scene> scenes;
+    std::vector<const Shader*> shaders;
+    std::vector<AABB> AABBs;
+    std::vector<vec4> colors;
+    std::vector<Material*> materials;
 
     bool are_AABBs_drawn;
     unsigned int total_drawable_objects;
+    unsigned int total_visible_drawables;
     unsigned int total_culled_objects;
 
 private:
