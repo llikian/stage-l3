@@ -87,6 +87,10 @@ void EventHandler::handle_cursor_position_event(int position_x, int position_y) 
     event_handler.mouse_position.y = position_y;
 }
 
+vec2 EventHandler::get_mouse_position() {
+    return get().mouse_position;
+}
+
 float EventHandler::get_time() {
     return get().time;
 }

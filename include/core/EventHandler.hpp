@@ -81,6 +81,11 @@ public:
     static void handle_cursor_position_event(int position_x, int position_y);
 
     /**
+     * @return ///< The position of the cursor of the mouse on the window.
+     */
+    static vec2 get_mouse_position();
+
+    /**
      * @return How much time elapsed since the beginning of the program.
      */
     static float get_time();
