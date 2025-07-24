@@ -129,9 +129,9 @@ public:
 
     /**
      * @brief Binds the texture to a specifc texture unit.
-     * @param texUnit The opengl texture unit ID.
+     * @param texture_unit The opengl texture unit ID.
      */
-    void bind(unsigned int texUnit = 0) const;
+    void bind(unsigned int texture_unit = 0) const;
 
     /**
      * @return Whether the texture is the default texture (id == 0).

@@ -10,7 +10,8 @@
 
 #include "debug.hpp"
 
-void get_internal_format_parameters(int internal_format, unsigned int& format, unsigned int& channels_amount,  unsigned int& type) {
+void get_internal_format_parameters(int internal_format, unsigned int& format, unsigned int& channels_amount,
+                                    unsigned int& type) {
     switch(internal_format) {
         case GL_RGB:
         case GL_RGB8:
@@ -237,11 +238,22 @@ void Texture::create(unsigned char r, unsigned char g, unsigned char b) {
 }
 
 void Texture::create(const std::filesystem::path& parent_path, const cgltf_texture_view& texture_view, bool srgb) {
-    init();
-    bind();
-
     const cgltf_texture* texture = texture_view.texture;
     const cgltf_sampler* sampler = texture->sampler;
+
+    std::filesystem::path path = parent_path / texture->image->uri;
+    if(texture->image->uri != nullptr) {
+        if(AssetManager::has_texture(path)) {
+            *this = AssetManager::get_texture(path);
+            return;
+        }
+    } else {
+        // TODO implement loading textures without URIs.
+        throw std::runtime_error("Didn't implement textures without URIs yet :p");
+    }
+
+    init();
+    bind();
 
     switch(sampler->wrap_s) {
         case cgltf_wrap_mode_clamp_to_edge:
@@ -330,17 +342,40 @@ void Texture::create(const std::filesystem::path& parent_path, const cgltf_textu
         }
     }
 
-    if(texture->image->uri != nullptr) {
-        *this = AssetManager::add_texture(parent_path / texture->image->uri, false, srgb);
-    } else {
-        // TODO implement loading textures without URIs.
-        throw std::runtime_error("Didn't implement textures without URIs yet :p");
+    Image image(path, false);
+    unsigned int internal_format = image.get_internal_format(srgb);
+    unsigned int width = image.get_width();
+    unsigned int height = image.get_height();
+    const void* data = image.get_data();
+
+    unsigned int format;
+    unsigned int channels_amount;
+    unsigned int type;
+    get_internal_format_parameters(internal_format, format, channels_amount, type);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, type, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    b_has_transparency = false;
+    if(data != nullptr && channels_amount == 4 && type == GL_UNSIGNED_BYTE) {
+        const unsigned char* typed_data = static_cast<const unsigned char*>(data);
+        for(unsigned int j = 0 ; j < height ; ++j) {
+            for(unsigned int i = 0 ; i < width ; ++i) {
+                if(typed_data[4 * (j * width + i) + 3] < 255) {
+                    b_has_transparency = true;
+                    return;
+                }
+            }
+        }
     }
+
+    AssetManager::add_texture(path, *this);
 }
 
-void Texture::bind(unsigned int texUnit) const {
-    glActiveTexture(GL_TEXTURE0 + texUnit);
+void Texture::bind(unsigned int texture_unit) const {
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, id);
+    std::cout << "Bound texture " << id << " to unit " << texture_unit << ".\n";
 }
 
 bool Texture::is_default_texture() const {
