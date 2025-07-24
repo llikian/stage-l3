@@ -375,7 +375,6 @@ void Texture::create(const std::filesystem::path& parent_path, const cgltf_textu
 void Texture::bind(unsigned int texture_unit) const {
     glActiveTexture(GL_TEXTURE0 + texture_unit);
     glBindTexture(GL_TEXTURE_2D, id);
-    std::cout << "Bound texture " << id << " to unit " << texture_unit << ".\n";
 }
 
 bool Texture::is_default_texture() const {
