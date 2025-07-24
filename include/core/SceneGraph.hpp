@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "culling/AABB.hpp"
-#include "maths/Transform.hpp"
 #include "mesh/Mesh.hpp"
 #include "mesh/Model.hpp"
 #include "mesh/Scene.hpp"
@@ -30,12 +29,22 @@ struct SceneGraph {
     Node& operator[](unsigned int node_index);
 
     unsigned int add_simple_node(ADD_NODE_PARAMETERS);
+    unsigned int add_mesh_node(ADD_NODE_PARAMETERS,
+                               unsigned int mesh_index,
+                               unsigned int shader_index,
+                               unsigned int AABB_index);
     unsigned int add_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const Shader* shader);
+    unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS,
+                                           unsigned int mesh_index,
+                                           unsigned int AABB_index,
+                                           const vec4& color);
     unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const vec4& color);
     unsigned int add_model_node(ADD_NODE_PARAMETERS, const Model* model, const Shader* shader);
     unsigned int add_scene_node(ADD_NODE_PARAMETERS, const std::filesystem::path& path);
     unsigned int add_terrain_node(ADD_NODE_PARAMETERS, float chunk_size, unsigned int chunks_on_line);
 
+    void add_mesh_and_AABB(const Mesh* mesh, unsigned int& mesh_index, unsigned int& AABB_index);
+    unsigned int add_shader(const Shader* shader);
     unsigned int add_material(Material* material);
 
     void add_imgui_node_tree();
@@ -45,7 +54,6 @@ struct SceneGraph {
     void set_is_selected(unsigned int node_index, bool is_selected);
 
     std::vector<Node> nodes; ///< The scene graph's nodes. The root is always at index 0.
-    std::vector<Transform> transforms;
 
     unsigned int flat_shader_index;
 
@@ -64,7 +72,7 @@ struct SceneGraph {
     unsigned int total_culled_objects;
 
 private:
-    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) ;
+    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index);
     void draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const;
 
     void add_node_to_imgui_node_tree(unsigned int node_index);

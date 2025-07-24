@@ -240,7 +240,7 @@ void Model::add_mesh(const std::vector<vec3>& positions,
 void Model::draw(const Shader& shader) const {
     shader.use();
     for(unsigned int i = 0 ; i < meshes.size() ; ++i) {
-        materials[i].update_shader_uniforms(shader);
+        materials[i].update_shader_uniforms(&shader);
         meshes[i].draw();
     }
 }

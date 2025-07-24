@@ -74,13 +74,13 @@ Application::Application()
                              });
     AssetManager::add_shader("metallic-roughness", {
                                  "shaders/vertex/tangent.vert",
+                                 "shaders/metallic-roughness/get_directions_tangent.frag",
                                  "shaders/metallic-roughness/metallic_roughness.frag",
-                                 "shaders/metallic-roughness/get_directions_tangent.frag"
                              });
     AssetManager::add_shader("metallic-roughness no tangent", {
                                  "shaders/vertex/default.vert",
+                                 "shaders/metallic-roughness/get_directions_no_tangent.frag",
                                  "shaders/metallic-roughness/metallic_roughness.frag",
-                                 "shaders/metallic-roughness/get_directions_no_tangent.frag"
                              });
     AssetManager::add_shader("terrain", {
                                  "shaders/terrain/terrain.vert",
@@ -112,6 +112,10 @@ Application::Application()
     AssetManager::add_texture("green", vec3(0.0f, 1.0f, 0.0f));
     AssetManager::add_texture("blue", vec3(0.0f, 0.0f, 1.0f));
 
+    /* ---- Scene Graph */
+    scene_graph.shaders.push_back(AssetManager::get_shader_ptr("flat"));
+    scene_graph.flat_shader_index = scene_graph.shaders.size() - 1;
+
     /* ---- Other ---- */
     // glfwSwapInterval(0); // disable vsync
 }
@@ -124,19 +128,38 @@ Application::~Application() {
 
 void Application::run() {
     /* Light */
-    unsigned int light = scene_graph.add_flat_shaded_mesh_node("Light", 0,
-                                                               &AssetManager::get_mesh("icosphere 1"),
+    unsigned int light = scene_graph.add_flat_shaded_mesh_node("Light",
+                                                               0,
+                                                               AssetManager::get_mesh_ptr("icosphere 1"),
                                                                vec4(1.0f));
-    scene_graph.transforms[light].set_local_position(0.0f, 100.0f, 0.0f);
-    const vec3& light_position = scene_graph.transforms[light].get_local_position_reference();
-    const vec4& light_color = scene_graph.colors[scene_graph[light].color_index];
+    scene_graph[light].transform.set_local_position(0.0f, 100.0f, 0.0f);
+
+    /* Frustum Tests */ {
+        unsigned int frustum_tests_root = scene_graph.add_simple_node("Frustum Tests Root", 0);
+        unsigned int mesh_index, AABB_index;
+        scene_graph.add_mesh_and_AABB(AssetManager::get_mesh_ptr("cube"), mesh_index, AABB_index);
+
+        std::string name = "Frustum Test Mesh ";
+
+        for(unsigned int i = 0 ; i < 10'000 ; ++i) {
+            unsigned int index = scene_graph.add_flat_shaded_mesh_node(name + std::to_string(i),
+                                                                       frustum_tests_root,
+                                                                       mesh_index,
+                                                                       AABB_index,
+                                                                       vec4(1.0f));
+
+            scene_graph[index].transform.set_local_position(Random::get_vec3(-500.0f, 500.0f));
+            scene_graph[index].transform.set_local_scale(Random::get_vec3(1.0f, 5.0f));
+        }
+    }
 
     /* Other Entities */
     unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
-    scene_graph.transforms[sponza].set_local_scale(20.0f);
+    scene_graph[sponza].transform.set_local_scale(20.0f);
 
-    unsigned int buggy = scene_graph.add_scene_node("buggy", 0, "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf");
-    scene_graph.transforms[buggy].set_local_scale(0.25f);
+    // unsigned int buggy = scene_graph.add_scene_node(
+    //     "buggy", 0, "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf");
+    // scene_graph.nodes[buggy].transform.set_local_scale(0.25f);
 
     /* Main Loop */
     while(!Window::should_close()) {
@@ -149,11 +172,12 @@ void Application::run() {
         framebuffer.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        const vec3 light_position = scene_graph[light].transform.get_local_position_reference();
+        const vec4 light_color = scene_graph.colors[scene_graph[light].color_index];
+
         vec3 camera_position = camera.get_position();
         vec3 camera_direction = camera.get_direction();
         frustum.view_projection = camera.get_view_projection_matrix();
-
-        scene_graph.update_transform_and_children();
 
         draw_background();
 

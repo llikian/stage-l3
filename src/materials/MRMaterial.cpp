@@ -15,15 +15,15 @@ MRMaterial::MRMaterial(const std::string& name)
       reflectance(0.5f) // Index of Refraction = 1.5f, 4% reflectance
 { }
 
-void MRMaterial::update_shader_uniforms(const Shader& shader) const {
+void MRMaterial::update_shader_uniforms(const Shader* shader) const {
     base_color_map.bind(0);
     metallic_roughness_map.bind(1);
     normal_map.bind(2);
 
-    shader.set_uniform_if_exists("u_material.base_color", base_color);
-    shader.set_uniform_if_exists("u_material.metallic", metallic);
-    shader.set_uniform_if_exists("u_material.roughness", roughness);
-    shader.set_uniform_if_exists("u_material.reflectance", reflectance);
+    shader->set_uniform_if_exists("u_material.base_color", base_color);
+    shader->set_uniform_if_exists("u_material.metallic", metallic);
+    shader->set_uniform_if_exists("u_material.roughness", roughness);
+    shader->set_uniform_if_exists("u_material.reflectance", reflectance);
 }
 
 bool MRMaterial::has_transparency() const {

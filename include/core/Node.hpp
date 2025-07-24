@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include "maths/Transform.hpp"
 
 constexpr unsigned int INVALID_INDEX = ~0u;
 
@@ -27,6 +28,8 @@ struct Node {
 
     unsigned int parent;                ///< The index of the node's parent. INVALID_INDEX if it is the root.
     std::vector<unsigned int> children; ///< The indices of the node's children.
+
+    Transform transform;
 
     unsigned int drawable_index; ///< The index of node's drawable object. INVALID_INDEX if not drawable.
     unsigned int shader_index;   ///< The index of the node's shader. INVALID_INDEX if no shader.
