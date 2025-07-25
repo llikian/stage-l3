@@ -1,0 +1,20 @@
+/***************************************************************************************************
+ * @file  frustum_culling.comp
+ * @brief Compute shader for calculating frustum culling
+ **************************************************************************************************/
+
+#version 460 core
+
+struct AABB {
+    vec3 points[8];
+};
+
+layout (binding = 0) readonly buffer data {
+    AABB AABBs[];
+};
+
+uniform mat4 view_projection;
+
+void main() {
+
+}

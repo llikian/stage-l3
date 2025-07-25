@@ -21,7 +21,7 @@ struct SceneGraph {
     SceneGraph();
     ~SceneGraph();
 
-    void draw(const mat4& view_projection, const Frustum& frustum);
+    void draw(const Frustum& frustum);
 
     void update_transform_and_children(unsigned int node_index = 0);
     void force_update_transform_and_children(unsigned int node_index = 0);
@@ -31,19 +31,17 @@ struct SceneGraph {
     unsigned int add_simple_node(ADD_NODE_PARAMETERS);
     unsigned int add_mesh_node(ADD_NODE_PARAMETERS,
                                unsigned int mesh_index,
-                               unsigned int shader_index,
-                               unsigned int AABB_index);
+                               unsigned int shader_index);
     unsigned int add_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const Shader* shader);
     unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS,
                                            unsigned int mesh_index,
-                                           unsigned int AABB_index,
                                            const vec4& color);
     unsigned int add_flat_shaded_mesh_node(ADD_NODE_PARAMETERS, const Mesh* mesh, const vec4& color);
     unsigned int add_model_node(ADD_NODE_PARAMETERS, const Model* model, const Shader* shader);
     unsigned int add_scene_node(ADD_NODE_PARAMETERS, const std::filesystem::path& path);
     unsigned int add_terrain_node(ADD_NODE_PARAMETERS, float chunk_size, unsigned int chunks_on_line);
 
-    void add_mesh_and_AABB(const Mesh* mesh, unsigned int& mesh_index, unsigned int& AABB_index);
+    unsigned int add_mesh(const Mesh* mesh);
     unsigned int add_shader(const Shader* shader);
     unsigned int add_material(Material* material);
 
@@ -54,6 +52,8 @@ struct SceneGraph {
     void set_is_selected(unsigned int node_index, bool is_selected);
 
     std::vector<Node> nodes; ///< The scene graph's nodes. The root is always at index 0.
+    std::vector<Transform> transforms;
+    std::vector<AABB> AABBs;
 
     unsigned int flat_shader_index;
 
@@ -62,19 +62,26 @@ struct SceneGraph {
     std::vector<Terrain> terrains;
     std::vector<Scene> scenes;
     std::vector<const Shader*> shaders;
-    std::vector<AABB> AABBs;
     std::vector<vec4> colors;
     std::vector<Material*> materials;
 
     bool are_AABBs_drawn;
-    unsigned int total_drawable_objects;
-    unsigned int total_visible_drawables;
-    unsigned int total_culled_objects;
+    unsigned int total_drawn_objects;
+
+    // Shader frustum_culling_comp;
+    // unsigned int AABBs_buffer;
+    // unsigned int models_buffer;
+    // unsigned int result_buffer;
 
 private:
-    void draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index);
+    unsigned int add_node(ADD_NODE_PARAMETERS, Node::Type type);
+
+    void draw(const Frustum& frustum, unsigned int node_index);
     void draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const;
 
+    void init_aabb(unsigned int node_index, Node::Type type);
+
     void add_node_to_imgui_node_tree(unsigned int node_index);
+
     unsigned int selected_node;
 };

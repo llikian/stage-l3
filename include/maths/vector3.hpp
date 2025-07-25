@@ -41,7 +41,7 @@ struct vector3 {
      * @brief Constructs a vector3 with its components specified by a vector4's first 3 components.
      * @param xyzw The value of the xyz (and the ignored w) components.
      */
-    vector3(const vector4<Type>& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z) { }
+    explicit vector3(const vector4<Type>& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z) { }
 
     /**
      * @brief Constructs a vector3 with the same value for each component.

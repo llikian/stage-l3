@@ -13,25 +13,30 @@
 SceneGraph::SceneGraph()
     : flat_shader_index(INVALID_INDEX), are_AABBs_drawn(false), selected_node(INVALID_INDEX) {
     add_simple_node("Scene Graph", INVALID_INDEX);
+
+    // frustum_culling_comp.create({"shaders/compute/frustum_culling.comp"}, "Frustum Culling");
+    //
+    // glGenBuffers(1, &AABBs_buffer);
+    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, AABBs_buffer);
+    // glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(AABB) * AABBs.size(), AABBs.data(), GL_STATIC_READ);
 }
 
 SceneGraph::~SceneGraph() {
     for(Scene& scene : scenes) {
         scene.free();
     }
+    // glDeleteBuffers(1, &AABBs_buffer);
 }
 
-void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum) {
-    total_drawable_objects = 0;
-    total_visible_drawables = 0;
-    total_culled_objects = 0;
+void SceneGraph::draw(const Frustum& frustum) {
+    total_drawn_objects = 0;
 
     update_transform_and_children();
-    draw(view_projection, frustum, 0);
+    draw(frustum, 0);
 }
 
 void SceneGraph::update_transform_and_children(unsigned int node_index) {
-    if(nodes[node_index].transform.is_local_model_dirty()) {
+    if(transforms[node_index].is_local_model_dirty()) {
         force_update_transform_and_children(node_index);
     } else {
         for(unsigned int child : nodes[node_index].children) {
@@ -43,9 +48,9 @@ void SceneGraph::update_transform_and_children(unsigned int node_index) {
 void SceneGraph::force_update_transform_and_children(unsigned int node_index) {
     Node& node = nodes[node_index];
     if(nodes[node_index].parent != INVALID_INDEX) {
-        node.transform.update_global_model(nodes[node.parent].transform.get_global_model());
+        transforms[node_index].update_global_model(transforms[node.parent].get_global_model());
     } else {
-        node.transform.update_global_model();
+        transforms[node_index].update_global_model();
     }
 
     for(unsigned int child : nodes[node_index].children) {
@@ -55,26 +60,33 @@ void SceneGraph::force_update_transform_and_children(unsigned int node_index) {
 
 Node& SceneGraph::operator[](unsigned int node_index) { return nodes[node_index]; }
 
-unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {
-    nodes.emplace_back(name, parent, Node::Type::SIMPLE);
+unsigned int SceneGraph::add_node(const std::string& name, unsigned int parent, Node::Type type) {
+    nodes.emplace_back(name, parent, type);
+    transforms.emplace_back();
+    AABBs.emplace_back();
+
     unsigned int index = nodes.size() - 1;
     if(parent != INVALID_INDEX) { nodes[parent].children.push_back(index); }
 
     return nodes.size() - 1;
 }
 
+unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {
+    unsigned int index = add_node(name, parent, Node::Type::SIMPLE);
+    init_aabb(index, Node::Type::SIMPLE);
+    return index;
+}
+
 unsigned int SceneGraph::add_mesh_node(const std::string& name,
                                        unsigned int parent,
                                        unsigned int mesh_index,
-                                       unsigned int shader_index,
-                                       unsigned int AABB_index) {
-    Node& node = nodes.emplace_back(name, parent, Node::Type::MESH);
-    unsigned int index = nodes.size() - 1;
-    nodes[parent].children.push_back(index);
+                                       unsigned int shader_index) {
+    unsigned int index = add_node(name, parent, Node::Type::MESH);
 
-    node.drawable_index = mesh_index;
-    node.shader_index = shader_index;
-    node.AABB_index = AABB_index;
+    nodes[index].drawable_index = mesh_index;
+    nodes[index].shader_index = shader_index;
+
+    init_aabb(index, Node::Type::MESH);
 
     return index;
 }
@@ -86,29 +98,22 @@ unsigned int SceneGraph::add_mesh_node(const std::string& name,
     meshes.push_back(mesh);
     shaders.push_back(shader);
 
-    vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::lowest());
-    meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
-    AABBs.emplace_back(min, max);
-
-    return add_mesh_node(name, parent, meshes.size() - 1, shaders.size() - 1, AABBs.size() - 1);
+    return add_mesh_node(name, parent, meshes.size() - 1, shaders.size() - 1);
 }
 
 unsigned int SceneGraph::add_flat_shaded_mesh_node(const std::string& name,
                                                    unsigned int parent,
                                                    unsigned int mesh_index,
-                                                   unsigned int AABB_index,
                                                    const vec4& color) {
-    Node& node = nodes.emplace_back(name, parent, Node::Type::FLAT_SHADED_MESH);
-    unsigned int index = nodes.size() - 1;
-    nodes[parent].children.push_back(index);
+    unsigned int index = add_node(name, parent, Node::Type::FLAT_SHADED_MESH);
 
-    node.drawable_index = mesh_index;
-    node.shader_index = flat_shader_index;
-    node.AABB_index = AABB_index;
+    nodes[index].drawable_index = mesh_index;
+    nodes[index].shader_index = flat_shader_index;
 
     colors.push_back(color);
-    node.color_index = colors.size() - 1;
+    nodes[index].color_index = colors.size() - 1;
+
+    init_aabb(index, Node::Type::FLAT_SHADED_MESH);
 
     return index;
 }
@@ -119,33 +124,22 @@ unsigned int SceneGraph::add_flat_shaded_mesh_node(const std::string& name,
                                                    const vec4& color) {
     meshes.push_back(mesh);
 
-    vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::lowest());
-    meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
-    AABBs.emplace_back(min, max);
-
-    return add_flat_shaded_mesh_node(name, parent, meshes.size() - 1, AABBs.size() - 1, color);
+    return add_flat_shaded_mesh_node(name, parent, meshes.size() - 1, color);
 }
 
 unsigned int SceneGraph::add_model_node(const std::string& name,
                                         unsigned int parent,
                                         const Model* model,
                                         const Shader* shader) {
-    Node& node = nodes.emplace_back(name, parent, Node::Type::MODEL);
-    unsigned int index = nodes.size() - 1;
-    nodes[parent].children.push_back(index);
+    unsigned int index = add_node(name, parent, Node::Type::MODEL);
 
     models.push_back(model);
-    node.drawable_index = models.size() - 1;
+    nodes[index].drawable_index = models.size() - 1;
 
     shaders.push_back(shader);
-    node.shader_index = shaders.size() - 1;
+    nodes[index].shader_index = shaders.size() - 1;
 
-    vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::lowest());
-    models.back()->get_min_max_axis_aligned_coordinates(min, max);
-    AABBs.emplace_back(min, max);
-    node.AABB_index = AABBs.size() - 1;
+    init_aabb(index, Node::Type::MODEL);
 
     return index;
 }
@@ -153,12 +147,12 @@ unsigned int SceneGraph::add_model_node(const std::string& name,
 unsigned int SceneGraph::add_scene_node(const std::string& name,
                                         unsigned int parent,
                                         const std::filesystem::path& path) {
-    Node& node = nodes.emplace_back(name, parent, Node::Type::SCENE);
-    unsigned int index = nodes.size() - 1;
-    nodes[parent].children.push_back(index);
+    unsigned int index = add_node(name, parent, Node::Type::SCENE);
 
     scenes.emplace_back(path, this, index);
-    node.scene_index = scenes.size() - 1;
+    nodes[index].scene_index = scenes.size() - 1;
+
+    init_aabb(index, Node::Type::SCENE);
 
     return index;
 }
@@ -167,25 +161,19 @@ unsigned int SceneGraph::add_terrain_node(const std::string& name,
                                           unsigned int parent,
                                           float chunk_size,
                                           unsigned int chunks_on_line) {
-    nodes.emplace_back(name, parent, Node::Type::TERRAIN);
-    unsigned int index = nodes.size() - 1;
-    nodes[parent].children.push_back(index);
+    unsigned int index = add_node(name, parent, Node::Type::TERRAIN);
 
     terrains.emplace_back(AssetManager::get_shader("terrain"), chunk_size, chunks_on_line);
     nodes[index].drawable_index = terrains.size() - 1;
 
+    init_aabb(index, Node::Type::TERRAIN);
+
     return index;
 }
 
-void SceneGraph::add_mesh_and_AABB(const Mesh* mesh, unsigned int& mesh_index, unsigned int& AABB_index) {
+unsigned int SceneGraph::add_mesh(const Mesh* mesh) {
     meshes.push_back(mesh);
-    mesh_index = meshes.size() - 1;
-
-    vec3 min(std::numeric_limits<float>::max());
-    vec3 max(std::numeric_limits<float>::lowest());
-    meshes.back()->get_min_max_axis_aligned_coordinates(min, max);
-    AABBs.emplace_back(min, max);
-    AABB_index = AABBs.size() - 1;
+    return meshes.size() - 1;
 }
 
 unsigned int SceneGraph::add_shader(const Shader* shader) {
@@ -205,7 +193,7 @@ void SceneGraph::add_imgui_node_tree() {
 void SceneGraph::add_object_editor_to_imgui_window() {
     if(selected_node < nodes.size()) {
         Node& node = nodes[selected_node];
-        Transform& transform = node.transform;
+        Transform& transform = transforms[selected_node];
 
         ImGui::Text("Selected Node: '%s'", node.name.c_str());
 
@@ -253,49 +241,45 @@ void SceneGraph::set_is_selected(unsigned int node_index, bool is_selected) {
     }
 }
 
-void SceneGraph::draw(const mat4& view_projection, const Frustum& frustum, unsigned int node_index) {
+void SceneGraph::draw(const Frustum& frustum, unsigned int node_index) {
     const Node& node = nodes[node_index];
 
-    if(node.drawable_index != INVALID_INDEX) {
-        ++total_drawable_objects;
+    if(!node.is_visible) { return; }
 
-        if(node.is_visible) {
-            ++total_visible_drawables;
+    const AABB& aabb = AABBs[node_index];
+    const Transform& transform = transforms[node_index];
 
-            const AABB* aabb = node.AABB_index == INVALID_INDEX ? nullptr : &AABBs[node.AABB_index];
-            const Shader* shader = node.shader_index == INVALID_INDEX ? nullptr : shaders[node.shader_index];
-
-            if(aabb != nullptr) {
-                if(aabb->is_in_frustum(frustum.view_projection * nodes[node_index].transform.get_global_model())) {
-                    draw(view_projection, shader, node_index);
-                } else {
-                    ++total_culled_objects;
-                }
-
-                if(are_AABBs_drawn) {
-                    shader = shaders[flat_shader_index];
-                    shader->use();
-                    shader->set_uniform("u_mvp", view_projection * aabb->get_global_model_matrix(node.transform));
-                    shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-                    glLineWidth(3.0f);
-                    AssetManager::get_mesh("wireframe cube").draw();
-                    glLineWidth(1.0f);
-                }
-            } else {
-                draw(view_projection, shader, node_index);
-            }
-
-            // TODO: Find a better way
-            if(node.is_selected) {
-                shader = shaders[flat_shader_index];
-                shader->use();
-                shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 0.25f));
-                draw(view_projection, shader, node_index);
-            }
+    if(aabb.is_in_frustum(frustum, transform.get_global_model())) {
+        if(node.drawable_index != INVALID_INDEX) {
+            ++total_drawn_objects;
+            const Shader* shader = shaders[node.shader_index];
+            draw(frustum.view_projection, shader, node_index);
         }
-    }
 
-    for(unsigned int index : node.children) { draw(view_projection, frustum, index); }
+        if(are_AABBs_drawn || node.is_selected) {
+            const Shader* shader = shaders[flat_shader_index];
+            shader->use();
+            shader->set_uniform("u_mvp", frustum.view_projection * aabb.get_global_model_matrix(transform));
+
+            if(node.is_selected) {
+                if(node.parent == INVALID_INDEX || !nodes[node.parent].is_selected) {
+                    shader->set_uniform("u_color", vec4(0.0f, 1.0f, 1.0f, 1.0f));
+                } else {
+                    shader->set_uniform("u_color", vec4(0.0f, 0.0f, 1.0f, 1.0f));
+                }
+            } else if(node.drawable_index == INVALID_INDEX) { // Not a drawable node.
+                shader->set_uniform("u_color", vec4(0.0f, 1.0f, 0.0f, 1.0f));
+            } else {
+                shader->set_uniform("u_color", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
+
+            glLineWidth(3.0f);
+            AssetManager::get_mesh("wireframe cube").draw();
+            glLineWidth(1.0f);
+        }
+
+        for(unsigned int index : node.children) { draw(frustum, index); }
+    }
 }
 
 void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const {
@@ -313,7 +297,7 @@ void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigne
 
     shader->use();
 
-    const mat4& global_model = node.transform.get_global_model_const_reference();
+    const mat4& global_model = transforms[node_index].get_global_model_const_reference();
     shader->set_uniform_if_exists("u_model", global_model);
 
     int u_mvp_location = shader->get_uniform_location("u_mvp");
@@ -341,6 +325,33 @@ void SceneGraph::draw(const mat4& view_projection, const Shader* shader, unsigne
             models[node.drawable_index]->draw(*shader);
             break;
         default: break;
+    }
+}
+
+void SceneGraph::init_aabb(unsigned int node_index, Node::Type type) {
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+
+    // No default to get a warning if a node type is added and this function is not updated.
+    switch(type) {
+        case Node::Type::SIMPLE: break;
+        case Node::Type::MESH:
+        case Node::Type::FLAT_SHADED_MESH:
+            meshes[nodes[node_index].drawable_index]->get_min_max_axis_aligned_coordinates(min, max);
+            AABBs[node_index].set(min, max);
+            break;
+        case Node::Type::MODEL:
+            models[nodes[node_index].drawable_index]->get_min_max_axis_aligned_coordinates(min, max);
+            AABBs[node_index].set(min, max);
+            break;
+        case Node::Type::SCENE: break;
+        case Node::Type::TERRAIN: break;
+    }
+
+    unsigned int index = node_index;
+    while(nodes[index].parent != INVALID_INDEX) {
+        AABBs[nodes[index].parent].update(AABBs[index], transforms[index]);
+        index = nodes[index].parent;
     }
 }
 

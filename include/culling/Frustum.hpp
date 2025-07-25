@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "assets/Camera.hpp"
 #include "maths/mat4.hpp"
 
 /**
@@ -12,5 +13,8 @@
  * @brief
  */
 struct Frustum {
+    void update(const Camera& camera);
+
     mat4 view_projection;
+    vec4 points[8];
 };

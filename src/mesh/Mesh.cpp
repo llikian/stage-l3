@@ -110,7 +110,7 @@ void Mesh::apply_model_matrix(const mat4& model) {
     for(unsigned int i = 0 ; i < data.size() ; i += stride) {
         if(has_attribute(ATTRIBUTE_POSITION)) {
             vec3* pos = reinterpret_cast<vec3*>(&data[pos_offset + i]);
-            *pos = model * vec4(pos->x, pos->y, pos->z, 1.0f);
+            *pos = vec3(model * vec4(pos->x, pos->y, pos->z, 1.0f));
         }
 
         if(has_attribute(ATTRIBUTE_NORMAL)) {

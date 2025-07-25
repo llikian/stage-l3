@@ -322,14 +322,14 @@ void Scene::add_node(const cgltf_node* c_node,
     bool transformed = false;
 
     if(c_node->has_translation) {
-        scene_graph->nodes[parent].transform.set_local_position(c_node->translation[0],
+        scene_graph->transforms[parent].set_local_position(c_node->translation[0],
                                                            c_node->translation[1],
                                                            c_node->translation[2]);
         transformed = true;
     }
 
     if(c_node->has_rotation) {
-        scene_graph->nodes[parent].transform.set_local_orientation(c_node->rotation[0],
+        scene_graph->transforms[parent].set_local_orientation(c_node->rotation[0],
                                                               c_node->rotation[1],
                                                               c_node->rotation[2],
                                                               c_node->rotation[3]);
@@ -337,14 +337,14 @@ void Scene::add_node(const cgltf_node* c_node,
     }
 
     if(c_node->has_scale) {
-        scene_graph->nodes[parent].transform.set_local_scale(c_node->scale[0],
+        scene_graph->transforms[parent].set_local_scale(c_node->scale[0],
                                                         c_node->scale[1],
                                                         c_node->scale[2]);
         transformed = true;
     }
 
     if(!transformed && c_node->has_matrix) {
-        scene_graph->nodes[parent].transform.set_local_model(c_node->matrix);
+        scene_graph->transforms[parent].set_local_model(c_node->matrix);
     }
 
     for(unsigned int i = 0 ; i < c_node->children_count ; ++i) {

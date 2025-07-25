@@ -11,7 +11,6 @@ Node::Node(const std::string& name, int parent, Type type)
       parent(parent),
       drawable_index(INVALID_INDEX),
       shader_index(INVALID_INDEX),
-      AABB_index(INVALID_INDEX),
       color_index(INVALID_INDEX),
       material_index(INVALID_INDEX),
       scene_index(INVALID_INDEX),
