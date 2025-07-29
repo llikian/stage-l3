@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Attribute.hpp"
+#include "culling/AABB.hpp"
 #include "glad/glad.h"
 #include "maths/mat4.hpp"
 #include "maths/vec2.hpp"
@@ -54,6 +55,8 @@ public:
     size_t get_indices_amount() const;
 
     AttributeType get_attribute_type(Attribute attribute);
+
+    AABB get_AABB() const;
 
     /**
      * @brief Calculates the minimum and maximum value for each coordinate for every position in the
@@ -158,6 +161,8 @@ private:
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
+
+    AABB aabb;
 };
 
 inline unsigned int get_opengl_enum_for_primitive(Primitive primitive) {

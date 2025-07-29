@@ -38,6 +38,8 @@ public:
 
     void get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const;
 
+    AABB get_AABB() const;
+
 private:
     /**
      * @brief Parse a .obj file and reads all of its data into the model's buffers.
@@ -65,4 +67,6 @@ private:
 
     std::vector<Mesh> meshes;  ///< The meshes composing the model.
     std::vector<PhongMaterial> materials; ///< The model's materials.
+
+    AABB aabb;
 };

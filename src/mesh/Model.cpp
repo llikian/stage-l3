@@ -139,6 +139,12 @@ void Model::parse_obj_file(const std::filesystem::path& path) {
         add_mesh(positions, normals, tex_coords, vertex_indices[i]);
     }
 
+    /* AABB */
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    get_min_max_axis_aligned_coordinates(min, max);
+    aabb.set(min, max);
+
 #ifdef DEBUG_LOG_MODEL_READ_INFO
     std::cout << '\t' << positions.size() << " vertex positions\n";
     if(!normals.empty()) { std::cout << '\t' << normals.size() << " normals\n"; }
@@ -247,10 +253,20 @@ void Model::draw(const Shader& shader) const {
 
 void Model::apply_model_matrix(const mat4& model) {
     for(Mesh& mesh : meshes) { mesh.apply_model_matrix(model); }
+
+    /* AABB */
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    get_min_max_axis_aligned_coordinates(min, max);
+    aabb.set(min, max);
 }
 
 void Model::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
     for(unsigned int i = 0 ; i < meshes.size() ; ++i) {
         meshes[i].get_min_max_axis_aligned_coordinates(minimum, maximum);
     }
+}
+
+AABB Model::get_AABB() const {
+    return aabb;
 }

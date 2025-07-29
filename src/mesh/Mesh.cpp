@@ -72,6 +72,10 @@ AttributeType Mesh::get_attribute_type(Attribute attribute) {
     return attributes[attribute];
 }
 
+AABB Mesh::get_AABB() const {
+    return aabb;
+}
+
 void Mesh::get_min_max_axis_aligned_coordinates(vec3& minimum, vec3& maximum) const {
     if(has_attribute(ATTRIBUTE_POSITION)) {
         const unsigned int offset = get_attribute_offset(ATTRIBUTE_POSITION);
@@ -167,6 +171,12 @@ void Mesh::add_face(unsigned int topL, unsigned int bottomL, unsigned int bottom
 }
 
 void Mesh::bind_buffers() {
+    /* AABB */
+    vec3 min(std::numeric_limits<float>::max());
+    vec3 max(std::numeric_limits<float>::lowest());
+    get_min_max_axis_aligned_coordinates(min, max);
+    aabb.set(min, max);
+
     /* VAO */
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
