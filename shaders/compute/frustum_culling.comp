@@ -5,16 +5,52 @@
 
 #version 460 core
 
+layout(local_size_x = 64) in;
+
 struct AABB {
-    vec3 points[8];
+    vec3 min_point;
+    vec3 max_point;
 };
 
-layout (binding = 0) readonly buffer data {
+layout(binding = 0) readonly buffer input_buffer {
     AABB AABBs[];
 };
 
-uniform mat4 view_projection;
+layout(binding = 1) writeonly buffer output_buffer {
+    int is_in_frustum[]; // 0 = false, 1 = true
+};
+
+uniform mat4 u_view_projection;
 
 void main() {
+    uint points_above_planes[6] = { 0, 0, 0, 0, 0, 0 };
+    
+    vec3 min_point = AABBs[gl_GlobalInvocationID.x].min_point;
+    vec3 max_point = AABBs[gl_GlobalInvocationID.x].max_point;
 
+    vec4 points[8] = {
+        u_view_projection * vec4(min_point.x, min_point.y, min_point.z, 1.0f),
+        u_view_projection * vec4(min_point.x, min_point.y, max_point.z, 1.0f),
+        u_view_projection * vec4(min_point.x, max_point.y, min_point.z, 1.0f),
+        u_view_projection * vec4(min_point.x, max_point.y, max_point.z, 1.0f),
+        u_view_projection * vec4(max_point.x, min_point.y, min_point.z, 1.0f),
+        u_view_projection * vec4(max_point.x, min_point.y, max_point.z, 1.0f),
+        u_view_projection * vec4(max_point.x, max_point.y, min_point.z, 1.0f),
+        u_view_projection * vec4(max_point.x, max_point.y, max_point.z, 1.0f)
+    };
+
+    for(int i = 0 ; i < 8 ; ++i) {
+        if(points[i].x < -points[i].w) { ++points_above_planes[0]; }
+        if(points[i].x > points[i].w) { ++points_above_planes[1]; }
+        if(points[i].y < -points[i].w) { ++points_above_planes[2]; }
+        if(points[i].y > points[i].w) { ++points_above_planes[3]; }
+        if(points[i].z < -points[i].w) { ++points_above_planes[4]; }
+        if(points[i].z > points[i].w) { ++points_above_planes[5]; }
+    }
+
+    for(int i = 0 ;i < 6 ; ++i) {
+        if(points_above_planes[i] == 8) { is_in_frustum[gl_GlobalInvocationID.x] = 0; return; }
+    }
+
+    is_in_frustum[gl_GlobalInvocationID.x] = 1;
 }

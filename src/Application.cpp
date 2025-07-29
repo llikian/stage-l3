@@ -140,7 +140,7 @@ void Application::run() {
 
         std::string name = "Frustum Test Mesh ";
 
-        for(unsigned int i = 0 ; i < 10'000 ; ++i) {
+        for(unsigned int i = 0 ; i < 100'000 ; ++i) {
             unsigned int index = scene_graph.add_flat_shaded_mesh_node(name + std::to_string(i),
                                                                        frustum_tests_root,
                                                                        mesh_index,
@@ -157,7 +157,7 @@ void Application::run() {
 
     // unsigned int buggy = scene_graph.add_scene_node(
     //     "buggy", 0, "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf");
-    // scene_graph.nodes[buggy].transform.set_local_scale(0.25f);
+    // scene_graph.transforms[buggy].set_local_scale(0.25f);
 
     /* Main Loop */
     while(!Window::should_close()) {

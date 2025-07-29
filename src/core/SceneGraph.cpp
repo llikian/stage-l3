@@ -11,21 +11,31 @@
 #include "imgui.h"
 
 SceneGraph::SceneGraph()
-    : flat_shader_index(INVALID_INDEX), are_AABBs_drawn(false), selected_node(INVALID_INDEX) {
+    : flat_shader_index(INVALID_INDEX),
+      are_AABBs_drawn(false),
+      selected_node(INVALID_INDEX),
+      last_nodes_count(0) {
     add_simple_node("Scene Graph", INVALID_INDEX);
 
-    // frustum_culling_comp.create({"shaders/compute/frustum_culling.comp"}, "Frustum Culling");
-    //
-    // glGenBuffers(1, &AABBs_buffer);
-    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, AABBs_buffer);
-    // glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(AABB) * AABBs.size(), AABBs.data(), GL_STATIC_READ);
+    frustum_culling_comp.create({ "shaders/compute/frustum_culling.comp" }, "Frustum Culling");
+
+    glGenBuffers(1, &AABBs_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, AABBs_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(AABB) * AABBs.size(), AABBs.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, AABBs_buffer);
+
+    glGenBuffers(1, &result_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, result_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * is_in_frustum.size(), is_in_frustum.data(), GL_DYNAMIC_READ);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, result_buffer);
 }
 
 SceneGraph::~SceneGraph() {
     for(Scene& scene : scenes) {
         scene.free();
     }
-    // glDeleteBuffers(1, &AABBs_buffer);
+    glDeleteBuffers(1, &AABBs_buffer);
+    glDeleteBuffers(1, &result_buffer);
 }
 
 Node& SceneGraph::operator[](unsigned int node_index) { return nodes[node_index]; }
@@ -34,13 +44,40 @@ void SceneGraph::draw(const Frustum& frustum) {
     total_drawn_objects = 0;
 
     update_transform_and_children();
+
     update_AABBs();
+
+    frustum_culling_comp.use();
+    frustum_culling_comp.set_uniform("u_view_projection", frustum.view_projection);
+
+    if(last_nodes_count != nodes.size()) {
+        // Reallocate buffers with the new sizes.
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, AABBs_buffer);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(AABB) * AABBs.size(), AABBs.data(), GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, AABBs_buffer);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, result_buffer);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * is_in_frustum.size(), is_in_frustum.data(),
+                     GL_DYNAMIC_READ);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, result_buffer);
+
+        last_nodes_count = nodes.size();
+    }
+
+    glDispatchCompute((AABBs.size() + 63) / 64, 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, result_buffer);
+    int* results = static_cast<int*>(glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY));
+    for(unsigned int i = 0 ; i < is_in_frustum.size() ; ++i) { is_in_frustum[i] = results[i]; }
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glUseProgram(0);
+
     draw(frustum, 0);
 }
 
 unsigned int SceneGraph::add_simple_node(const std::string& name, unsigned int parent) {
-    unsigned int index = add_node(name, parent, Node::Type::SIMPLE);
-    return index;
+    return add_node(name, parent, Node::Type::SIMPLE);
 }
 
 unsigned int SceneGraph::add_mesh_node(const std::string& name,
@@ -202,7 +239,8 @@ void SceneGraph::draw(const Frustum& frustum, unsigned int node_index) {
 
     if(!node.is_visible) { return; }
 
-    if(AABBs[node_index].is_in_frustum(frustum)) {
+    // if(AABBs[node_index].is_in_frustum(frustum)) {
+    if(is_in_frustum[node_index]) {
         if(node.drawable_index != INVALID_INDEX) {
             ++total_drawn_objects;
             const Shader* shader = shaders[node.shader_index];
@@ -334,6 +372,7 @@ unsigned int SceneGraph::add_node(const std::string& name, unsigned int parent, 
     nodes.emplace_back(name, parent, type);
     transforms.emplace_back();
     AABBs.emplace_back();
+    is_in_frustum.push_back(false);
 
     unsigned int index = nodes.size() - 1;
     if(parent != INVALID_INDEX) { nodes[parent].children.push_back(index); }

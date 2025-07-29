@@ -51,6 +51,7 @@ struct SceneGraph {
     std::vector<Node> nodes; ///< The scene graph's nodes. The root is always at index 0.
     std::vector<Transform> transforms;
     std::vector<AABB> AABBs;
+    std::vector<int> is_in_frustum;
 
     unsigned int flat_shader_index;
 
@@ -65,10 +66,9 @@ struct SceneGraph {
     bool are_AABBs_drawn;
     unsigned int total_drawn_objects;
 
-    // Shader frustum_culling_comp;
-    // unsigned int AABBs_buffer;
-    // unsigned int models_buffer;
-    // unsigned int result_buffer;
+    Shader frustum_culling_comp;
+    unsigned int AABBs_buffer;
+    unsigned int result_buffer;
 
 private:
     void draw(const Frustum& frustum, unsigned int node_index);
@@ -83,4 +83,6 @@ private:
     void add_node_to_imgui_node_tree(unsigned int node_index);
 
     unsigned int selected_node;
+
+    unsigned int last_nodes_count;
 };
