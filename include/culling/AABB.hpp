@@ -32,6 +32,6 @@ struct AABB {
     void set(const vec3& min, const vec3& max);
     void set(const AABB& aabb, const Transform& transform);
 
-    vec3 min_point;
-    vec3 max_point;
+    vec4 min_point;
+    vec4 max_point;
 };

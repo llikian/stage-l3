@@ -48,7 +48,9 @@ bool AABB::is_in_frustum(const Frustum& frustum) const {
 }
 
 mat4 AABB::get_global_model_matrix() const {
-    vec3 center = 0.5f * (min_point + max_point);
+    vec3 center(0.5f * (min_point.x + max_point.x),
+                0.5f * (min_point.y + max_point.y),
+                0.5f * (min_point.z + max_point.z));
 
     return mat4(
         max_point.x - center.x, 0.0f, 0.0f, center.x,
@@ -59,8 +61,8 @@ mat4 AABB::get_global_model_matrix() const {
 }
 
 void AABB::set(const vec3& min, const vec3& max) {
-    min_point = min;
-    max_point = max;
+    min_point = vec4(min, 1.0f);
+    max_point = vec4(max, 1.0f);
 }
 
 void AABB::set(const AABB& aabb, const Transform& transform) {
