@@ -140,20 +140,20 @@ void Application::run() {
 
         std::string name = "Frustum Test Mesh ";
 
-        for(unsigned int i = 0 ; i < 1 ; ++i) {
+        for(unsigned int i = 0 ; i < 10'000 ; ++i) {
             unsigned int index = scene_graph.add_flat_shaded_mesh_node(name + std::to_string(i),
                                                                        frustum_tests_root,
                                                                        mesh_index,
                                                                        vec4(1.0f));
 
-            scene_graph.transforms[index].set_local_position(Random::get_vec3(-50.0f, 50.0f));
+            scene_graph.transforms[index].set_local_position(Random::get_vec3(-500.0f, 500.0f));
             scene_graph.transforms[index].set_local_scale(Random::get_vec3(1.0f, 5.0f));
         }
     }
 
     /* Other Entities */
-    // unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
-    // scene_graph.transforms[sponza].set_local_scale(20.0f);
+    unsigned int sponza = scene_graph.add_scene_node("sponza", 0, "data/gltf/sponza/Sponza.gltf");
+    scene_graph.transforms[sponza].set_local_scale(20.0f);
 
     // unsigned int buggy = scene_graph.add_scene_node(
     //     "buggy", 0, "/home/llikian/Downloads/stage/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf");

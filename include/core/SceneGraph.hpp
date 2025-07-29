@@ -21,12 +21,9 @@ struct SceneGraph {
     SceneGraph();
     ~SceneGraph();
 
-    void draw(const Frustum& frustum);
-
-    void update_transform_and_children(unsigned int node_index = 0);
-    void force_update_transform_and_children(unsigned int node_index = 0);
-
     Node& operator[](unsigned int node_index);
+
+    void draw(const Frustum& frustum);
 
     unsigned int add_simple_node(ADD_NODE_PARAMETERS);
     unsigned int add_mesh_node(ADD_NODE_PARAMETERS,
@@ -74,12 +71,14 @@ struct SceneGraph {
     // unsigned int result_buffer;
 
 private:
-    unsigned int add_node(ADD_NODE_PARAMETERS, Node::Type type);
-
     void draw(const Frustum& frustum, unsigned int node_index);
     void draw(const mat4& view_projection, const Shader* shader, unsigned int node_index) const;
 
-    void init_aabb(unsigned int node_index, Node::Type type);
+    void update_transform_and_children(unsigned int node_index = 0);
+    void force_update_transform_and_children(unsigned int node_index = 0);
+    void update_AABBs(unsigned int node_index = 0);
+
+    unsigned int add_node(ADD_NODE_PARAMETERS, Node::Type type);
 
     void add_node_to_imgui_node_tree(unsigned int node_index);
 
